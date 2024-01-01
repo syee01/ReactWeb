@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@400;700&display=swap');
+
+body{
+  font-family: 'Roboto Serif', serif;
+}
+
 .login-container {
     display: flex;
     min-height: 100vh;
@@ -13,7 +19,12 @@
     padding: 2rem;
     color: white;
   }
-  
+
+  .welcome-section h2,
+  .welcome-section h1{
+    font-weight:bold;
+  }
+
   .logo {
     max-width: 150px;
     margin-bottom: 20px;
@@ -37,6 +48,7 @@
     text-align: center;
     margin-bottom: 2rem;
     color: #439262;
+    font-weight: bold;
   }
   
   .login-content form {
@@ -75,7 +87,9 @@
   }
   
   .login-content button:hover {
-    background-color: #00695c; /* Darker green on hover */
+    background-color: #ffffff; 
+    border: 1px solid #00695c;
+    color: #00695c;
   }
   
   .profile-icon {
@@ -92,18 +106,19 @@
 }
 
 .input-group input {
-    width: 100%; /* Full width */
+    width: 90%; /* Full width */
     border: none; /* Remove border */
     border-bottom: 1px solid #439262; /* Just a bottom border */
-    padding: 10px 0; /* Some padding top and bottom */
+    padding-top: 20px 0; /* Some padding top and bottom */
     outline: none; /* Remove the outline */
+    transform: translateX(10%);
 }
 
 .input-group .input-icon {
     position: absolute;
-    left: -30px; /* Position the icon to the left of the input field */
+    left: -10px; /* Position the icon to the left of the input field */
     top: 50%; /* Center vertically */
-    transform: translateY(0%); /* Center vertically */
+    transform: translateY(-50%); /* Center vertically */
     color: #439262;
 }
 

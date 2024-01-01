@@ -37,7 +37,7 @@ function Login(){
                     if(res.data === "Success") {                        
                         navigate('/Home');                    
                     } else {                        
-                        alert("No record existed");                    
+                      setBackendError(["Email is not registered"]);               
                     }                
                 }                            
             })            
@@ -57,7 +57,7 @@ function Login(){
             <h2>Login</h2>
             <img src={profile} alt="Profile Icon" className="profile-icon" /> {/* Profile Icon */}
             {backendError ? backendError.map(e => (
-              <p className='text-danger'>{e.msg}</p>
+              <p className='error'>{e.msg}</p>
             )) : <span></span>}
             <form onSubmit={handleSubmit}>
               {/* email input */}
@@ -67,6 +67,9 @@ function Login(){
               <input type="email" id="email" name="email"
                 onChange={handleInput} value={values.email} />
               {errors.email && <p className="error">{errors.email}</p>}
+              {backendError.length > 0 && backendError.map((error, index) => (
+                    <p key={index} className='error'>{error}</p>
+                ))}
               </div>
               {/* password input */}
               <div className="input-group">

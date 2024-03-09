@@ -1,90 +1,102 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../UserContext'; // Make sure this path is correct
 import Validation from "./LoginValidation";
 import axios from 'axios';
-import '../cssFolder/login.css'
-import logo from '../images/logo.png'
-import profile from '../images/profile.png'
-import {FaEnvelope,FaLock} from 'react-icons/fa'
+import '../cssFolder/login.css';
+import logo from '../images/logo.png';
+import profile from '../images/profile.png';
+import {FaEnvelope, FaLock} from 'react-icons/fa';
 
-// get the email and password entered
-function Login(){
-    const[values,setValues] = useState({
-        email:'',
-        password:''
-    })
-    const navigate = useNavigate()
-    const handleInput = (event) =>{
-        setValues(prev => ({...prev,[event.target.name]:[event.target.value]}))
-    }
+function Login() {
+    const [values, setValues] = useState({
+        email: '',
+        password: ''
+    });
+    const navigate = useNavigate();
+    const { setUser } = useUser();
+    const [errors, setErrors] = useState({});
+    const [backendError, setBackendError] = useState([]);
 
-    // Input Validation
-    const [errors,setErrors] = useState({})
-    const [backendError, setBackendError] = useState([])
+    const handleInput = (event) => {
+        setValues({
+            ...values,
+            [event.target.name]: event.target.value
+        });
+    };
 
-    // Submit Action
-    const handleSubmit = (event) =>{
+    const handleSubmit = (event) => {
         event.preventDefault();
-        const err = Validation(values);  
-        setErrors(err); 
-        if(err.email === "" && err.password === "") { 
+        const validationErrors = Validation(values);
+        setErrors(validationErrors);
+        
+        // Proceed if there are no validation errors
+        if (Object.keys(validationErrors).length === 0) {
             axios.post('http://localhost:8085/login', values)
-            .then(res => {                
-                if(res.data.errors) {                   
-                    setBackendError(res.data.errors);
-                } else {                    
-                    setBackendError([]);                    
-                    if(res.data === "Success") {                        
-                        navigate('/Home');                    
-                    } else {                        
-                      setBackendError(["Email is not registered"]);               
-                    }                
-                }                            
-            })            
-            .catch(err => console.log(err));        
-        }   
-    }
+            .then(res => {
+                if (res.data === "Success") {
+                    // Set user information upon successful login
+                    setUser({ username: values.email }); // Adjust based on the actual data you'd store
+                    
+                    // Navigate to the home page
+                    navigate('/home');
+                } else {
+                    // Handle different or more specific backend errors as needed
+                    setBackendError(["Invalid email or password"]); // Simplified for demonstration
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                setBackendError(["An error occurred during login"]);
+            });
+        }
+    };
 
     return (
-      <div className="login-container">
-        <div className="welcome-section">
-          <h1>Welcome Back</h1>
-          <img src={logo} alt="myHalal Checker Logo" className="logo" />
-          <h2>myHalal Checker</h2>
+        <div className="login-container">
+            <div className="welcome-section">
+                <h1>Welcome Back</h1>
+                <img src={logo} alt="myHalal Checker Logo" className="logo" />
+                <h2>myHalal Checker</h2>
+            </div>
+            <div className="login-section">
+                <div className="login-content">
+                    <h2>Login</h2>
+                    <img src={profile} alt="Profile Icon" className="profile-icon" />
+                    {backendError.length > 0 && backendError.map((error, index) => (
+                        <p key={index} className="error">{error}</p>
+                    ))}
+                    <form onSubmit={handleSubmit}>
+                        <div className="input-group">
+                            <FaEnvelope className="input-icon" />
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="Email"
+                                onChange={handleInput}
+                                value={values.email}
+                            />
+                            {errors.email && <p className="error">{errors.email}</p>}
+                        </div>
+                        <div className="input-group">
+                            <FaLock className="input-icon" />
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Password"
+                                onChange={handleInput}
+                                value={values.password}
+                            />
+                            {errors.password && <p className="error">{errors.password}</p>}
+                        </div>
+                        <button type="submit" className="login-btn">Log in</button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div className="login-section">
-          <div className="login-content">
-            <h2>Login</h2>
-            <img src={profile} alt="Profile Icon" className="profile-icon" /> {/* Profile Icon */}
-            {backendError ? backendError.map(e => (
-              <p className='error'>{e.msg}</p>
-            )) : <span></span>}
-            <form onSubmit={handleSubmit}>
-              {/* email input */}
-              <div className="input-group">
-              <FaEnvelope className="input-icon" />
-              {/* <label htmlFor="email">Email</label> */}
-              <input type="email" id="email" name="email"
-                onChange={handleInput} value={values.email} />
-              {errors.email && <p className="error">{errors.email}</p>}
-              {backendError.length > 0 && backendError.map((error, index) => (
-                    <p key={index} className='error'>{error}</p>
-                ))}
-              </div>
-              {/* password input */}
-              <div className="input-group">
-              <FaLock className="input-icon" />
-              {/* <label htmlFor="password">Password</label> */}
-              <input type="password" id="password" name="password"
-                onChange={handleInput} value={values.password} />
-              {errors.password && <p className="error">{errors.password}</p>}
-              </div>
-              {/* Log in Button */}
-              <button type="submit">Log in</button>
-            </form>
-          </div>
-        </div>
-      </div>
     );
 }
-export default Login
+
+export default Login;

@@ -1,0 +1,31 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* background-color: #333; */
+    color: #0F7C5D;
+    padding: 0.05px 10px; /* Adjusted padding for reducing space inside the navbar */
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2);
+}
+
+.navbar .links a {
+    color: #0F7C5D;
+    padding: 0 10px; /* Reduced right padding for links */
+    text-decoration: none;
+    margin-right: 10px; /* Reduced space between links */
+}
+
+.navbar h4 {
+    margin-left: 10px; /* Reduced left margin for the title/h1 */
+    margin-right: 10px; /* Ensures some space between the h1 and the first link if they're adjacent */
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.navbar .links a:hover {
+    text-decoration: underline;
+}
+
+.logonav {
+    max-width: 100px;
+}

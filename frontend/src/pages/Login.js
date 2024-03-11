@@ -26,30 +26,38 @@ function Login() {
     };
 
     const handleSubmit = (event) => {
+        console.log(values)
         event.preventDefault();
         const validationErrors = Validation(values);
+        console.log(validationErrors);
         setErrors(validationErrors);
+        console.log(Object.keys(validationErrors).length)
         
         // Proceed if there are no validation errors
-        if (Object.keys(validationErrors).length === 0) {
+        if (Object.keys(validationErrors).length === 2) {
+            console.log('here')
             axios.post('http://localhost:8085/login', values)
             .then(res => {
-                if (res.data === "Success") {
+                console.log(res.data);
+                if (res.data.status === "Success") {
                     // Set user information upon successful login
-                    setUser({ username: values.email }); // Adjust based on the actual data you'd store
+                    console.log(res.data.username); // Now you have the username
+                    setUser({ username: res.data.username }); // Use the returned username
                     
                     // Navigate to the home page
                     navigate('/home');
                 } else {
                     // Handle different or more specific backend errors as needed
-                    setBackendError(["Invalid email or password"]); // Simplified for demonstration
+                    setBackendError([res.data.message || "Invalid email or password"]); // Use the error message from the backend
                 }
             })
+            
             .catch(err => {
                 console.error('Error:', err);
                 setBackendError(["An error occurred during login"]);
             });
         }
+        console.log('here')
     };
 
     return (

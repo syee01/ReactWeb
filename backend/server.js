@@ -16,27 +16,25 @@ const db = mysql.createConnection({
 })
 
 // write login error 
-app.post('/login',[ check('email', "Emaill length error").isEmail().isLength({min: 10, max:30}),    
-check('password', "password length 8-10").isLength({min: 1, max: 10})], 
-(req, res) => {    const sql = "SELECT * FROM user WHERE email = ? AND password = ?";    
-// get login result (successful or failed)
-db.query(sql, [req.body.email,req.body.password ], 
-    (err, data) => {
-        const errors = validationResult(req);       
-        if(!errors.isEmpty()) {           
-             return res.json(errors);        
-        } else {            
-            if(err) {  
-                console.log(err)              
-                return res.json("Error");            
-            }            
-            if(data.length > 0) {               
-                 return res.json("Success");            
-            } 
-            else {               
-                 return res.json("Failed");            
-            }        
-        }            
-    })})
+app.post('/login', [check('email', "Email length error").isEmail().isLength({ min: 10, max: 30 }), check('password', "password length 8-10").isLength({ min: 1, max: 10 })], (req, res) => {
+    const sql = "SELECT * FROM user WHERE email = ? AND password = ?";
+    db.query(sql, [req.body.email, req.body.password], (err, data) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.json({ status: "Failed", errors: errors.array() });
+        } else {
+            if (err) {
+                return res.json({ status: "Error", message: "An error occurred" });
+            }
+            if (data.length > 0) {
+                // Assuming 'username' is a field in your user table
+                return res.json({ status: "Success", username: data[0].username });
+            } else {
+                return res.json({ status: "Failed", message: "Invalid email or password" });
+            }
+        }
+    });
+});
+
     
 app.listen(8085, ()=> {console.log("listening");})

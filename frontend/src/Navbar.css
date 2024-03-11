@@ -1,31 +1,84 @@
 .navbar {
-    display: flex;
+    /* display: flex; */
     justify-content: space-between;
     align-items: center;
-    /* background-color: #333; */
-    color: #0F7C5D;
-    padding: 0.05px 10px; /* Adjusted padding for reducing space inside the navbar */
+    padding: 0 10px;
     box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2);
-}
-
-.navbar .links a {
     color: #0F7C5D;
-    padding: 0 10px; /* Reduced right padding for links */
-    text-decoration: none;
-    margin-right: 10px; /* Reduced space between links */
+    background-color: #FFF; /* Or any desired background color */
 }
 
 .navbar h4 {
-    margin-left: 10px; /* Reduced left margin for the title/h1 */
-    margin-right: 10px; /* Ensures some space between the h1 and the first link if they're adjacent */
-    margin-top: 15px;
-    margin-bottom: 15px;
+    margin: 0;
+    padding-left: 20px;
+    /* flex-shrink: 0; */
 }
 
-.navbar .links a:hover {
+.navbar .links {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+.navbar .links a, 
+.navbar .links .user-menu {
+    color: #0F7C5D;
+    padding: 10px 15px; /* Adjust the padding to control space around the links */
+    text-decoration: none;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.navbar .links a:hover,
+.navbar .links .user-menu:hover {
     text-decoration: underline;
 }
 
-.logonav {
-    max-width: 100px;
+.user-menu {
+    position: relative;
+    cursor: pointer;
+}
+
+.dropdown {
+    display: none; /* Hide the dropdown initially */
+    position: fixed; /* Position it relative to the viewport */
+    top: 20px; 
+    right: 10px; /* Adjust based on your layout/design */
+    background-color: white;
+    border: 1px solid #ccc;
+    z-index: 2; /* Lower z-index than navbar so it goes underneath */
+    padding: 10px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    min-width: 120px;
+}
+
+.user-menu:hover .dropdown {
+    display:block;
+}
+
+.dropdown a, 
+.dropdown button {
+    display: block;
+    padding: 8px 0; /* This gives the dropdown items padding */
+    color: #0F7C5D;
+    text-align: left;
+    border: none;
+    background: none;
+    width: 100%;
+}
+
+.dropdown button {
+    cursor: pointer;
+}
+
+/* Adjust the dropdown link styling */
+.dropdown a {
+    text-decoration: none;
+    color: #0F7C5D; /* Keep the text color consistent with the navbar */
+    padding: 8px 0;
+}
+
+.dropdown a:hover {
+    text-decoration: underline;
 }

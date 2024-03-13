@@ -1,0 +1,73 @@
+/* Data.css */
+
+.data-component {
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Tab styles */
+  .tabs {
+    display: flex;
+    /* justify-content: center; */
+    margin-top: 30px;
+    margin-left: 30px;
+    margin-bottom: 30px;
+  }
+  
+  .tab {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: 2px solid #ccc;
+    border-radius: 15px;
+    background: none;
+    cursor: pointer;
+    outline: none;
+    font-size: 16px;
+  }
+  
+  .tab.selected {
+    border-color: #007bff;
+    color: #007bff;
+  }
+  
+  /* Category styles */
+  .categories {
+    display: flex;
+    /* justify-content: center; */
+    margin-bottom: 20px;
+    margin-left: 30px;
+  }
+  
+  .category {
+    padding: 5px 10px;
+    margin: 0 5px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    outline: none;
+    font-size: 16px;
+  }
+  
+  .category.selected {
+    border-bottom-color: #000;
+  }
+  
+  /* Add New Data button styles */
+  .add-new-data {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .add-data-button {
+    padding: 10px 20px;
+    border: 2px dashed #ccc;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .add-data-button:hover {
+    border-style: solid;
+  }
+  

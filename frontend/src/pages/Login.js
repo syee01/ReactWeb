@@ -35,7 +35,6 @@ function Login() {
         
         // Proceed if there are no validation errors
         if (Object.keys(validationErrors).length === 2) {
-            console.log('here')
             axios.post('http://localhost:8085/login', values)
             .then(res => {
                 console.log(res.data);

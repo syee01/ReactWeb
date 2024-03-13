@@ -36,5 +36,20 @@ app.post('/login', [check('email', "Email length error").isEmail().isLength({ mi
     });
 });
 
+app.get('/masproduct', (req, res) => {
+    // Assuming you have a database connection setup with a query function
+    const sql = 'SELECT * FROM malaysiaproduct'; // Selects all products
+    db.query(sql, (err, results) => {
+      if (err) {
+        // Handle error
+        console.log('here')
+        console.error(err);
+        res.status(500).json({ message: 'Error retrieving products' });
+      } else {
+        res.json(results);
+      }
+    });
+  });
+  
     
 app.listen(8085, ()=> {console.log("listening");})

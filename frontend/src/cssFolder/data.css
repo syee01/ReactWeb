@@ -2,6 +2,11 @@
 
 .data-component {
     font-family: Arial, sans-serif;
+    max-width: 95%;
+    margin: 20px auto;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
   }
   
   /* Tab styles */
@@ -70,4 +75,69 @@
   .add-data-button:hover {
     border-style: solid;
   }
+
+  .content {
+    overflow-x: auto;
+  }
   
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .add-new-data {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .add-data-button {
+    padding: 10px 20px;
+    border: 2px dashed #ccc;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+  
+  .add-data-button:hover {
+    border-style: solid;
+  }
+  
+  /* Style for the filter input */
+  .filter-input {
+    font-size: 16px;
+    padding: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .scrollable-table-container {
+    max-height: 250px; 
+    overflow-y: auto; 
+    overflow-x: auto; /* Hides the horizontal scrollbar */
+  }
+  
+  /* Style for the table and its cells */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto; /* Adjust column widths based on content */
+  }
+  
+  th, td {
+    padding: 8px; /* Adjust padding as needed */
+    border: 1px solid #ddd; /* Border for cells */
+    text-align: left;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  /* Define column widths */
+  th:nth-child(1), td:nth-child(1) { width: 10%; }
+  th:nth-child(2), td:nth-child(2) { width: 5%; }
+  th:nth-child(3), td:nth-child(3) { width: 5%; }
+  th:nth-child(4), td:nth-child(4) { width: 10%; }

@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Data from './pages/Data'
 import Home from './pages/Home';
 import { UserProvider } from './UserContext'; // Ensure this is correctly imported
+import EditProductPage from './pages/EditProductPage';
 
 // Create a component to conditionally render the Navbar
 const LayoutWithConditionalNavbar = () => {
@@ -17,6 +18,7 @@ const LayoutWithConditionalNavbar = () => {
         <Route path='/' element={<Login />} />
         <Route path='/home' element={<Home />} />
         <Route path='/data' element={<Data />} />
+        <Route path="/editProduct/:productId" element={<EditProductPage />} />
       </Routes>
     </>
   );

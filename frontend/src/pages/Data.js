@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../cssFolder/data.css';
+import { useNavigate } from 'react-router-dom';
+
 
 const Tab = ({ name, isSelected, onClick }) => (
     <button
@@ -19,15 +21,32 @@ const Tab = ({ name, isSelected, onClick }) => (
       {name}
     </button>
   );
-  
+
+
 const Data = () => {
   const [selectedCountry, setSelectedCountry] = useState('MALAYSIA');
   const [selectedCategory, setSelectedCategory] = useState('Products');
   const [products, setProducts] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
-  const [isEditing, setIsEditing] = useState(null);
   const [filter, setFilter] = useState('');
   const [visibleRows, setVisibleRows] = useState(5);
+  const [filterBy, setFilterBy] = useState('name');
+  const [statusFilter, setStatusFilter] = useState(''); // Possible values: '', 'Active', 'Expired'
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const navigate = useNavigate();
+
+  const handleEdit = (productId) => {
+    console.log(productId)
+    // Navigate to the edit page with the productId as a URL param
+    navigate(`/editProduct/${productId}`);
+  };
+
+  const handleSave = (product) => {
+    console.log('Saving product', product);
+    setIsModalOpen(false);
+    // Here you would send the update to your backend
+  };
 
   const countries = ['MALAYSIA', 'THAILAND', 'KOREA'];
   const categories = ['Products', 'Restaurants', 'Mosques', 'Prayer Room'];
@@ -70,10 +89,40 @@ const Data = () => {
   const handleFilterChange = (e) => {
     setFilter(e.target.value.toLowerCase());
   };
+  
+  const getStatus = (dateString) => {
+    if (!dateString) return 'Unknown'; // Handle undefined or null dates
+  
+    const today = new Date();
+    const expiredDate = new Date(dateString.split('T')[0]); // dateString is expected to be in ISO format
+  
+    return expiredDate < today ? 'Expired' : 'Active';
+  };
 
+  const filteredProducts = products.filter((product) => {
+    // Match by name or brand, according to the filterBy state
+    const matchesFilter = filterBy === 'name'
+      ? product.name.toLowerCase().includes(filter)
+      : product.brand.toLowerCase().includes(filter);
+  
+    // If the selected country is Korea, return the product if it matches the name/brand filter
+    // without considering the status filter.
+    if (selectedCountry === 'KOREA') {
+      return matchesFilter;
+    }
+  
+    // For other countries, apply the status filter if specified.
+    if (statusFilter === 'Active' || statusFilter === 'Expired') {
+      const status = getStatus(product.date);
+      return matchesFilter && status === statusFilter;
+    }
+  
+    // If no status filter is set, just return based on the name/brand match.
+    return matchesFilter;
+  });
 
   useEffect(() => {
-    setVisibleRows(5);
+    setVisibleRows(10);
   }, [products]);
 
   const handleScroll = (e) => {
@@ -83,16 +132,7 @@ const Data = () => {
     }
   };
 
-  // Filter products based on the filter state
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(filter) ||
-    product.brand.toLowerCase().includes(filter) ||
-    product.id.toString().toLowerCase().includes(filter)
-  );
-
   const displayedProducts = filteredProducts.slice(0, visibleRows);
-
-
 
   return (
     <div>
@@ -118,13 +158,23 @@ const Data = () => {
 
     </div>
     <div className="data-component">
-    <input
-      type="text"
-      placeholder="Type to filter..."
-      className="filter-input"
-      value={filter}
-      onChange={handleFilterChange}
-    />
+    <div className="filter-controls">
+        <select
+          value={filterBy}
+          onChange={(e) => setFilterBy(e.target.value)}
+          className="filter-type-selector"
+        >
+          <option value="name">Name</option>
+          <option value="brand">Brand</option>
+        </select>
+        <input
+          type="text"
+          placeholder="Type to search..."
+          className="filter-input"
+          value={filter}
+          onChange={handleFilterChange}
+        />
+      </div>
       <div className="content">
         {isFetching ? (
           <p>Loading...</p>
@@ -132,24 +182,51 @@ const Data = () => {
           <div className="scrollable-table-container"
           onScroll={handleScroll} >
           <table>
-            <thead>
-              <tr>
-              <th>ID</th>
-              {selectedCountry !== 'KOREA' && <th>Expired Date</th>}
-              <th>Brand</th>
-              <th>Name</th>
-              </tr>
-            </thead>
-            <tbody className="table-scroll">
-                {filteredProducts.map((product) => (
-                    <tr key={product.id}>
-                    <td>{product.productID}</td>
-                    {selectedCountry !== 'KOREA' && <td>{product.date.split('T')[0]}</td>}
-                    <td>{product.brand}</td>
-                    <td>{product.name}</td>
-                    </tr>
-                ))}
-            </tbody>
+          <thead>
+          <tr>
+            <th>ID</th>
+            {selectedCountry !== 'KOREA' && <th>Expired Date</th>}
+            <th>Brand</th>
+            <th>Name</th>
+            {selectedCountry !== 'KOREA' && (
+              <th>
+                Status
+              <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="status-selector"
+              style={{ marginLeft: '10px' }}
+              disabled={selectedCountry === 'KOREA'} // Disable the dropdown for Korea
+            >
+              <option value="">All</option>
+              <option value="Active">Active</option>
+              <option value="Expired">Expired</option>
+            </select>
+              </th>
+            )}
+            <th>Edit</th> 
+          </tr>
+        </thead>
+        <tbody className="table-scroll">
+        {displayedProducts.map((product) => (
+          <tr key={product.productID}>
+            <td>{product.productID}</td>
+            {selectedCountry !== 'KOREA' && (
+              <td>{product.date ? product.date.split('T')[0] : 'N/A'}</td>
+            )}
+            <td>{product.brand}</td>
+            <td>{product.name}</td>
+            {selectedCountry !== 'KOREA' && (
+              <td>{product.date ? getStatus(product.date) : 'Unknown'}</td>
+            )}
+            <td>
+            <button onClick={() => handleEdit(product.productID)} className="edit-button">
+            Edit
+          </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
           </table>
           </div>
         ) : null}
@@ -159,6 +236,7 @@ const Data = () => {
         {/* <button className="add-data-button">Add New Data +</button> */}
       </div>
     </div>
+
     </div>
   );
 };

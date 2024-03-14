@@ -80,6 +80,54 @@ app.get('/masproduct', (req, res) => {
       }
     });
   });
+
+  app.get('/masproduct/:id', (req, res) => {
+    const productId = req.params.id; // Get the product ID from the route parameter
+    const sql = 'SELECT * FROM malaysiaproduct WHERE productID = ?'; // SQL query to select the product by ID
+    db.query(sql, [productId], (err, results) => {
+        if (err) {
+            // Handle error
+            console.error(err);
+            res.status(500).json({ message: 'Error retrieving product' });
+        } else {
+            if (results.length > 0) {
+                res.json(results[0]); // Send back the found product
+            } else {
+                res.status(404).json({ message: 'Product not found' }); // No product found for the given ID
+            }
+        }
+    });
+});
+
+// app.put to handle update requests
+app.put('/masproduct/:id', (req, res) => {
+  // Extract the product ID from the URL path
+  const productId = req.params.id;
+  // Extract updated data from the request body
+  const { name, brand, date } = req.body;
+
+  // Construct the SQL query for updating the product information
+  const sql = `UPDATE malaysiaproduct SET name = ?, brand = ?, date = ? WHERE productID = ?`;
+
+  // Execute the query with the provided data
+  db.query(sql, [name, brand, date, productId], (err, result) => {
+    if (err) {
+      // If an error occurs, log it and return a server error response
+      console.error('Error updating product:', err);
+      res.status(500).json({ message: 'Error updating product' });
+    } else {
+      // If the update is successful, return a success response
+      // result.affectedRows checks how many rows were affected. If no rows were affected, it means the product was not found
+      if (result.affectedRows > 0) {
+        res.json({ message: 'Product updated successfully' });
+      } else {
+        res.status(404).json({ message: 'Product not found' });
+      }
+    }
+  });
+});
+
+
   
     
 app.listen(8085, ()=> {console.log("listening");})

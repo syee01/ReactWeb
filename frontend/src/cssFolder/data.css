@@ -129,7 +129,7 @@
   }
   
   th, td {
-    padding: 8px; /* Adjust padding as needed */
+    padding: 8px;
     border: 1px solid #ddd; /* Border for cells */
     text-align: left;
     white-space: nowrap;
@@ -138,6 +138,6 @@
   }
   /* Define column widths */
   th:nth-child(1), td:nth-child(1) { width: 10%; }
-  th:nth-child(2), td:nth-child(2) { width: 5%; }
-  th:nth-child(3), td:nth-child(3) { width: 5%; }
+  th:nth-child(2), td:nth-child(2) { width: 8%; }
+  th:nth-child(3), td:nth-child(3) { min-width: 60px; max-width: 300px; }
   th:nth-child(4), td:nth-child(4) { width: 10%; }

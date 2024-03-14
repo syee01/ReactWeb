@@ -50,6 +50,36 @@ app.get('/masproduct', (req, res) => {
       }
     });
   });
+
+  app.get('/thaiproduct', (req, res) => {
+    // Assuming you have a database connection setup with a query function
+    const sql = 'SELECT * FROM thailandproduct'; // Selects all products
+    db.query(sql, (err, results) => {
+      if (err) {
+        // Handle error
+        console.log('here')
+        console.error(err);
+        res.status(500).json({ message: 'Error retrieving products' });
+      } else {
+        res.json(results);
+      }
+    });
+  });
+
+  app.get('/krproduct', (req, res) => {
+    // Assuming you have a database connection setup with a query function
+    const sql = 'SELECT * FROM koreaproduct'; // Selects all products
+    db.query(sql, (err, results) => {
+      if (err) {
+        // Handle error
+        console.log('here')
+        console.error(err);
+        res.status(500).json({ message: 'Error retrieving products' });
+      } else {
+        res.json(results);
+      }
+    });
+  });
   
     
 app.listen(8085, ()=> {console.log("listening");})

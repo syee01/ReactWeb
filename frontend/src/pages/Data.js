@@ -33,7 +33,7 @@ const Data = () => {
   const categories = ['Products', 'Restaurants', 'Mosques', 'Prayer Room'];
 
   useEffect(() => {
-    if (selectedCountry === 'MALAYSIA' && selectedCategory === 'Products') {
+    if (selectedCategory === 'Products') {
       fetchProducts();
     }
   }, [selectedCountry, selectedCategory]);
@@ -42,13 +42,27 @@ const Data = () => {
   const fetchProducts = async () => {
     setIsFetching(true);
     try {
-      // Replace with your actual API endpoint
-      const response = await axios.get('http://localhost:8085/masproduct');
+      let endpoint = ''
+      // Dynamically set the endpoint based on the selected country
+      if (selectedCountry === 'THAILAND') {
+        endpoint = 'http://localhost:8085/thaiproduct'; // Example endpoint for Thai products
+      } else if (selectedCountry === 'KOREA') {
+        endpoint = 'http://localhost:8085/krproduct'; // Example endpoint for Korean products
+      } else if (selectedCountry === 'MALAYSIA') {
+        endpoint = 'http://localhost:8085/masproduct'; // Existing endpoint for Malaysian products
+      }
+  
+      const response = await axios.get(endpoint);
       setProducts(response.data);
-      console.log(response.data)
+      console.log(response.data);
     } catch (error) {
       console.error('Error fetching products:', error);
-      console.log(error.response.data)
+      // Handle error based on error.response.data if available
+      if (error.response && error.response.data) {
+        console.log(error.response.data);
+      } else {
+        console.log('Error fetching data');
+      }
     }
     setIsFetching(false);
   };
@@ -114,14 +128,14 @@ const Data = () => {
       <div className="content">
         {isFetching ? (
           <p>Loading...</p>
-        ) : selectedCountry === 'MALAYSIA' && selectedCategory === 'Products' ? (
+        ) : selectedCategory === 'Products' ? (
           <div className="scrollable-table-container"
           onScroll={handleScroll} >
           <table>
             <thead>
               <tr>
-              <th>Product ID</th>
-              <th>Expired Date</th>
+              <th>ID</th>
+              {selectedCountry !== 'KOREA' && <th>Expired Date</th>}
               <th>Brand</th>
               <th>Name</th>
               </tr>
@@ -130,7 +144,7 @@ const Data = () => {
                 {filteredProducts.map((product) => (
                     <tr key={product.id}>
                     <td>{product.productID}</td>
-                    <td>{product.date}</td>
+                    {selectedCountry !== 'KOREA' && <td>{product.date.split('T')[0]}</td>}
                     <td>{product.brand}</td>
                     <td>{product.name}</td>
                     </tr>

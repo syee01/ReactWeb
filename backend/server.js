@@ -1,11 +1,25 @@
 const express = require("express");
-const mysql = require ('mysql');
-const cors = require('cors');
-const { check, validationResult } = require('express-validator');
+const mysql = require("mysql");
+const cors = require("cors");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Multer setup for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+      cb(null, 'uploads/')
+  },
+  filename: (req, file, cb) => {
+      cb(null, `${Date.now()}-${file.originalname}`)
+  }
+});
+const upload = multer({ storage });
+
 
 // create to mysql database
 const db = mysql.createConnection({
@@ -23,12 +37,14 @@ app.post('/login', [check('email', "Email length error").isEmail().isLength({ mi
         if (!errors.isEmpty()) {
             return res.json({ status: "Failed", errors: errors.array() });
         } else {
-            if (err) {
-                return res.json({ status: "Error", message: "An error occurred" });
-            }
+          if (err) {
+            console.error("Database error:", err);
+            return res.json({ status: "Error", message: "An error occurred", error: err.message });
+          }
+        
             if (data.length > 0) {
                 // Assuming 'username' is a field in your user table
-                return res.json({ status: "Success", username: data[0].username });
+                return res.json({ status: "Success", username: data[0].username, userID: data[0].UserID });
             } else {
                 return res.json({ status: "Failed", message: "Invalid email or password" });
             }
@@ -218,5 +234,57 @@ db.query(sql, [name, brand, productId], (err, result) => {
   }
 });
 });
-    
+
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)){
+    fs.mkdirSync(uploadsDir);
+}
+
+app.get("/userProfile/:userID", (req, res) => {
+  const { userID } = req.params;
+  const sql = "SELECT username, profilePic FROM user WHERE userID = ?";
+  db.query(sql, [userID], (err, results) => {
+      if (err) {
+          console.error("Error fetching user profile:", err);
+          return res.status(500).json({ message: "Error fetching user profile" });
+      }
+      if (results.length > 0) {
+          const { username, profilePic } = results[0];
+          res.json({ username, profilePic });
+      } else {
+          res.status(404).json({ message: "User not found" });
+      }
+  });
+});
+
+app.post("/updateUserProfile/:userID", upload.single('profilePic'), (req, res) => {
+  const { userID } = req.params;
+  const { username } = req.body;
+  const profilePic = req.file ? req.file.path : null;
+
+  let sql = "UPDATE user SET username = ?, profilePic = ? WHERE UserID = ?";
+  let values = [username, profilePic, userID];
+  
+  db.query(sql, values, (err, result) => {
+      if (err) {
+          console.error("Error updating user profile:", err);
+          return res.status(500).json({ message: "Error updating user profile" });
+      }
+      res.json({ message: "Profile updated successfully" });
+  });
+});
+
+app.put("/changeUserPassword/:userID", (req, res) => {
+  const { userID, newPassword } = req.body;
+  const sql = "UPDATE user SET password = ? WHERE UserID = ?";
+  
+  db.query(sql, [newPassword, userID], (err, result) => {
+      if (err) {
+          console.error("Error changing password:", err);
+          return res.status(500).json({ message: "Error changing password" });
+      }
+      res.json({ message: "Password updated successfully" });
+  });
+});
+
 app.listen(8085, ()=> {console.log("listening");})

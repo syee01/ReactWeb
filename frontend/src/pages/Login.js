@@ -43,6 +43,8 @@ function Login() {
                     console.log(res.data.username); // Now you have the username
                     setUser({ username: res.data.username }); // Use the returned username
                     
+                    localStorage.setItem('userID', res.data.userID); // Assuming userID is returned from the server
+                    localStorage.setItem('username', res.data.username)
                     // Navigate to the home page
                     navigate('/home');
                 } else {

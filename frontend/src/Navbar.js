@@ -9,6 +9,8 @@ const Navbar = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
+        localStorage.removeItem('UserID');
+        localStorage.removeItem('username');
         setUser(null); // Clear user context, adjust based on your context implementation
         navigate('/'); // Redirect to login page, adjust the route as needed
     };

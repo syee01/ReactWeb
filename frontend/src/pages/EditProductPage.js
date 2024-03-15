@@ -1,12 +1,13 @@
 // EditProductPage.js
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import '../cssFolder/editProduct.css';
 
 const EditProductPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [editedProduct, setEditedProduct] = useState({
     name: '',
     brand: '',
@@ -14,11 +15,27 @@ const EditProductPage = () => {
   });
   const [isFetching, setIsFetching] = useState(false);
 
+  // Function to parse query parameters
+  const searchParams = new URLSearchParams(location.search);
+  const country = searchParams.get('country'); // Get the country query parameter
+  let datacountry = '';
+  if(country==='THAILAND'){
+    datacountry='thai'
+  }
+  else if(country==='MALAYSIA'){
+    datacountry='mas'
+  }
+  else if(country==='KOREA'){
+    datacountry='kr'
+  }
+
   useEffect(() => {
+    // Fetch product using productId and country
+    // Adjust your API endpoint as necessary
     const fetchProduct = async () => {
       setIsFetching(true);
       try {
-        const response = await axios.get(`http://localhost:8085/masproduct/${productId}`);
+        const response = await axios.get(`http://localhost:8085/${datacountry}product/${productId}`);
         setEditedProduct(response.data);
       } catch (error) {
         console.error('Error fetching product:', error);
@@ -27,8 +44,8 @@ const EditProductPage = () => {
     };
 
     fetchProduct();
-  }, [productId]);
-
+  }, [productId, country]);
+  
   if (isFetching) return <div>Loading...</div>;
 
   const handleInputChange = (e) => {
@@ -40,8 +57,9 @@ const EditProductPage = () => {
     event.preventDefault(); // Prevent default form submission behavior
     try {
       console.log('Saving product', editedProduct);
-      await axios.put(`http://localhost:8085/masproduct/${editedProduct.id}`, editedProduct);
-      navigate('/home'); // Adjust the navigation route as needed
+      const productId = editedProduct.productID;
+      await axios.put(`http://localhost:8085/${datacountry}product/${productId}`, editedProduct);
+      navigate('/Data'); // Adjust the navigation route as needed
     } catch (error) {
       console.error('Error saving product:', error);
     }
@@ -78,6 +96,7 @@ const EditProductPage = () => {
             name="date"
             value={editedProduct.date ? editedProduct.date.split('T')[0] : ''}
             onChange={handleInputChange}
+            disabled={country === 'KOREA'}
           />
         </div>
         <button type="submit">Save</button>

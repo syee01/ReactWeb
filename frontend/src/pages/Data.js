@@ -36,11 +36,10 @@ const Data = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const navigate = useNavigate();
 
-  const handleEdit = (productId) => {
-    console.log(productId)
-    // Navigate to the edit page with the productId as a URL param
-    navigate(`/editProduct/${productId}`);
+  const handleEdit = (productId, country) => {
+    navigate(`/editProduct/${productId}?country=${country}`);
   };
+  
 
   const handleSave = (product) => {
     console.log('Saving product', product);
@@ -122,7 +121,7 @@ const Data = () => {
   });
 
   useEffect(() => {
-    setVisibleRows(10);
+    setVisibleRows(100);
   }, [products]);
 
   const handleScroll = (e) => {
@@ -220,9 +219,7 @@ const Data = () => {
               <td>{product.date ? getStatus(product.date) : 'Unknown'}</td>
             )}
             <td>
-            <button onClick={() => handleEdit(product.productID)} className="edit-button">
-            Edit
-          </button>
+            <button onClick={() => handleEdit(product.productID, selectedCountry)} className="edit-button">Edit</button>
             </td>
           </tr>
         ))}

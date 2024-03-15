@@ -218,6 +218,5 @@ db.query(sql, [name, brand, productId], (err, result) => {
   }
 });
 });
-  
     
 app.listen(8085, ()=> {console.log("listening");})

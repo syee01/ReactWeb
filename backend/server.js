@@ -4,10 +4,15 @@ const cors = require("cors");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const { check, validationResult } = require('express-validator');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Serving static files from "assets" directory
+const assetsDir = path.join(__dirname, 'images');
+app.use('/images', express.static(assetsDir));
 
 // Multer setup for file uploads
 const storage = multer.diskStorage({

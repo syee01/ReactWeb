@@ -80,16 +80,22 @@ const Data = () => {
   };
 
   const filteredProducts = products.filter((product) => {
+    const productName = product.name || "";
+    const productBrand = product.brand || "";
+    
     const matchesFilter = filterBy === 'name'
-      ? product.name.toLowerCase().includes(filter)
-      : product.brand.toLowerCase().includes(filter);
+      ? productName.toLowerCase().includes(filter)
+      : productBrand.toLowerCase().includes(filter);
+    
     if (selectedCountry === 'KOREA') {
       return matchesFilter;
     }
+    
     if (statusFilter === 'Active' || statusFilter === 'Expired') {
       const status = getStatus(product.date);
       return matchesFilter && status === statusFilter;
     }
+    
     return matchesFilter;
   });
 
@@ -105,6 +111,19 @@ const Data = () => {
   };
 
   const displayedProducts = filteredProducts.slice(0, visibleRows);
+
+  const getImageUrl = (country, imageURL) => {
+    switch (country) {
+      case 'MALAYSIA':
+        return `http://localhost:8085/images/malaysiaProductImage/${imageURL}`;
+      case 'KOREA':
+        return `http://localhost:8085/images/koreaProductImage/${imageURL}`;
+      case 'THAILAND':
+        return `http://localhost:8085/images/thailandProductImage/${imageURL}`;
+      default:
+        return ''; // Default case or you can put a placeholder image
+    }
+  };
 
   return (
     <div>
@@ -168,7 +187,11 @@ const Data = () => {
                         <td>{product.name}</td>
                         {selectedCountry !== 'KOREA' && <td>{product.date ? getStatus(product.date) : 'Unknown'}</td>}
                         <td>
-                          <img src={`/images/malaysiaProductImage/${product.imageURL}`} alt={product.name} style={{ width: '100px', height: 'auto' }} />
+                        <img 
+                            src={getImageUrl(selectedCountry, product.imageURL)} 
+                            alt={product.name} 
+                            style={{ width: '100px', height: 'auto' }} 
+                          />
                         </td>
                         <td>
                           <button onClick={() => handleEdit(product.productID, selectedCountry)} className="edit-button">

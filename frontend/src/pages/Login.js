@@ -5,7 +5,7 @@ import Validation from "./LoginValidation";
 import axios from 'axios';
 import '../cssFolder/login.css';
 import logo from '../images/logo.png';
-import profile from '../images/profile.png';
+import profile from '../images/profile.png'
 import {FaEnvelope, FaLock} from 'react-icons/fa';
 
 function Login() {

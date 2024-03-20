@@ -10,29 +10,46 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serving static files from "assets" directory
-const assetsDir = path.join(__dirname, 'images');
-app.use('/images', express.static(assetsDir));
-
-// Multer setup for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-      cb(null, 'uploads/')
-  },
-  filename: (req, file, cb) => {
-      cb(null, `${Date.now()}-${file.originalname}`)
-  }
-});
-const upload = multer({ storage });
-
-
 // create to mysql database
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "myhalalchecker"
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "myhalalchecker"
 })
+
+const imagesDir = path.join(__dirname, '../frontend/src/images');
+app.use('/images', express.static(imagesDir));
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const country = req.body.country;
+    let destinationDir = ''; // Default directory
+    
+    // Check the country and set the destination directory accordingly
+    if (country === 'mas') {
+      destinationDir = path.join(imagesDir, 'malaysiaProductImage');
+    } else if (country === 'thai') {
+      destinationDir = path.join(imagesDir, 'thailandProductImage');
+    } else if (country === 'kr') {
+      destinationDir = path.join(imagesDir, 'koreaProductImage');
+    }
+  
+    // Make sure the directory exists
+    if (!fs.existsSync(destinationDir)){
+      fs.mkdirSync(destinationDir, { recursive: true });
+    }
+    
+    cb(null, destinationDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
+
 
 // write login error 
 app.post('/login', [check('email', "Email length error").isEmail().isLength({ min: 10, max: 30 }), check('password', "password length 8-10").isLength({ min: 1, max: 10 })], (req, res) => {
@@ -121,30 +138,53 @@ app.get('/masproduct', (req, res) => {
 });
 
 // app.put to handle update requests
-app.put('/masproduct/:id', (req, res) => {
-  // Extract the product ID from the URL path
-  const productId = req.params.id;
-  // Extract updated data from the request body
+// app.put('/masproduct/:id', (req, res) => {
+//   // Extract the product ID from the URL path
+//   const productId = req.params.id;
+//   // Extract updated data from the request body
+//   const { name, brand, date } = req.body;
+
+//   // Construct the SQL query for updating the product information
+//   const sql = `UPDATE malaysiaproduct SET name = ?, brand = ?, date = ? WHERE productID = ?`;
+
+//   // Execute the query with the provided data
+//   db.query(sql, [name, brand, date, productId], (err, result) => {
+//     if (err) {
+//       // If an error occurs, log it and return a server error response
+//       console.error('Error updating product:', err);
+//       res.status(500).json({ message: 'Error updating product' });
+//     } else {
+//       // If the update is successful, return a success response
+//       // result.affectedRows checks how many rows were affected. If no rows were affected, it means the product was not found
+//       if (result.affectedRows > 0) {
+//         res.json({ message: 'Product updated successfully' });
+//       } else {
+//         res.status(404).json({ message: 'Product not found' });
+//       }
+//     }
+//   });
+// });
+
+app.put('/masproduct/:id', upload.single('image'), (req, res) => {
+  const { id } = req.params;
   const { name, brand, date } = req.body;
+  let newImagePath = req.file ? req.file.path : '';
 
-  // Construct the SQL query for updating the product information
-  const sql = `UPDATE malaysiaproduct SET name = ?, brand = ?, date = ? WHERE productID = ?`;
-
-  // Execute the query with the provided data
-  db.query(sql, [name, brand, date, productId], (err, result) => {
+  if (req.file) {
+    // A new image was uploaded, process the file
+    const newFileName = `image_${id}${path.extname(req.file.originalname)}`;
+    newImagePath = newFileName;
+  } else {
+    // No new image was uploaded, use the original imageURL
+    newImagePath = req.body.imageURL;
+  }
+  const sql = 'UPDATE malaysiaproduct SET name = ?, brand = ?, date = ?, imageURL = ? WHERE productID = ?';
+  db.query(sql, [name, brand, date, newImagePath, id], (err, result) => {
     if (err) {
-      // If an error occurs, log it and return a server error response
       console.error('Error updating product:', err);
-      res.status(500).json({ message: 'Error updating product' });
-    } else {
-      // If the update is successful, return a success response
-      // result.affectedRows checks how many rows were affected. If no rows were affected, it means the product was not found
-      if (result.affectedRows > 0) {
-        res.json({ message: 'Product updated successfully' });
-      } else {
-        res.status(404).json({ message: 'Product not found' });
-      }
+      return res.status(500).json({ message: 'Error updating product', error: err.message });
     }
+    res.json({ message: 'Product updated successfully' });
   });
 });
 
@@ -165,33 +205,27 @@ app.get('/thaiproduct/:id', (req, res) => {
       }
   });
 });
+app.put('/thaiproduct/:id', upload.single('image'), (req, res) => {
+  const { id } = req.params;
+  const { name, brand, date } = req.body;
+  let newImagePath = req.file ? req.file.path : '';
 
-// app.put to handle update requests
-app.put('/thaiproduct/:id', (req, res) => {
-// Extract the product ID from the URL path
-const productId = req.params.id;
-// Extract updated data from the request body
-const { name, brand, date } = req.body;
-
-// Construct the SQL query for updating the product information
-const sql = `UPDATE thailandproduct SET name = ?, brand = ?, date = ? WHERE productID = ?`;
-
-// Execute the query with the provided data
-db.query(sql, [name, brand, date, productId], (err, result) => {
-  if (err) {
-    // If an error occurs, log it and return a server error response
-    console.error('Error updating product:', err);
-    res.status(500).json({ message: 'Error updating product' });
+  if (req.file) {
+    // A new image was uploaded, process the file
+    const newFileName = `image_${id}${path.extname(req.file.originalname)}`;
+    newImagePath = newFileName;
   } else {
-    // If the update is successful, return a success response
-    // result.affectedRows checks how many rows were affected. If no rows were affected, it means the product was not found
-    if (result.affectedRows > 0) {
-      res.json({ message: 'Product updated successfully' });
-    } else {
-      res.status(404).json({ message: 'Product not found' });
-    }
+    // No new image was uploaded, use the original imageURL
+    newImagePath = req.body.imageURL;
   }
-});
+  const sql = 'UPDATE thailandproduct SET name = ?, brand = ?, date = ?, imageURL = ? WHERE productID = ?';
+  db.query(sql, [name, brand, date, newImagePath, id], (err, result) => {
+    if (err) {
+      console.error('Error updating product:', err);
+      return res.status(500).json({ message: 'Error updating product', error: err.message });
+    }
+    res.json({ message: 'Product updated successfully' });
+  });
 });
 
 app.get('/krproduct/:id', (req, res) => {
@@ -212,38 +246,56 @@ app.get('/krproduct/:id', (req, res) => {
   });
 });
 
-// app.put to handle update requests
-app.put('/krproduct/:id', (req, res) => {
-// Extract the product ID from the URL path
-const productId = req.params.id;
-// Extract updated data from the request body
-const { name, brand, date } = req.body;
+// // app.put to handle update requests
+// app.put('/krproduct/:id', (req, res) => {
+// // Extract the product ID from the URL path
+// const productId = req.params.id;
+// // Extract updated data from the request body
+// const { name, brand, date } = req.body;
 
-// Construct the SQL query for updating the product information
-const sql = `UPDATE koreaproduct SET name = ?, brand = ? WHERE productID = ?`;
+// // Construct the SQL query for updating the product information
+// const sql = `UPDATE koreaproduct SET name = ?, brand = ? WHERE productID = ?`;
 
-// Execute the query with the provided data
-db.query(sql, [name, brand, productId], (err, result) => {
-  if (err) {
-    // If an error occurs, log it and return a server error response
-    console.error('Error updating product:', err);
-    res.status(500).json({ message: 'Error updating product' });
+// // Execute the query with the provided data
+// db.query(sql, [name, brand, productId], (err, result) => {
+//   if (err) {
+//     // If an error occurs, log it and return a server error response
+//     console.error('Error updating product:', err);
+//     res.status(500).json({ message: 'Error updating product' });
+//   } else {
+//     // If the update is successful, return a success response
+//     // result.affectedRows checks how many rows were affected. If no rows were affected, it means the product was not found
+//     if (result.affectedRows > 0) {
+//       res.json({ message: 'Product updated successfully' });
+//     } else {
+//       res.status(404).json({ message: 'Product not found' });
+//     }
+//   }
+// });
+// });
+
+app.put('/krproduct/:id', upload.single('image'), (req, res) => {
+  const { id } = req.params;
+  const { name, brand } = req.body;
+  let newImagePath = req.file ? req.file.path : '';
+
+  if (req.file) {
+    // A new image was uploaded, process the file
+    const newFileName = `image_${id}${path.extname(req.file.originalname)}`;
+    newImagePath = newFileName;
   } else {
-    // If the update is successful, return a success response
-    // result.affectedRows checks how many rows were affected. If no rows were affected, it means the product was not found
-    if (result.affectedRows > 0) {
-      res.json({ message: 'Product updated successfully' });
-    } else {
-      res.status(404).json({ message: 'Product not found' });
-    }
+    // No new image was uploaded, use the original imageURL
+    newImagePath = req.body.imageURL;
   }
+  const sql = 'UPDATE koreaproduct SET name = ?, brand = ?, imageURL = ? WHERE productID = ?';
+  db.query(sql, [name, brand, newImagePath, id], (err, result) => {
+    if (err) {
+      console.error('Error updating product:', err);
+      return res.status(500).json({ message: 'Error updating product', error: err.message });
+    }
+    res.json({ message: 'Product updated successfully' });
+  });
 });
-});
-
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)){
-    fs.mkdirSync(uploadsDir);
-}
 
 app.get("/userProfile/:userID", (req, res) => {
   const { userID } = req.params;

@@ -28,15 +28,25 @@ const Data = () => {
   const [selectedCountry, setSelectedCountry] = useState('MALAYSIA');
   const [selectedCategory, setSelectedCategory] = useState('Products');
   const [products, setProducts] = useState([]);
+  const [mosques, setMosques] = useState([]);
+  const [prayerRoom, setPrayerRoom] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [filter, setFilter] = useState('');
-  const [visibleRows, setVisibleRows] = useState(5);
+  const [visibleRows, setVisibleRows] = useState(10);
   const [filterBy, setFilterBy] = useState('name');
   const [statusFilter, setStatusFilter] = useState('');
   const navigate = useNavigate();
 
-  const handleEdit = (productId, country) => {
+  const handleEditProduct = (productId, country) => {
     navigate(`/editProduct/${productId}?country=${country}`);
+  };
+
+  const handleEditMosques = (mosqueId, country) => {
+    navigate(`/editMosque/${mosqueId}?country=${country}`);
+  };
+
+  const handleEditPrayerRoom = (prId, country) => {
+    navigate(`/editPrayerRoom/${prId}?country=${country}`);
   };
 
   const countries = ['MALAYSIA', 'THAILAND', 'KOREA'];
@@ -45,6 +55,12 @@ const Data = () => {
   useEffect(() => {
     if (selectedCategory === 'Products') {
       fetchProducts();
+    }
+    else if(selectedCategory === 'Mosques') {
+      fetchMosques();
+    }
+    else if(selectedCategory === 'Prayer Room') {
+      fetchPrayerRoom();
     }
   }, [selectedCountry, selectedCategory]);
 
@@ -64,6 +80,46 @@ const Data = () => {
       setProducts(response.data);
     } catch (error) {
       console.error('Error fetching products:', error);
+    }
+    setIsFetching(false);
+  };
+
+  const fetchMosques = async () => {
+    setIsFetching(true);
+    try {
+      let endpoint = '';
+      if (selectedCountry === 'THAILAND') {
+        endpoint = 'http://localhost:8085/thailandmosque';
+      } else if (selectedCountry === 'KOREA') {
+        endpoint = 'http://localhost:8085/koreamosque';
+      } else {
+        // Default to MALAYSIA
+        endpoint = 'http://localhost:8085/malaysiamosque';
+      }
+      const response = await axios.get(endpoint);
+      setMosques(response.data);
+    } catch (error) {
+      console.error('Error fetching mosque:', error);
+    }
+    setIsFetching(false);
+  };
+
+  const fetchPrayerRoom = async () => {
+    setIsFetching(true);
+    try {
+      let endpoint = '';
+      if (selectedCountry === 'THAILAND') {
+        endpoint = 'http://localhost:8085/thailandpr';
+      } else if (selectedCountry === 'KOREA') {
+        endpoint = 'http://localhost:8085/koreapr';
+      } else {
+        // Default to MALAYSIA
+        endpoint = 'http://localhost:8085/malaysiapr';
+      }
+      const response = await axios.get(endpoint);
+      setPrayerRoom(response.data);
+    } catch (error) {
+      console.error('Error fetching mosque:', error);
     }
     setIsFetching(false);
   };
@@ -99,18 +155,40 @@ const Data = () => {
     return matchesFilter;
   });
 
+  const filteredMosques = mosques.filter((mosque) => {
+    const mosqueName = mosque.name || "";
+
+    const matchesFilter = filterBy === 'name'
+    ? mosqueName.toLowerCase().includes(filter)
+    : false;
+        
+    return matchesFilter;
+  });
+
+  const filteredPrayerRoom = prayerRoom.filter((pr) => {
+    const prName = pr.name || "";
+
+    const matchesFilter = filterBy === 'name'
+    ? prName.toLowerCase().includes(filter)
+    : false;
+        
+    return matchesFilter;
+  });
+
   useEffect(() => {
     setVisibleRows(5); // Reset visible rows on product change
-  }, [products]);
+  }, [products,prayerRoom, mosques]);
 
   const handleScroll = (e) => {
     const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
     if (bottom) {
-      setVisibleRows((prevVisibleRows) => prevVisibleRows + 5);
+      setVisibleRows((prevVisibleRows) => prevVisibleRows + 10);
     }
   };
 
   const displayedProducts = filteredProducts.slice(0, visibleRows);
+  const displayedMosques = filteredMosques.slice(0, visibleRows);
+  const displayedPrayerRoom = filteredPrayerRoom.slice(0, visibleRows);
 
   const getImageUrl = (country, imageURL) => {
     switch (country) {
@@ -138,19 +216,24 @@ const Data = () => {
         ))}
       </div>
       <div className="data-component">
-        <div className="filter-controls">
+      
+      <div className="filter-controls">
+        {selectedCategory === 'Products' && (
           <select value={filterBy} onChange={(e) => setFilterBy(e.target.value)} className="filter-type-selector">
             <option value="name">Name</option>
             <option value="brand">Brand</option>
           </select>
-          <input type="text" placeholder="Type to search..." className="filter-input" value={filter} onChange={handleFilterChange} />
+        )}
+        <input type="text" placeholder="Type to search..." className="filter-input" value={filter} onChange={handleFilterChange} />
+
         </div>
         <div className="content">
           {isFetching ? (
             <p>Loading...</p>
           ) : (
-            selectedCategory === 'Products' && (
-              <div className="scrollable-table-container" onScroll={handleScroll}>
+            <>
+              {selectedCategory === 'Products' && (
+                <div className="scrollable-table-container" onScroll={handleScroll} >
                 <table>
                   <thead>
                     <tr>
@@ -194,7 +277,7 @@ const Data = () => {
                           />
                         </td>
                         <td>
-                          <button onClick={() => handleEdit(product.productID, selectedCountry)} className="edit-button">
+                          <button onClick={() => handleEditProduct(product.productID, selectedCountry)} className="edit-button">
                             Edit
                           </button>
                         </td>
@@ -203,7 +286,81 @@ const Data = () => {
                   </tbody>
                 </table>
               </div>
-            )
+              )}
+              {selectedCategory === 'Mosques' && (
+                <div className="scrollable-table-container" onScroll={handleScroll}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Address</th>
+                      <th>State</th>
+                      {selectedCountry === 'MALAYSIA' && <th>District</th>}
+                      <th>Latitude</th>
+                      <th>Longitude</th>
+                      <th>Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody className="table-scroll">
+                    {displayedMosques.map((mosque) => (
+                      <tr key={mosque.mosqueprID}>
+                        <td>{mosque.mosqueprID}</td>
+                        <td>{mosque.name}</td>
+                        <td>{mosque.address}</td>
+                        <td>{mosque.state}</td>
+                        {selectedCountry === 'MALAYSIA' && <td>{mosque.district}</td>}
+                        <td>{mosque.latitude}</td>
+                        <td>{mosque.longitude}</td>
+                        <td>
+                          <button onClick={() => handleEditMosques(mosque.mosqueprID, selectedCountry)} className="edit-button">
+                            Edit
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                </div>
+              )}
+              {selectedCategory === 'Prayer Room' && (
+                <div className="scrollable-table-container" onScroll={handleScroll}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Address</th>
+                      <th>State</th>
+                      {selectedCountry === 'MALAYSIA' && <th>District</th>}
+                      <th>Latitude</th>
+                      <th>Longitude</th>
+                      <th>Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody className="table-scroll">
+                    {displayedPrayerRoom.map((pr) => (
+                      <tr key={pr.mosqueprID}>
+                        <td>{pr.mosqueprID}</td>
+                        <td>{pr.name}</td>
+                        <td>{pr.address}</td>
+                        <td>{pr.state}</td>
+                        {selectedCountry === 'MALAYSIA' && <td>{pr.district}</td>}
+                        <td>{pr.latitude}</td>
+                        <td>{pr.longitude}</td>
+                        <td>
+                          <button onClick={() => handleEditPrayerRoom(pr.mosqueprID, selectedCountry)} className="edit-button">
+                            Edit
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                  
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -74,6 +74,96 @@ app.post('/login', [check('email', "Email length error").isEmail().isLength({ mi
     });
 });
 
+app.get('/malaysiapr', (req, res) => {
+  // Assuming you have a database connection setup with a query function
+  const sql = 'SELECT * FROM malaysiapr'; // Selects all products
+  db.query(sql, (err, results) => {
+    if (err) {
+      // Handle error
+      console.log('here')
+      console.error(err);
+      res.status(500).json({ message: 'Error retrieving products' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+app.get('/thailandpr', (req, res) => {
+  // Assuming you have a database connection setup with a query function
+  const sql = 'SELECT * FROM thailandpr'; // Selects all products
+  db.query(sql, (err, results) => {
+    if (err) {
+      // Handle error
+      console.log('here')
+      console.error(err);
+      res.status(500).json({ message: 'Error retrieving products' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+app.get('/koreapr', (req, res) => {
+  // Assuming you have a database connection setup with a query function
+  const sql = 'SELECT * FROM koreapr'; // Selects all products
+  db.query(sql, (err, results) => {
+    if (err) {
+      // Handle error
+      console.log('here')
+      console.error(err);
+      res.status(500).json({ message: 'Error retrieving products' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+app.get('/malaysiamosque', (req, res) => {
+  // Assuming you have a database connection setup with a query function
+  const sql = 'SELECT * FROM malaysiamosque'; // Selects all products
+  db.query(sql, (err, results) => {
+    if (err) {
+      // Handle error
+      console.log('here')
+      console.error(err);
+      res.status(500).json({ message: 'Error retrieving products' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+app.get('/thailandmosque', (req, res) => {
+  // Assuming you have a database connection setup with a query function
+  const sql = 'SELECT * FROM thailandmosque'; // Selects all products
+  db.query(sql, (err, results) => {
+    if (err) {
+      // Handle error
+      console.log('here')
+      console.error(err);
+      res.status(500).json({ message: 'Error retrieving products' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+app.get('/koreamosque', (req, res) => {
+  // Assuming you have a database connection setup with a query function
+  const sql = 'SELECT * FROM koreamosque'; // Selects all products
+  db.query(sql, (err, results) => {
+    if (err) {
+      // Handle error
+      console.log('here')
+      console.error(err);
+      res.status(500).json({ message: 'Error retrieving products' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
 app.get('/masproduct', (req, res) => {
     // Assuming you have a database connection setup with a query function
     const sql = 'SELECT * FROM malaysiaproduct'; // Selects all products
@@ -205,6 +295,7 @@ app.get('/thaiproduct/:id', (req, res) => {
       }
   });
 });
+
 app.put('/thaiproduct/:id', upload.single('image'), (req, res) => {
   const { id } = req.params;
   const { name, brand, date } = req.body;
@@ -245,34 +336,6 @@ app.get('/krproduct/:id', (req, res) => {
       }
   });
 });
-
-// // app.put to handle update requests
-// app.put('/krproduct/:id', (req, res) => {
-// // Extract the product ID from the URL path
-// const productId = req.params.id;
-// // Extract updated data from the request body
-// const { name, brand, date } = req.body;
-
-// // Construct the SQL query for updating the product information
-// const sql = `UPDATE koreaproduct SET name = ?, brand = ? WHERE productID = ?`;
-
-// // Execute the query with the provided data
-// db.query(sql, [name, brand, productId], (err, result) => {
-//   if (err) {
-//     // If an error occurs, log it and return a server error response
-//     console.error('Error updating product:', err);
-//     res.status(500).json({ message: 'Error updating product' });
-//   } else {
-//     // If the update is successful, return a success response
-//     // result.affectedRows checks how many rows were affected. If no rows were affected, it means the product was not found
-//     if (result.affectedRows > 0) {
-//       res.json({ message: 'Product updated successfully' });
-//     } else {
-//       res.status(404).json({ message: 'Product not found' });
-//     }
-//   }
-// });
-// });
 
 app.put('/krproduct/:id', upload.single('image'), (req, res) => {
   const { id } = req.params;
@@ -341,6 +404,33 @@ app.put("/changeUserPassword/:userID", (req, res) => {
           return res.status(500).json({ message: "Error changing password" });
       }
       res.json({ message: "Password updated successfully" });
+  });
+});
+
+app.put('/malaysiamosque/:id', (req, res) => {
+  // Extract the product ID from the URL path
+  const productId = req.params.id;
+  // Extract updated data from the request body
+  const { name, brand, date } = req.body;
+
+  // Construct the SQL query for updating the product information
+  const sql = `UPDATE malaysiaproduct SET name = ?, brand = ?, date = ? WHERE productID = ?`;
+
+  // Execute the query with the provided data
+  db.query(sql, [name, brand, date, productId], (err, result) => {
+    if (err) {
+      // If an error occurs, log it and return a server error response
+      console.error('Error updating product:', err);
+      res.status(500).json({ message: 'Error updating product' });
+    } else {
+      // If the update is successful, return a success response
+      // result.affectedRows checks how many rows were affected. If no rows were affected, it means the product was not found
+      if (result.affectedRows > 0) {
+        res.json({ message: 'Product updated successfully' });
+      } else {
+        res.status(404).json({ message: 'Product not found' });
+      }
+    }
   });
 });
 

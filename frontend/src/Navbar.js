@@ -23,7 +23,7 @@ const Navbar = () => {
             <h4>myHalal Checker</h4>
             <div className="links">
                 <Link to="/home">Home</Link>
-                <Link to="/about">Report</Link>
+                <Link to="/report">Report</Link>
                 <Link to="/contact">Enquiry</Link>
                 <Link to="/data">Data</Link>
                 {user && (

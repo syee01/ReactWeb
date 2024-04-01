@@ -36,6 +36,7 @@ const Data = () => {
   const [filterBy, setFilterBy] = useState('name');
   const [statusFilter, setStatusFilter] = useState('');
   const navigate = useNavigate();
+  const userRole = localStorage.getItem('role');
 
   const handleEditProduct = (productId, country) => {
     navigate(`/editProduct/${productId}?country=${country}`);
@@ -277,7 +278,7 @@ const Data = () => {
                           />
                         </td>
                         <td>
-                          <button onClick={() => handleEditProduct(product.productID, selectedCountry)} className="edit-button">
+                          <button onClick={() => handleEditProduct(product.productID, selectedCountry)} disabled={userRole !== 'data admin'} className="edit-button">
                             Edit
                           </button>
                         </td>
@@ -297,8 +298,6 @@ const Data = () => {
                       <th>Address</th>
                       <th>State</th>
                       {selectedCountry === 'MALAYSIA' && <th>District</th>}
-                      <th>Latitude</th>
-                      <th>Longitude</th>
                       <th>Edit</th>
                     </tr>
                   </thead>
@@ -310,10 +309,8 @@ const Data = () => {
                         <td>{mosque.address}</td>
                         <td>{mosque.state}</td>
                         {selectedCountry === 'MALAYSIA' && <td>{mosque.district}</td>}
-                        <td>{mosque.latitude}</td>
-                        <td>{mosque.longitude}</td>
                         <td>
-                          <button onClick={() => handleEditMosques(mosque.mosqueprID, selectedCountry)} className="edit-button">
+                          <button onClick={() => handleEditMosques(mosque.mosqueprID, selectedCountry)} disabled={userRole !== 'data admin'} className="edit-button">
                             Edit
                           </button>
                         </td>
@@ -333,8 +330,6 @@ const Data = () => {
                       <th>Address</th>
                       <th>State</th>
                       {selectedCountry === 'MALAYSIA' && <th>District</th>}
-                      <th>Latitude</th>
-                      <th>Longitude</th>
                       <th>Edit</th>
                     </tr>
                   </thead>
@@ -346,10 +341,8 @@ const Data = () => {
                         <td>{pr.address}</td>
                         <td>{pr.state}</td>
                         {selectedCountry === 'MALAYSIA' && <td>{pr.district}</td>}
-                        <td>{pr.latitude}</td>
-                        <td>{pr.longitude}</td>
                         <td>
-                          <button onClick={() => handleEditPrayerRoom(pr.mosqueprID, selectedCountry)} className="edit-button">
+                          <button onClick={() => handleEditPrayerRoom(pr.mosqueprID, selectedCountry)} disabled={userRole !== 'data admin'} className="edit-button">
                             Edit
                           </button>
                         </td>

@@ -78,6 +78,11 @@ body, html {
   font-family:'Spectral',serif;
 }
 
+.input-group {
+  position: relative;
+  margin-bottom: 1em;
+}
+
 .input-field:focus {
   border-color: #0F7C5D;
 }

@@ -50,6 +50,61 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+app.put('/viewByReportUpdate/:reportId', async (req, res) => {
+  const { reportId } = req.params;
+  const { viewedBy, category } = req.body;
+  let tableName = '';
+
+  try {
+    // Determine the table based on the category
+    if (category === 'Products') {
+      tableName = 'product_reports';
+    } else if (category === 'Restaurants') {
+      tableName = 'restaurant_reports';
+    } else {
+      // Handle invalid category
+      return res.status(400).send('Invalid category');
+    }
+    console.log(viewedBy)
+    console.log(tableName)
+    // Update the database with the current user
+    await db.query(`UPDATE ${tableName} SET ViewedBy = ? WHERE ReportID = ?`, [viewedBy, reportId]);
+
+    res.status(200).send('ViewedBy updated successfully');
+  } catch (error) {
+    console.error('Error updating ViewedBy:', error);
+    res.status(500).send('Error updating ViewedBy');
+  }
+});
+
+
+app.get('/reports', (req, res) => {
+  const { category, status } = req.query;
+  let tableName = '';
+
+  if (category === 'Products') {
+    tableName = 'product_reports';
+  } else if (category === 'Restaurants') {
+    tableName = 'restaurant_reports';
+  } else {
+    return res.status(400).send('Invalid category');
+  }
+
+  const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+
+  db.query(
+    `SELECT * FROM ${tableName} WHERE Status = ?`,
+    [formattedStatus],
+    (error, results) => {
+      if (error) {
+        console.error('SQL Error: ', error.message); // Log detailed error
+        return res.status(500).send('Error fetching data');
+      }
+      res.json(results);
+    }
+  );
+});
+
 
 // write login error 
 app.post('/login', [check('email', "Email length error").isEmail().isLength({ min: 10, max: 30 }), check('password', "password length 8-10").isLength({ min: 1, max: 10 })], (req, res) => {
@@ -66,7 +121,7 @@ app.post('/login', [check('email', "Email length error").isEmail().isLength({ mi
         
             if (data.length > 0) {
                 // Assuming 'username' is a field in your user table
-                return res.json({ status: "Success", username: data[0].username, userID: data[0].UserID });
+                return res.json({ status: "Success", username: data[0].username, userID: data[0].UserID, role:data[0].role });
             } else {
                 return res.json({ status: "Failed", message: "Invalid email or password" });
             }

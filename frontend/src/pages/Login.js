@@ -39,16 +39,16 @@ function Login() {
                 console.log(res.data);
                 if (res.data.status === "Success") {
                     // Set user information upon successful login
-                    console.log(res.data.username); // Now you have the username
                     setUser({ username: res.data.username }); // Use the returned username
                     
                     localStorage.setItem('userID', res.data.userID); // Assuming userID is returned from the server
                     localStorage.setItem('username', res.data.username)
+                    localStorage.setItem('role', res.data.role)
                     // Navigate to the home page
                     navigate('/home');
                 } else {
                     // Handle different or more specific backend errors as needed
-                    setBackendError([res.data.message || "Invalid email or password"]); // Use the error message from the backend
+                    setBackendError([res.data.message || "Invalid email"]); // Use the error message from the backend
                 }
             })
             
@@ -57,7 +57,6 @@ function Login() {
                 setBackendError(["An error occurred during login"]);
             });
         }
-        console.log('here')
     };
 
     return (
@@ -78,7 +77,7 @@ function Login() {
                   value={values.email}
                   className="input-field"
                 />
-                {errors.email && <p className="error">{errors.email}</p>}
+                {errors.email && <p className="error below-password">{errors.email}</p>}
                 </div>
                 <label htmlFor="password" className="login-label">Password</label>
                 <div className="input-group">
@@ -96,7 +95,7 @@ function Login() {
                     {errors.password && <p className="
                         error below-password">{errors.password}</p>}
                         </div>
-                        {backendError.length > 0 && (
+                        {errors.password<0 && errors.email <0 && backendError.length > 0 && (
                         <p className="error below-password">{backendError[0]}</p>
                         )}
                         <button type="submit" className="login-btn">Login</button>

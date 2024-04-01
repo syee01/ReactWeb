@@ -4,8 +4,7 @@ import { useUser } from '../UserContext'; // Make sure this path is correct
 import Validation from "./LoginValidation";
 import axios from 'axios';
 import '../cssFolder/login.css';
-import logo from '../images/logo.png';
-import profile from '../images/profile.png'
+import court from '../images/court.png';
 import {FaEnvelope, FaLock} from 'react-icons/fa';
 
 function Login() {
@@ -62,50 +61,51 @@ function Login() {
     };
 
     return (
-        <div className="login-container">
-            <div className="welcome-section">
-                <h1>Welcome Back</h1>
-                <img src={logo} alt="myHalal Checker Logo" className="logo" />
-                <h2>myHalal Checker</h2>
-            </div>
-            <div className="login-section">
-                <div className="login-content">
-                    <h2>Login</h2>
-                    <img src={profile} alt="Profile Icon" className="profile-icon" />
-                    {backendError.length > 0 && backendError.map((error, index) => (
-                        <p key={index} className="error">{error}</p>
-                    ))}
-                    <form onSubmit={handleSubmit}>
-                        <div className="input-group">
-                            <FaEnvelope className="input-icon" />
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                placeholder="Email"
-                                onChange={handleInput}
-                                value={values.email}
-                            />
-                            {errors.email && <p className="error">{errors.email}</p>}
-                        </div>
-                        <div className="input-group">
-                            <FaLock className="input-icon" />
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                placeholder="Password"
-                                onChange={handleInput}
-                                value={values.password}
-                            />
-                            {errors.password && <p className="error">{errors.password}</p>}
-                        </div>
-                        <button type="submit" className="login-btn">Log in</button>
-                    </form>
+        <div className="login-container" style={{ backgroundImage: `url(${court})` }}>
+          <div className="login-box">
+            <h1>Welcome Back</h1>
+            <p>Log into your Account</p>
+            <form onSubmit={handleSubmit} className="login-form">
+            <label htmlFor="email-address" className="login-label">Email Address</label>
+              <div className="input-group">
+                <FaEnvelope className="input-icon" />
+                <input
+                  type="email"
+                  id="email-address"
+                  name="email"
+                  placeholder="Email Address"
+                  onChange={handleInput}
+                  value={values.email}
+                  className="input-field"
+                />
+                {errors.email && <p className="error">{errors.email}</p>}
                 </div>
+                <label htmlFor="password" className="login-label">Password</label>
+                <div className="input-group">
+                <FaLock className="input-icon" />
+                
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Password"
+                    onChange={handleInput}
+                    value={values.password}
+                    className="input-field"
+                    />
+                    {errors.password && <p className="
+                        error below-password">{errors.password}</p>}
+                        </div>
+                        {backendError.length > 0 && (
+                        <p className="error below-password">{backendError[0]}</p>
+                        )}
+                        <button type="submit" className="login-btn">Login</button>
+                        <a href="#" className="forgot-password">Forgot password?</a>
+                        </form>
+                </div>
+        
             </div>
-        </div>
-    );
+      );
 }
 
 export default Login;

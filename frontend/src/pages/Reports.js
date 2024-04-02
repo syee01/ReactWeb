@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../cssFolder/report.css';
 import moment from 'moment'; 
+import { Link } from 'react-router-dom';
 
 const ReportPage = () => {
   const [activeTab, setActiveTab] = useState('PENDING'); // Initialize in correct format
@@ -15,28 +16,42 @@ const ReportPage = () => {
     setActiveTab(formattedStatus);
   };
 
-  const handleReview = async (reportId) => {
+  const fetchReports = async () => {
     try {
-      const report = reports.find(report => report.ReportID === reportId);
-      if (report.ViewedBy && report.ViewedBy !== currentUser) {
-        console.log('You have already reviewed this report.');
-        return;
-      }
-
-      await axios.put(`http://localhost:8085/viewByReportUpdate/${reportId}`, {
-        viewedBy: currentUser,
-        category: activeCategory
+      const response = await axios.get(`http://localhost:8085/reports`, {
+        params: { 
+          category: activeCategory,
+          status: activeTab // Send the formatted status to the server
+        }
       });
-
-      const response = await axios.get(`http://localhost:8085/getUsername/${report.ViewedBy}`);
       console.log(response.data)
-      const { username } = response.data;
-
-      setReports(reports.map(report => report.ReportID === reportId ? { ...report, ViewedBy: username } : report));
+      setReports(response.data); // Assuming the data is an array of reports
     } catch (error) {
-      console.error('Error updating viewedBy:', error);
+      console.error('Error fetching reports:', error);
     }
   };
+  
+  const handleReview = async (reportId) => {
+    try {
+        const report = reports.find(report => report.ReportID === reportId);
+        if (report.ViewedBy) {
+            console.log('This report has already been reviewed.');
+            return;
+        }
+
+        // Update the ViewedBy field in the database
+        await axios.put(`http://localhost:8085/viewByReportUpdate/${reportId}`, {
+            viewedBy: currentUser,
+            category: activeCategory,
+            status: 'Reviewed'
+        });
+
+        // Re-fetch reports to update the component's state with the latest data
+        fetchReports(); // Assuming you have a function to fetch reports similar to what you use in useEffect
+    } catch (error) {
+        console.error('Error updating viewedBy:', error);
+    }
+};
 
   const formatDate = (dateString) => {
     return moment(dateString).format('YYYY-MM-DD HH:mm:ss');
@@ -130,25 +145,52 @@ const ReportPage = () => {
           </thead>
           {/* Dynamically render different table rows based on activeCategory */}
           <tbody>
-            {reports.map((report) => (
-              <tr key={report.id}>
+          {reports.map((report) => (
+            <tr key={report.id}>
                 {/* Table cells */}
                 <td>{report.ReportID}</td>
                 <td>{report.Name}</td>
-                <td>{activeCategory === 'Products' ? report.Brand : report.RestaurantName}</td>
-                <td>{formatDate(report.Date)}</td>
-                <td>{report.ViewedBy}</td>
+                {/* Conditionally render different cells based on the activeCategory */}
+                {activeCategory === 'Products' ? (
+                <>
+                    <td>{report.Brand}</td>
+                    <td>{formatDate(report.Date)}</td>
+                </>
+                ) : (
+                <>
+                    <td>{formatDate(report.Date)}</td>
+                </>
+                )}
+                <td>{report.ViewedByUsername}</td>
                 <td>{report.ApprovedBy}</td>
                 <td>
-                <button 
+                {/* <button 
                     className="edit-button" 
-                    disabled={report.ViewedBy !== null && report.ViewedBy !== currentUser} // Enable the button if ViewedBy is null or matches currentUser
+                    disabled={report.ViewedBy !== null && report.ViewedBy !== currentUser}
                     onClick={() => handleReview(report.ReportID)}
-                    >
+                >
                     Review
-                    </button>
+                </button> */}
+                {report.ViewedBy !== null && report.ViewedBy !== currentUser ? (
+                  <button 
+                    className="edit-button" 
+                    onClick={() => handleReview(report.ReportID)}
+                    disabled={report.ViewedBy !== null && report.ViewedBy !== currentUser}
+                  >
+                    Review
+                  </button>
+                ) : (
+                    <Link
+                        to="/productReport"
+                        className="edit-button"
+                        style={{ textDecoration: 'none' }}
+                        onClick={() => handleReview(report.ReportID)}
+                        >
+                    Review
+                  </Link>
+                )}
                 </td>
-              </tr>
+            </tr>
             ))}
           </tbody>
           </table>

@@ -50,33 +50,57 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-app.put('/viewByReportUpdate/:reportId', async (req, res) => {
-  const { reportId } = req.params;
-  const { viewedBy, category } = req.body;
-  let tableName = '';
+// Route to get username by user ID
+app.get('/getUsername/:userID', (req, res) => {
+  const userID = req.params.userID;
 
-  try {
-    // Determine the table based on the category
-    if (category === 'Products') {
-      tableName = 'product_reports';
-    } else if (category === 'Restaurants') {
-      tableName = 'restaurant_reports';
-    } else {
-      // Handle invalid category
-      return res.status(400).send('Invalid category');
-    }
-    console.log(viewedBy)
-    console.log(tableName)
-    // Update the database with the current user
-    await db.query(`UPDATE ${tableName} SET ViewedBy = ? WHERE ReportID = ?`, [viewedBy, reportId]);
-
-    res.status(200).send('ViewedBy updated successfully');
-  } catch (error) {
-    console.error('Error updating ViewedBy:', error);
-    res.status(500).send('Error updating ViewedBy');
+  // If userID is 'null' (as a string), return null for username and don't query the DB
+  if (userID === 'null') {
+    return res.json({ username: null });
   }
+
+  const parsedUserID = parseInt(userID, 10); // Convert the userID to integer
+
+  if (isNaN(parsedUserID)) {
+    return res.status(400).send('Invalid user ID'); // Send error if userID is not a number
+  }
+
+  const sql = 'SELECT username FROM user WHERE UserID = ?';
+  db.query(sql, [parsedUserID], (err, results) => {
+    if (err) {
+      console.error('Error fetching username:', err);
+      return res.status(500).json({ message: 'Error fetching username' });
+    }
+
+    if (results.length > 0) {
+      const username = results[0].username;
+      res.json({ username });
+    } else {
+      // If no user is found, also return null for username
+      res.json({ username: null });
+    }
+  });
 });
 
+app.put('/viewByReportUpdate/:reportId', (req, res) => {
+  const { reportId } = req.params;
+  const { viewedBy, category, status } = req.body;
+  let tableName = category === 'Products' ? 'product_reports' : 'restaurant_reports';
+  const sql = `UPDATE ${tableName} SET ViewedBy = ?, Status = ? WHERE ReportID = ?`;
+
+  console.log('Route hit with reportId:', typeof(req.params.reportId));
+
+  db.query(sql, [viewedBy, status, reportId], (error, results) => {
+    if (error) {
+      console.log('Error updating report:', error);
+      return res.status(500).send('Error updating report');
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).send('Report not found');
+    }
+    res.json({ message: 'Report updated successfully' });
+  });
+});
 
 app.get('/reports', (req, res) => {
   const { category, status } = req.query;
@@ -92,19 +116,30 @@ app.get('/reports', (req, res) => {
 
   const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
 
-  db.query(
-    `SELECT * FROM ${tableName} WHERE Status = ?`,
-    [formattedStatus],
-    (error, results) => {
-      if (error) {
-        console.error('SQL Error: ', error.message); // Log detailed error
-        return res.status(500).send('Error fetching data');
-      }
-      res.json(results);
-    }
-  );
-});
+  // Adjust this query based on your actual database schema
+  // This example assumes that you have a 'users' table where the username for a given userID can be found
+  const query = `
+    SELECT r.*, u1.username AS ViewedByUsername, u2.username AS ApprovedByUsername
+    FROM ${tableName} r
+    LEFT JOIN user u1 ON r.ViewedBy = u1.UserID
+    LEFT JOIN user u2 ON r.ApprovedBy = u2.UserID
+    WHERE r.Status = ?
+  `;
 
+  db.query(query, [formattedStatus], (error, results) => {
+    if (error) {
+      console.error('SQL Error:', error.message);
+      return res.status(500).send('Error fetching reports');
+    }
+    // Process the results to replace NULL with a dash
+    const processedResults = results.map(report => ({
+      ...report,
+      ViewedByUsername: report.ViewedByUsername || '-',
+      ApprovedByUsername: report.ApprovedByUsername || '-'
+    }));
+    res.json(processedResults);
+  });
+});
 
 // write login error 
 app.post('/login', [check('email', "Email length error").isEmail().isLength({ min: 10, max: 30 }), check('password', "password length 8-10").isLength({ min: 1, max: 10 })], (req, res) => {

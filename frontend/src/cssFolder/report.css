@@ -195,7 +195,7 @@ th:nth-child(4), td:nth-child(4) { min-width: 60px; max-width: 280px; }
 }
 
 .edit-button {
-    padding: 5px 10px;
+    padding: 8px 10px;
     font-size: 14px;
     cursor: pointer;
     background-color: #007bff;

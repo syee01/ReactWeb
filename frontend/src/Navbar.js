@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from './UserContext'; // Adjust the path as necessary
 import './Navbar.css';
 
 const Navbar = () => {
-    const { user, setUser } = useUser(); // Ensure setUser is provided from context for logout functionality
+    const { user, setUser, loading } = useUser(); // Ensure loading state is provided from context
     const [showDropdown, setShowDropdown] = useState(false);
     const navigate = useNavigate();
 
+    // Function to handle logout
     const handleLogout = () => {
         localStorage.removeItem('UserID');
         localStorage.removeItem('username');
@@ -17,6 +18,11 @@ const Navbar = () => {
 
     // Toggle dropdown
     const toggleDropdown = () => setShowDropdown(!showDropdown);
+
+    // Wait for loading to finish before rendering
+    if (loading) {
+      return null; // You can return a loading indicator here if needed
+    }
 
     return (
         <nav className="navbar">
@@ -41,4 +47,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

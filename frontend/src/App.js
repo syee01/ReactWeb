@@ -9,6 +9,7 @@ import { UserProvider } from './UserContext'; // Ensure this is correctly import
 import EditProductPage from './pages/EditProductPage';
 import EditMosquePage from './pages/EditMosquePage';
 import ReportPage from './pages/Reports';
+import ProductReportPage from './pages/ProductReport';
 
 // Create a component to conditionally render the Navbar
 const LayoutWithConditionalNavbar = () => {
@@ -26,6 +27,7 @@ const LayoutWithConditionalNavbar = () => {
         <Route path="/editPrayerRoom/:productId" element={<EditMosquePage />} />
         <Route path='/profile' element={<Profile />} />
         <Route path='/report' element={<ReportPage />} />
+        <Route path='/productReport' element={<ProductReportPage />} />
       </Routes>
     </>
   );

@@ -1,7 +1,8 @@
 // ProductReportModal.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../cssFolder/modalProducts.css'; // Ensure you have a CSS file for modal-specific styles
+import moment from 'moment';
+import '../cssFolder/modalProducts.css'
 
 const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
   const [reportData, setReportData] = useState({});
@@ -34,7 +35,7 @@ const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
     <div className="modal-backdrop">
       <div className="modal-container">
         <div className="modal-header">
-          <h2>Report Details</h2>
+          <h2 className='reportTitle'>Report Details</h2>
           <button className="modal-close-button" onClick={onClose}>&times;</button>
         </div>
         {isLoading ? (
@@ -43,7 +44,7 @@ const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
           <p>{error}</p>
         ) : (
           <div className="modal-content">
-            <h3>{reportData.ReportID}</h3>
+            <h3 className='reportReportID'>{reportData.ReportID}</h3>
             {category === 'Products' && (
               <>
                 <p><strong>Name:</strong> {reportData.Name}</p>
@@ -52,7 +53,7 @@ const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
               </>
             )}
             <p><strong>Description:</strong> {reportData.Description}</p>
-            <p><strong>Reported Date:</strong> {reportData.reportedDate}</p>
+            <p><strong>Reported Date:</strong> {moment(reportData.Date).format('YYYY-MM-DD HH:mm:ss')}</p>
           </div>
         )}
         <div className="modal-footer">

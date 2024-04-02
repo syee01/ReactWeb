@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../cssFolder/report.css';
 import moment from 'moment'; 
-import { Link } from 'react-router-dom';
 import ProductReportModal from './ProductReport';
 
 const ReportPage = () => {

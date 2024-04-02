@@ -3,12 +3,15 @@ import axios from 'axios';
 import '../cssFolder/report.css';
 import moment from 'moment'; 
 import { Link } from 'react-router-dom';
+import ProductReportModal from './ProductReport';
 
 const ReportPage = () => {
   const [activeTab, setActiveTab] = useState('PENDING'); // Initialize in correct format
   const [activeCategory, setActiveCategory] = useState('Products');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [reports, setReports] = useState([]);
   const currentUser = localStorage.getItem('userID');
+  const [selectedReportId, setSelectedReportId] = useState(null);
 
   // This function formats the tab status and sets the active tab
   const handleTabClick = (tab) => {
@@ -47,6 +50,8 @@ const ReportPage = () => {
         });
 
         // Re-fetch reports to update the component's state with the latest data
+        setIsModalOpen(true);
+        setSelectedReportId(report.ReportID)
         fetchReports(); // Assuming you have a function to fetch reports similar to what you use in useEffect
     } catch (error) {
         console.error('Error updating viewedBy:', error);
@@ -180,24 +185,35 @@ const ReportPage = () => {
                     Review
                   </button>
                 ) : (
-                    <Link
-                        to="/productReport"
-                        className="edit-button"
-                        style={{ textDecoration: 'none' }}
-                        onClick={() => handleReview(report.ReportID)}
-                        >
-                    Review
-                  </Link>
+                  <button
+                    className="edit-button"
+                    onClick={() => {
+                      setSelectedReportId(report.ReportID); // Set the selected report ID
+                      setIsModalOpen(true); // Open the modal
+                    }}
+                >
+                  Review
+                </button>
                 )}
                 </td>
             </tr>
             ))}
           </tbody>
+          <ProductReportModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            reportId={selectedReportId}
+            category={activeCategory}
+          />
           </table>
         </div>
       </div>
     </>
   );
+
+  
 };
+
+
 
 export default ReportPage;

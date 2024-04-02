@@ -82,6 +82,21 @@ app.get('/getUsername/:userID', (req, res) => {
   });
 });
 
+app.get('/specificReports/:category/:reportId', (req, res) => {
+  const { category, reportId } = req.params;
+  let tableName = category === 'restaurant' ? 'restaurant_reports' : 'product_reports';
+
+  db.query(`SELECT * FROM ${tableName} WHERE ReportID = ?`, [reportId], (err, results) => {
+    if (err) {
+      return res.status(500).send('An error occurred');
+    }
+    if (results.length === 0) {
+      return res.status(404).send('Report not found');
+    }
+    res.json(results[0]);
+  });
+});
+
 app.put('/viewByReportUpdate/:reportId', (req, res) => {
   const { reportId } = req.params;
   const { viewedBy, category, status } = req.body;

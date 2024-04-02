@@ -1,159 +1,66 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+// ProductReportModal.js
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import '../cssFolder/editProduct.css';
+import '../cssFolder/modalProducts.css'; // Ensure you have a CSS file for modal-specific styles
 
-const ProductReportPage = () => {
-  const { productId } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [editedProduct, setEditedProduct] = useState({
-    name: '',
-    brand: '',
-    date: '',
-    imageURL: '',
-  });
-  const [imageFile, setImageFile] = useState(null);
-  const [isFetching, setIsFetching] = useState(false);
-
-  const searchParams = new URLSearchParams(location.search);
-  const country = searchParams.get('country');
-  let datacountry = '';
-  let datacountryIMG = '';
-  switch (country) {
-    case 'THAILAND':
-      datacountry = 'thai';
-      datacountryIMG = 'thailand';
-      break;
-    case 'MALAYSIA':
-      datacountry = 'mas';
-      datacountryIMG = 'malaysia';
-      break;
-    case 'KOREA':
-      datacountry = 'kr';
-      datacountryIMG = 'korea';
-      break;
-    default:
-      // Handle other cases or default case as needed
-      break;
-  }
+const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
+  const [reportData, setReportData] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      setIsFetching(true);
-      try {
-        const response = await axios.get(`http://localhost:8085/${datacountry}product/${productId}`);
-        setEditedProduct(response.data);
-      } catch (error) {
-        console.error('Error fetching product:', error);
-      }
-      setIsFetching(false);
-    };
+    if (isOpen) {
+      const fetchData = async () => {
+        setIsLoading(true);
+        try {
+          const endpoint = `http://localhost:8085/specificReports/${category}/${reportId}`;
+          const response = await axios.get(endpoint);
+          setReportData(response.data);
+        } catch (err) {
+          setError('Failed to fetch data. Please try again later.');
+          console.error(err);
+        } finally {
+          setIsLoading(false);
+        }
+      };
 
-    fetchProduct();
-  }, [productId, datacountry]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditedProduct({ ...editedProduct, [name]: value });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validate file type if necessary
-      setImageFile(file);
+      fetchData();
     }
-  };
-  
-  const handleSave = async (event) => {
-    event.preventDefault();
-    
-    const formData = new FormData();
-    formData.append('country', datacountry);
-    formData.append('name', editedProduct.name);
-    formData.append('brand', editedProduct.brand);
-    formData.append('date', editedProduct.date);
+  }, [isOpen, reportId, category]);
 
-    // Only append the new image if it has been selected
-    if (imageFile) {
-      const extension = imageFile.name.match(/\.(png|jpg|jpeg)$/i)[0];
-      const filename = `image_${productId}${extension}`;
-      formData.append('image', imageFile, filename);
-    } else {
-      // If no new image file is selected, send the original image URL
-      formData.append('imageURL', editedProduct.imageURL);
-    }
-    
-    try {
-      console.log(datacountry)
-      const response = await axios.put(`http://localhost:8085/${datacountry}product/${productId}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      console.log(response.data);
-      navigate('/Data'); // Or your desired route after saving
-    } catch (error) {
-      console.error('Error saving product:', error);
-    }
-  };
-
-  if (isFetching) return <div>Loading...</div>;
-  if (!editedProduct) return <div>Product not found.</div>;
+  if (!isOpen) return null;
 
   return (
-    <div className='edit-form'>
-      <h2>Edit Product</h2>
-      <form onSubmit={handleSave}>
-      <div>
-          <label>Name:</label>
-          <input
-            type="text"
-            name="name"
-            value={editedProduct.name || ''}
-            onChange={handleInputChange}
-          />
+    <div className="modal-backdrop">
+      <div className="modal-container">
+        <div className="modal-header">
+          <h2>Report Details</h2>
+          <button className="modal-close-button" onClick={onClose}>&times;</button>
         </div>
-        <div>
-          <label>Brand:</label>
-          <input
-            type="text"
-            name="brand"
-            value={editedProduct.brand || ''}
-            onChange={handleInputChange}
-          />
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p>{error}</p>
+        ) : (
+          <div className="modal-content">
+            <h3>{reportData.ReportID}</h3>
+            {category === 'Products' && (
+              <>
+                <p><strong>Name:</strong> {reportData.Name}</p>
+                <p><strong>Brand:</strong> {reportData.Brand}</p>
+                <p><strong>Location:</strong> {reportData.Location}</p>
+              </>
+            )}
+            <p><strong>Description:</strong> {reportData.Description}</p>
+            <p><strong>Reported Date:</strong> {reportData.reportedDate}</p>
+          </div>
+        )}
+        <div className="modal-footer">
+          <button onClick={onClose}>Close</button>
         </div>
-        <div>
-          <label>Expired Date:</label>
-          <input
-            type="date"
-            name="date"
-            value={editedProduct.date ? editedProduct.date.split('T')[0] : ''}
-            onChange={handleInputChange}
-            disabled={country === 'KOREA'}
-          />
-        </div>
-        <div>
-          <label>Image:</label>
-          {editedProduct.imageURL && (
-            <img
-              src={`http://localhost:8085/images/${datacountryIMG}ProductImage/${editedProduct.imageURL}`}
-              alt="Product"
-              style={{ width: '100px', height: 'auto' }}
-            />
-          )}
-          <input
-            type="file"
-            name="image"
-            accept=".png, .jpg, .jpeg"
-            onChange={handleImageChange}
-          />
-        </div>
-        <button type="submit">Save</button>
-      </form>
+      </div>
     </div>
   );
 };
 
-export default ProductReportPage;
+export default ProductReportModal;

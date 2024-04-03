@@ -50,6 +50,83 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// Route to handle finalizing report
+app.post('/finalise_report/:category', (req, res) => {
+  const { reportId, updateData } = req.body;
+  const { category } = req.params;
+
+  let tableName = '';
+  if (category === 'Restaurants') {
+    tableName = 'restaurant_reports';
+  } else if (category === 'Products') {
+    tableName = 'product_reports';
+  } else {
+    return res.status(400).json({ error: 'Invalid category' });
+  }
+
+  const query = `UPDATE ${tableName} SET ? WHERE ReportID = ?`;
+
+  db.query(query, [updateData, reportId], (err, result) => {
+    if (err) {
+      console.error('Error updating report:', err);
+      return res.status(500).json({ error: 'Failed to update report' });
+    }
+    console.log('Report updated successfully');
+    res.status(200).json({ message: 'Report updated successfully' });
+  });
+});
+
+
+app.post('/update_report/:category', (req, res) => {
+  const { category } = req.params;
+  const { reportId, halalStatus, comment } = req.body;
+  
+  let tableName = '';
+  if (category === 'Products') {
+    tableName = 'product_reports';
+  } else if (category === 'Restaurants') {
+    tableName = 'restaurant_reports';
+  } else {
+    res.status(400).send('Invalid category');
+    return;
+  }
+
+  const sql = `UPDATE ${tableName} SET HalalStatus = ?, Comment = ?, Status = 'To Be Confirmed' WHERE ReportID = ?`;
+  db.query(sql, [halalStatus, comment, reportId], (err, result) => {
+    if (err) {
+      console.error(`Error updating ${category} report:`, err);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+    console.log(`${category} report updated successfully`);
+    res.status(200).send(`${category} report updated successfully`);
+  });
+});
+
+app.get('/reportImages/:reportId', (req, res) => {
+  const reportId = req.params.reportId;
+  getImagesForReportId(reportId, (err, imagePaths) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Server error');
+    }
+    res.json(imagePaths);
+  });
+});
+
+
+const getImagesForReportId = (reportId, callback) => {
+  db.query('SELECT ImagePath FROM report_images WHERE ReportID = ?', [reportId], (error, results, fields) => {
+    if (error) {
+      return callback(error, null);
+    }
+    // Assuming that 'ImagePath' contains only the filename
+    const imagePaths = results.map(row => row.ImagePath);
+    callback(null, imagePaths);
+  });
+};
+
+
 // Route to get username by user ID
 app.get('/getUsername/:userID', (req, res) => {
   const userID = req.params.userID;
@@ -84,8 +161,8 @@ app.get('/getUsername/:userID', (req, res) => {
 
 app.get('/specificReports/:category/:reportId', (req, res) => {
   const { category, reportId } = req.params;
-  let tableName = category === 'restaurant' ? 'restaurant_reports' : 'product_reports';
-
+  let tableName = category === 'Restaurants' ? 'restaurant_reports' : 'product_reports';
+  
   db.query(`SELECT * FROM ${tableName} WHERE ReportID = ?`, [reportId], (err, results) => {
     if (err) {
       return res.status(500).send('An error occurred');

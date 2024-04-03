@@ -3,13 +3,16 @@ import axios from 'axios';
 import moment from 'moment';
 import '../cssFolder/modalProducts.css';
 
-const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
+const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
   const [reportData, setReportData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [reportImages, setReportImages] = useState([]);
   const [comment, setComment] = useState('');
-  const [isHalal, setIsHalal] = useState(null);
+ 
+  const handleCommentChange = (e) => {
+    setComment(e.target.value);
+  };
 
   const filterNull = (location) => {
     // Split the location into parts
@@ -55,25 +58,34 @@ const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
     }
   }, [isOpen, reportId, category]);
 
-  const handleHalalStatus = () => {
-    setIsHalal(prevState => !prevState);
-  };
 
-  
-  const handleSubmit = async () => {
+  const handleAction = async (action) => {
     try {
-      const endpoint = `http://localhost:8085/update_report/${category}`;
+      const updateData = {
+        Status: 'Completed',
+        ApprovedBy: localStorage.getItem('userID'),
+        Comment: comment
+      };
+  
+      if (action === 'approve') {
+        updateData.HalalStatus = 1;
+      } else if (action === 'reject') {
+        updateData.HalalStatus = 0;
+      }
+  
+      // Update the report status and other fields
+      const endpoint = `http://localhost:8085/finalise_report/${category}`;
       await axios.post(endpoint, {
         reportId,
-        halalStatus: isHalal,
-        comment
+        updateData
       });
+  
       // Close the modal
       onClose();
       // Refresh the page
       window.location.reload();
     } catch (error) {
-      console.error('Failed to submit data:', error);
+      console.error('Failed to update report:', error);
       // Handle error accordingly
     }
   };
@@ -155,42 +167,31 @@ const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
             </div>
             <div className="form-group">
               <p className="bold-text"> {/* Added class for bold text */}
-                <strong>Halal Status:</strong>
+                <strong>Halal Status:</strong>{reportData.HalalStatus === 0 ? 'Not Halal' : 'Halal'}
               </p>
-              <div className="halal-buttons">
-                <button
-                  className={`halalStatus ${isHalal === true ? 'active' : ''}`}
-                  onClick={handleHalalStatus}
-                >
-                  Halal
-                </button>
-                <button
-                  className={`halalStatus ${isHalal === false ? 'active' : ''}`}
-                  onClick={handleHalalStatus}
-                >
-                  Not Halal
-                </button>
-              </div>
-            </div>
-            <div className="form-group">
+              <div className="comment-edit">
               <label htmlFor="comment" className="bold-text"> {/* Added class for bold text */}
-                <strong>Comment:</strong>
+                Officer Comment:
               </label>
               <input
                 type="text"
                 id="comment"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
+                value={reportData.Comment}
+                onChange={handleCommentChange}
+                className="comment-input"
               />
             </div>
+            </div>
+            
           </div>
         )}
         <div className="modal-footer">
-          <button onClick={handleSubmit}>Submit</button>
+          <button onClick={() => handleAction('approve')}>Approve</button>
+          <button onClick={() => handleAction('reject')}>Reject</button>
         </div>
       </div>
     </div>
   );
 };
 
-export default ProductReportModal;
+export default ReportHeadOfficer;

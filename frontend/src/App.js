@@ -10,6 +10,7 @@ import EditProductPage from './pages/EditProductPage';
 import EditMosquePage from './pages/EditMosquePage';
 import ReportPage from './pages/Reports';
 import ProductReportPage from './pages/ProductReport';
+import ReportHeadOfficer from './pages/ReportHeadOfficer';
 
 // Create a component to conditionally render the Navbar
 const LayoutWithConditionalNavbar = () => {
@@ -28,6 +29,7 @@ const LayoutWithConditionalNavbar = () => {
         <Route path='/profile' element={<Profile />} />
         <Route path='/report' element={<ReportPage />} />
         <Route path="/productReport/:reportId/:category" element={<ProductReportPage />} />
+        <Route path="/reportHeadOfficer/:reportId/:category" element={<ReportHeadOfficer />} />
       </Routes>
     </>
   );

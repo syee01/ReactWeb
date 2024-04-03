@@ -1,150 +1,171 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import "../cssFolder/profile.css";
+import { FaPencilAlt, FaCheck, FaTimes } from 'react-icons/fa';
 
-const Profile = () => {
-    const [profileData, setProfileData] = useState({
-        username: '',
-        profilePic: null, // Assuming this is the path or URL to the image
-        newPassword: '',
-        confirmNewPassword: ''
-    });
-    const [editMode, setEditMode] = useState(false);
-    const [changePasswordMode, setChangePasswordMode] = useState(false);
-    const userID = localStorage.getItem('userID');
+const PasswordChangeModal = ({ isOpen, onClose, onSave }) => {
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     useEffect(() => {
-        fetchUserProfile();
-    }, []);
+        if (!isOpen) {
+            setNewPassword('');
+            setConfirmPassword('');
+        }
+    }, [isOpen]);
+  
+    const handleSave = () => {
+        if (newPassword === confirmPassword) {
+            onSave(newPassword);
+            setNewPassword('');
+            setConfirmPassword('');
+        } else {
+            alert("Passwords don't match!");
+        }
+    };
 
-    const fetchUserProfile = () => {
+    if (!isOpen) return null;
+  
+    return (
+      <div className="modal1">
+        <div className="modal1-content">
+          <span className="close1" onClick={onClose}>&times;</span>
+          <h2 className="changePasswordTitle">Change New Password</h2>
+          <input
+            type="password"
+            placeholder="New Password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Confirm New Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          <button className='passwordBtn' onClick={handleSave}>Confirm</button>
+        </div>
+      </div>
+    );
+  };
+
+const Profile = () => {
+    const [profileData, setProfileData] = useState({ username: '', email: '', role: '', gender: '', age: '', phone: '' });
+    const [editingField, setEditingField] = useState(null); // Track which field is being edited
+    const userID = localStorage.getItem('userID');
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+
+    useEffect(() => {
+        if (userID) {
+            fetchUserProfile(userID);
+        } else {
+            console.error('User ID not found in localStorage');
+        }
+    }, [userID]);
+
+    const fetchUserProfile = (userID) => {
         axios.get(`http://localhost:8085/userProfile/${userID}`)
             .then(response => {
-                setProfileData(prevData => ({
-                    ...prevData,
-                    username: response.data.username,
-                    profilePic: response.data.profilePic // Adjust according to how your API sends the image path or URL
-                }));
+                setProfileData(response.data);
             })
             .catch(error => console.error("Error fetching user profile:", error));
     };
 
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setProfileData(prevData => ({
-            ...prevData,
-            [name]: value
-        }));
+    const handleEditClick = (fieldName) => {
+        setEditingField(fieldName);
     };
 
-    const handleFileChange = (event) => {
-        setProfileData(prevData => ({
-            ...prevData,
-            profilePic: event.target.files[0] // Assuming file input for image
-        }));
+    const handleCancelClick = () => {
+        setEditingField(null);
     };
 
-    const handleEdit = () => {
-        setEditMode(!editMode);
+    const handlePasswordChange = (newPassword) => {
+        // Call the API to update the password in the database
+        axios.put(`http://localhost:8085/changePassword/${userID}`, {
+            newPassword
+        })
+        .then(response => {
+            alert('Password updated successfully!'); // Show success alert
+            setIsPasswordModalOpen(false); // Close the modal on success
+        })
+        .catch(error => {
+            console.error("Error updating password:", error);
+        });
     };
 
-    const handleSave = async () => {
-        // Implement the update logic here
-        const formData = new FormData();
-        formData.append('username', profileData.username);
-        formData.append('profilePic', profileData.profilePic); // Assuming file input for image
-        // Add more fields as necessary
+    const handleSaveClick = async (fieldName) => {
         try {
-            await axios.post(`http://localhost:8085/updateUserProfile/${userID}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            setEditMode(false);
-            fetchUserProfile(); // Refetch to get updated data
+          const response = await axios.put(`http://localhost:8085/updateUserProfile/${userID}`, {
+            [fieldName]: profileData[fieldName]
+          });
+          console.log(response.data);
+          // If update was successful, reset the editing field to null
+          setEditingField(null);
         } catch (error) {
-            console.error("Error updating profile:", error);
+          console.error("Error updating user profile:", error);
         }
+      };
+      
+
+    const handleChange = (e) => {
+        setProfileData({ ...profileData, [e.target.name]: e.target.value });
     };
 
-    const handlePasswordChange = async () => {
-        if (profileData.newPassword !== profileData.confirmNewPassword) {
-            alert('Passwords do not match!');
-            return;
-        }
-        try {
-            await axios.put(`http://localhost:8085/changeUserPassword/${userID}`, {
-                userID,
-                newPassword: profileData.newPassword
-            });
-            alert('Password updated successfully');
-            setChangePasswordMode(false);
-            setProfileData(prevData => ({
-                ...prevData,
-                newPassword: '',
-                confirmNewPassword: ''
-            }));
-        } catch (error) {
-            console.error("Error changing password:", error);
-        }
-    };
-
-    return (
-        <div className="profile-container">
-            <div className="avatar-container">
-                {profileData.profilePic && <img src={profileData.profilePic} alt="Profile" />}
-                {editMode && <input type="file" name="profilePic" onChange={handleFileChange} />}
-            </div>
-            <div className="username-edit-container">
-            {editMode ? (
-                <>
-                    <input
-                        className="input-text"
-                        type="text"
-                        name="username"
-                        value={profileData.username}
-                        onChange={handleInputChange}
-                    />
-                    <button className="btn btn-save" onClick={handleSave}>Save</button>
-                    <button className="btn btn-cancel" onClick={handleEdit}>Cancel</button>
-                </>
-            ) : (
-                <>
-                    <p>{profileData.username}</p>
-                    <button className="btn btn-edit" onClick={handleEdit}>Edit Profile</button>
-                </>
-            )}
-            </div>
-            {changePasswordMode ? (
-        <div>
-            <div className="password-container">
-                <input
-                    className="input-password"
-                    type="password"
-                    placeholder="New Password"
-                    name="newPassword"
-                    value={profileData.newPassword}
-                    onChange={handleInputChange}
-                />
-            </div>
-            <div className="password-container">
-                <input
-                    className="input-password"
-                    type="password"
-                    placeholder="Confirm New Password"
-                    name="confirmNewPassword"
-                    value={profileData.confirmNewPassword}
-                    onChange={handleInputChange}
-                />
-            </div>
-            <div className="button-container">
-                <button className="btn" type="submit" onClick={handlePasswordChange}>Update Password</button>
-                <button className="btn" onClick={() => setChangePasswordMode(false)}>Cancel</button>
-            </div>
+    const renderField = (fieldKey, isEditable) => {
+        return (
+            <div key={fieldKey} className="profile-field">
+                <div className="field-title">
+                    <strong>{fieldKey.charAt(0).toUpperCase() + fieldKey.slice(1)}</strong>
                 </div>
-            ) : (
-                <button className="btn" onClick={() => setChangePasswordMode(true)}>Change Password</button>
-            )}
+                <div className="field-content">
+                    {editingField === fieldKey ? (
+                        <>
+                            <input
+                                type="text"
+                                name={fieldKey}
+                                value={profileData[fieldKey]}
+                                onChange={handleChange}
+                            />
+                            <FaCheck className="icon save-icon" onClick={() => handleSaveClick(fieldKey)} />
+                            <FaTimes className="icon cancel-icon" onClick={handleCancelClick} />
+                        </>
+                    ) : (
+                        <>
+                            <span>{profileData[fieldKey]}</span>
+                            {isEditable && <FaPencilAlt className="icon edit-icon" onClick={() => handleEditClick(fieldKey)} />}
+                        </>
+                    )}
+                </div>
+            </div>
+        );
+    };
+    
+    return (
+        <div className="page-wrapper">
+            <div className="profile-container">
+                <div className="avatar-container">
+                    <img
+                        src={`http://localhost:8085/images/userProfile/${profileData.imageURL}`}
+                        alt="Profile"
+                        className="avatar"
+                        style={{ width: '100px', height: 'auto' }}
+                    />
+                    <div className="user-info">
+                        {renderField('username', true)}
+                        {renderField('email', true)}
+                        {renderField('role', false)}
+                        {renderField('gender', true)}
+                        {renderField('age', true)}
+                        {renderField('phone', true)}
+                    </div>
+                    <button onClick={() => setIsPasswordModalOpen(true)} className="change-password-btn">CHANGE PASSWORD</button>
+                    <PasswordChangeModal
+                        isOpen={isPasswordModalOpen}
+                        onClose={() => setIsPasswordModalOpen(false)}
+                        onSave={handlePasswordChange}
+                    />
+                </div>
+            </div>
         </div>
     );
 };

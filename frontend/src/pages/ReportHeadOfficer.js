@@ -69,11 +69,13 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
         Comment: comment, // Use the state value
       };
   
+      
       if (action === 'approve') {
-        updateData.HalalStatus = 1;
+        // Keep the original HalalStatus for approval.
+        updateData.HalalStatus = reportData.HalalStatus;
       } else if (action === 'reject') {
-
-        updateData.HalalStatus = 0;
+        // Toggle HalalStatus for rejection.
+        updateData.HalalStatus = reportData.HalalStatus === '0' ? 1 : 0;
       }
   
       const endpoint = `http://localhost:8085/finalise_report/${category}`;

@@ -683,48 +683,57 @@ app.put('/krproduct/:id', upload.single('image'), (req, res) => {
 
 app.get("/userProfile/:userID", (req, res) => {
   const { userID } = req.params;
-  const sql = "SELECT username, profilePic FROM user WHERE userID = ?";
+  const sql = "SELECT * FROM user WHERE UserID = ?";
   db.query(sql, [userID], (err, results) => {
-      if (err) {
-          console.error("Error fetching user profile:", err);
-          return res.status(500).json({ message: "Error fetching user profile" });
-      }
-      if (results.length > 0) {
-          const { username, profilePic } = results[0];
-          res.json({ username, profilePic });
-      } else {
-          res.status(404).json({ message: "User not found" });
-      }
+    if (err) {
+      console.error("Error fetching user profile:", err);
+      return res.status(500).json({ message: "Error fetching user profile" });
+    }
+    if (results.length > 0) {
+      const userProfile = results[0]; // Assuming only one user with this ID
+      res.json(userProfile);
+    } else {
+      res.status(404).json({ message: "User not found with ID " + userID });
+    }
   });
 });
 
-app.post("/updateUserProfile/:userID", upload.single('profilePic'), (req, res) => {
-  const { userID } = req.params;
-  const { username } = req.body;
-  const profilePic = req.file ? req.file.path : null;
 
-  let sql = "UPDATE user SET username = ?, profilePic = ? WHERE UserID = ?";
-  let values = [username, profilePic, userID];
-  
-  db.query(sql, values, (err, result) => {
-      if (err) {
-          console.error("Error updating user profile:", err);
-          return res.status(500).json({ message: "Error updating user profile" });
+app.put('/updateUserProfile/:userID', (req, res) => {
+  const userID = req.params.userID;
+  const fieldName = Object.keys(req.body)[0]; // assuming the object has a single key
+  const fieldValue = req.body[fieldName];
+
+  // Construct your SQL query to update only the specified field
+  const query = `UPDATE user SET ${fieldName} = ? WHERE UserID = ?`;
+  const values = [fieldValue, userID];
+
+  // Perform the database query
+  // Replace with your actual database code
+  db.query(query, values, (error, results, fields) => {
+      if (error) {
+          res.status(500).send('Error updating user profile');
+          return;
       }
-      res.json({ message: "Profile updated successfully" });
+      res.send('Profile updated successfully');
   });
 });
 
-app.put("/changeUserPassword/:userID", (req, res) => {
-  const { userID, newPassword } = req.body;
-  const sql = "UPDATE user SET password = ? WHERE UserID = ?";
-  
-  db.query(sql, [newPassword, userID], (err, result) => {
-      if (err) {
-          console.error("Error changing password:", err);
-          return res.status(500).json({ message: "Error changing password" });
-      }
-      res.json({ message: "Password updated successfully" });
+
+app.put('/changePassword/:userID', (req, res) => {
+  const userID = req.params.userID;
+  const newPassword = req.body.newPassword; // Make sure you hash this password before storing
+
+  // Replace with your actual database update logic, make sure to hash the password
+  const query = 'UPDATE user SET password = ? WHERE UserID = ?';
+  const values = [newPassword, userID]; // Use a proper hashing function like bcrypt
+
+  db.query(query, values, (error, results) => {
+    if (error) {
+      res.status(500).send('Error updating password');
+    } else {
+      res.send('Password updated successfully');
+    }
   });
 });
 

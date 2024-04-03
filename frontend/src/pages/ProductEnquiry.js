@@ -3,16 +3,13 @@ import axios from 'axios';
 import moment from 'moment';
 import '../cssFolder/modalProducts.css';
 
-const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
+const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
   const [reportData, setReportData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [reportImages, setReportImages] = useState([]);
   const [comment, setComment] = useState('');
- 
-  const handleCommentChange = (e) => {
-    setComment(e.target.value);
-  };
+  const [isHalal, setIsHalal] = useState(null);
 
   const filterNull = (location) => {
     // Split the location into parts
@@ -28,10 +25,10 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
       const fetchData = async () => {
         setIsLoading(true);
         try {
-          const endpoint = `http://localhost:8085/specificReports/${category}/${reportId}`;
+          const endpoint = `http://localhost:8085/specificEnquiry/${category}/${reportId}`;
+          console.log(endpoint)
           const response = await axios.get(endpoint);
           setReportData(response.data);
-          setComment(response.data.Comment || ''); 
         } catch (err) {
           setError('Failed to fetch data. Please try again later.');
           console.error(err);
@@ -43,7 +40,7 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
       fetchData();
       const fetchReportImages = async () => {
         try {
-          const endpoint = `http://localhost:8085/reportImages/${reportId}`;
+          const endpoint = `http://localhost:8085/enquiryImages/${reportId}`;
           const response = await axios.get(endpoint);
           setReportImages(response.data);
         } catch (err) {
@@ -54,38 +51,31 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
       if (isOpen) {
         setIsLoading(true);
         fetchData();
-        fetchReportImages().then(() => setIsLoading(false));
+        fetchReportImages().then(() => setIsLoading(false)); 
       }
     }
   }, [isOpen, reportId, category]);
 
+  const handleHalalStatus = () => {
+    setIsHalal(prevState => !prevState);
+  };
 
-  const handleAction = async (action) => {
-    console.log(comment)
+  
+  const handleSubmit = async () => {
     try {
-      const updateData = {
-        Status: 'Completed',
-        ApprovedBy: localStorage.getItem('userID'),
-        Comment: comment, // Use the state value
-      };
-  
-      if (action === 'approve') {
-        updateData.HalalStatus = 1;
-      } else if (action === 'reject') {
-
-        updateData.HalalStatus = 0;
-      }
-  
-      const endpoint = `http://localhost:8085/finalise_report/${category}`;
+      const endpoint = `http://localhost:8085/update_enquiry/${category}`;
       await axios.post(endpoint, {
         reportId,
-        updateData
+        halalStatus: isHalal,
+        comment
       });
-  
-      onClose(); // Close the modal
-      window.location.reload(); // Refresh the page
+      // Close the modal
+      onClose();
+      // Refresh the page
+      window.location.reload();
     } catch (error) {
-      console.error('Failed to update report:', error);
+      console.error('Failed to submit data:', error);
+      // Handle error accordingly
     }
   };
 
@@ -166,31 +156,42 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
             </div>
             <div className="form-group">
               <p className="bold-text"> {/* Added class for bold text */}
-                <strong>Halal Status: </strong>{ reportData.HalalStatus === '0' ? 'Not Halal' : 'Halal'}
+                <strong>Halal Status: </strong>
               </p>
-              <div className="comment-edit">
+              <div className="halal-buttons">
+                <button
+                  className={`halalStatus ${isHalal === true ? 'active' : ''}`}
+                  onClick={handleHalalStatus}
+                >
+                  Halal
+                </button>
+                <button
+                  className={`halalStatus ${isHalal === false ? 'active' : ''}`}
+                  onClick={handleHalalStatus}
+                >
+                  Not Halal
+                </button>
+              </div>
+            </div>
+            <div className="form-group">
               <label htmlFor="comment" className="bold-text"> {/* Added class for bold text */}
-                Officer Comment:
+                <strong>Comment: </strong>
               </label>
               <input
                 type="text"
                 id="comment"
                 value={comment}
-                onChange={handleCommentChange}
-                className="comment-input"
+                onChange={(e) => setComment(e.target.value)}
               />
             </div>
-            </div>
-            
           </div>
         )}
         <div className="modal-footer">
-          <button onClick={() => handleAction('approve')}>Approve</button>
-          <button onClick={() => handleAction('reject')}>Reject</button>
+          <button onClick={handleSubmit}>Submit</button>
         </div>
       </div>
     </div>
   );
 };
 
-export default ReportHeadOfficer;
+export default ProductEnquiryModal;

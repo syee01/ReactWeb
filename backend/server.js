@@ -76,6 +76,31 @@ app.post('/finalise_report/:category', (req, res) => {
   });
 });
 
+app.post('/finalise_enquiry/:category', (req, res) => {
+  const { reportId, updateData } = req.body;
+  const { category } = req.params;
+
+  let tableName = '';
+  if (category === 'Restaurants') {
+    tableName = 'restaurant_enquiry';
+  } else if (category === 'Products') {
+    tableName = 'product_enquiry';
+  } else {
+    return res.status(400).json({ error: 'Invalid category' });
+  }
+
+  const query = `UPDATE ${tableName} SET ? WHERE ReportID = ?`;
+
+  db.query(query, [updateData, reportId], (err, result) => {
+    if (err) {
+      console.error('Error updating report:', err);
+      return res.status(500).json({ error: 'Failed to update report' });
+    }
+    console.log('Report updated successfully');
+    res.status(200).json({ message: 'Report updated successfully' });
+  });
+});
+
 
 app.post('/update_report/:category', (req, res) => {
   const { category } = req.params;
@@ -103,7 +128,44 @@ app.post('/update_report/:category', (req, res) => {
   });
 });
 
+app.post('/update_enquiry/:category', (req, res) => {
+  const { category } = req.params;
+  const { reportId, halalStatus, comment } = req.body;
+  
+  let tableName = '';
+  if (category === 'Products') {
+    tableName = 'product_enquiry';
+  } else if (category === 'Restaurants') {
+    tableName = 'restaurant_enquiry';
+  } else {
+    res.status(400).send('Invalid category');
+    return;
+  }
+
+  const sql = `UPDATE ${tableName} SET HalalStatus = ?, Comment = ?, Status = 'To Be Confirmed' WHERE ReportID = ?`;
+  db.query(sql, [halalStatus, comment, reportId], (err, result) => {
+    if (err) {
+      console.error(`Error updating ${category} report:`, err);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+    console.log(`${category} report updated successfully`);
+    res.status(200).send(`${category} report updated successfully`);
+  });
+});
+
 app.get('/reportImages/:reportId', (req, res) => {
+  const reportId = req.params.reportId;
+  getImagesForReportId(reportId, (err, imagePaths) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Server error');
+    }
+    res.json(imagePaths);
+  });
+});
+
+app.get('/enquiryImages/:reportId', (req, res) => {
   const reportId = req.params.reportId;
   getImagesForReportId(reportId, (err, imagePaths) => {
     if (err) {
@@ -174,10 +236,47 @@ app.get('/specificReports/:category/:reportId', (req, res) => {
   });
 });
 
+app.get('/specificEnquiry/:category/:reportId', (req, res) => {
+  const { category, reportId } = req.params;
+  let tableName = category === 'Restaurants' ? 'restaurant_enquiry' : 'product_enquiry';
+  
+  db.query(`SELECT * FROM ${tableName} WHERE ReportID = ?`, [reportId], (err, results) => {
+    if (err) {
+      console.log(error)
+      return res.status(500).send('An error occurred');
+    }
+    if (results.length === 0) {
+      console.log(error)
+      return res.status(404).send('Report not found');
+    }
+    res.json(results[0]);
+  });
+});
+
 app.put('/viewByReportUpdate/:reportId', (req, res) => {
   const { reportId } = req.params;
   const { viewedBy, category, status } = req.body;
   let tableName = category === 'Products' ? 'product_reports' : 'restaurant_reports';
+  const sql = `UPDATE ${tableName} SET ViewedBy = ?, Status = ? WHERE ReportID = ?`;
+
+  console.log('Route hit with reportId:', typeof(req.params.reportId));
+
+  db.query(sql, [viewedBy, status, reportId], (error, results) => {
+    if (error) {
+      console.log('Error updating report:', error);
+      return res.status(500).send('Error updating report');
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).send('Report not found');
+    }
+    res.json({ message: 'Report updated successfully' });
+  });
+});
+
+app.put('/viewByEnquiryUpdate/:reportId', (req, res) => {
+  const { reportId } = req.params;
+  const { viewedBy, category, status } = req.body;
+  let tableName = category === 'Products' ? 'product_enquiry' : 'restaurant_enquiry';
   const sql = `UPDATE ${tableName} SET ViewedBy = ?, Status = ? WHERE ReportID = ?`;
 
   console.log('Route hit with reportId:', typeof(req.params.reportId));
@@ -232,6 +331,46 @@ app.get('/reports', (req, res) => {
     res.json(processedResults);
   });
 });
+
+app.get('/enquiry', (req, res) => {
+  const { category, status } = req.query;
+  let tableName = '';
+
+  if (category === 'Products') {
+    tableName = 'product_enquiry';
+  } else if (category === 'Restaurants') {
+    tableName = 'restaurant_enquiry';
+  } else {
+    return res.status(400).send('Invalid category');
+  }
+
+  const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+
+  // Adjust this query based on your actual database schema
+  // This example assumes that you have a 'users' table where the username for a given userID can be found
+  const query = `
+    SELECT r.*, u1.username AS ViewedByUsername, u2.username AS ApprovedByUsername
+    FROM ${tableName} r
+    LEFT JOIN user u1 ON r.ViewedBy = u1.UserID
+    LEFT JOIN user u2 ON r.ApprovedBy = u2.UserID
+    WHERE r.Status = ?
+  `;
+
+  db.query(query, [formattedStatus], (error, results) => {
+    if (error) {
+      console.error('SQL Error:', error.message);
+      return res.status(500).send('Error fetching reports');
+    }
+    // Process the results to replace NULL with a dash
+    const processedResults = results.map(report => ({
+      ...report,
+      ViewedByUsername: report.ViewedByUsername || '-',
+      ApprovedByUsername: report.ApprovedByUsername || '-'
+    }));
+    res.json(processedResults);
+  });
+});
+
 
 // write login error 
 app.post('/login', [check('email', "Email length error").isEmail().isLength({ min: 10, max: 30 }), check('password', "password length 8-10").isLength({ min: 1, max: 10 })], (req, res) => {

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../cssFolder/report.css';
 import moment from 'moment'; 
-import ProductReportModal from './ProductReport';
-import ReportHeadOfficer from './ReportHeadOfficer';
-import CompletedReportModal from './CompletedReport';
+import ProductEnquiryModal from './ProductEnquiry';
+import EnquiryHeadOfficer from './EnquiryHeadOfficer';
+import CompletedEnquiryModal from './CompletedEnquiry';
 
-const ReportPage = () => {
+const EnquiryPage = () => {
   const [activeTab, setActiveTab] = useState('PENDING');
   const [activeCategory, setActiveCategory] = useState('Products');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,7 +28,7 @@ const ReportPage = () => {
 
   const fetchReports = async () => {
     try {
-      const response = await axios.get(`http://localhost:8085/reports`, {
+      const response = await axios.get(`http://localhost:8085/enquiry`, {
         params: { 
           category: activeCategory,
           status: activeTab
@@ -36,7 +36,7 @@ const ReportPage = () => {
       });
       setReports(response.data);
     } catch (error) {
-      console.error('Error fetching reports:', error);
+      console.error('Error fetching enquiry:', error);
     }
   };
   
@@ -48,7 +48,7 @@ const ReportPage = () => {
             return;
         }
 
-        await axios.put(`http://localhost:8085/viewByReportUpdate/${reportId}`, {
+        await axios.put(`http://localhost:8085/viewByEnquiryUpdate/${reportId}`, {
             viewedBy: currentUser,
             category: activeCategory,
             status: 'Reviewed'
@@ -69,7 +69,7 @@ const ReportPage = () => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const response = await axios.get(`http://localhost:8085/reports`, {
+        const response = await axios.get(`http://localhost:8085/enquiry`, {
           params: { 
             category: activeCategory,
             status: activeTab
@@ -241,18 +241,18 @@ const ReportPage = () => {
         </div>
       </div>
       <>
-        {reports.map((report) => (
+      {reports.map((report) => (
         <React.Fragment key={report.id}>
           {activeTab !== 'To be confirmed' ? (
             activeTab === 'Completed' ? (
-              <CompletedReportModal
+              <CompletedEnquiryModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 reportId={selectedReportId}
                 category={activeCategory}
               />
             ) : (
-              <ProductReportModal
+              <ProductEnquiryModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 reportId={selectedReportId}
@@ -260,7 +260,7 @@ const ReportPage = () => {
               />
             )
           ) : (
-            <ReportHeadOfficer
+            <EnquiryHeadOfficer
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
               reportId={selectedReportId}
@@ -274,4 +274,4 @@ const ReportPage = () => {
   );
 };
 
-export default ReportPage;
+export default EnquiryPage;

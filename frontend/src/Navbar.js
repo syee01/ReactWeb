@@ -30,7 +30,7 @@ const Navbar = () => {
             <div className="links">
                 <Link to="/home">Home</Link>
                 <Link to="/report">Report</Link>
-                <Link to="/contact">Enquiry</Link>
+                <Link to="/enquiry">Enquiry</Link>
                 <Link to="/data">Data</Link>
                 {user && (
                     <div className="user-menu" onClick={toggleDropdown}>

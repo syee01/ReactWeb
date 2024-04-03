@@ -3,16 +3,12 @@ import axios from 'axios';
 import moment from 'moment';
 import '../cssFolder/modalProducts.css';
 
-const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
+const CompletedEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
   const [reportData, setReportData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [reportImages, setReportImages] = useState([]);
-  const [comment, setComment] = useState('');
- 
-  const handleCommentChange = (e) => {
-    setComment(e.target.value);
-  };
+  const [isHalal, setIsHalal] = useState(null);
 
   const filterNull = (location) => {
     // Split the location into parts
@@ -28,10 +24,9 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
       const fetchData = async () => {
         setIsLoading(true);
         try {
-          const endpoint = `http://localhost:8085/specificReports/${category}/${reportId}`;
+          const endpoint = `http://localhost:8085/specificEnquiry/${category}/${reportId}`;
           const response = await axios.get(endpoint);
           setReportData(response.data);
-          setComment(response.data.Comment || ''); 
         } catch (err) {
           setError('Failed to fetch data. Please try again later.');
           console.error(err);
@@ -43,7 +38,7 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
       fetchData();
       const fetchReportImages = async () => {
         try {
-          const endpoint = `http://localhost:8085/reportImages/${reportId}`;
+          const endpoint = `http://localhost:8085/enquiryImages/${reportId}`;
           const response = await axios.get(endpoint);
           setReportImages(response.data);
         } catch (err) {
@@ -59,34 +54,8 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
     }
   }, [isOpen, reportId, category]);
 
-
-  const handleAction = async (action) => {
-    console.log(comment)
-    try {
-      const updateData = {
-        Status: 'Completed',
-        ApprovedBy: localStorage.getItem('userID'),
-        Comment: comment, // Use the state value
-      };
-  
-      if (action === 'approve') {
-        updateData.HalalStatus = 1;
-      } else if (action === 'reject') {
-
-        updateData.HalalStatus = 0;
-      }
-  
-      const endpoint = `http://localhost:8085/finalise_report/${category}`;
-      await axios.post(endpoint, {
-        reportId,
-        updateData
-      });
-  
-      onClose(); // Close the modal
-      window.location.reload(); // Refresh the page
-    } catch (error) {
-      console.error('Failed to update report:', error);
-    }
+  const handleHalalStatus = () => {
+    setIsHalal(prevState => !prevState);
   };
 
   if (!isOpen) return null;
@@ -164,33 +133,18 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
                 </div>
               ))}
             </div>
-            <div className="form-group">
-              <p className="bold-text"> {/* Added class for bold text */}
-                <strong>Halal Status: </strong>{ reportData.HalalStatus === '0' ? 'Not Halal' : 'Halal'}
-              </p>
-              <div className="comment-edit">
-              <label htmlFor="comment" className="bold-text"> {/* Added class for bold text */}
-                Officer Comment:
-              </label>
-              <input
-                type="text"
-                id="comment"
-                value={comment}
-                onChange={handleCommentChange}
-                className="comment-input"
-              />
-            </div>
-            </div>
             
+            <p>
+              <strong>Halal Status: </strong>{ reportData.HalalStatus === '0' ? 'Not Halal' : 'Halal'}
+            </p>
+            <p>
+                  <strong>Comment: </strong> {reportData.Comment}
+            </p>
           </div>
         )}
-        <div className="modal-footer">
-          <button onClick={() => handleAction('approve')}>Approve</button>
-          <button onClick={() => handleAction('reject')}>Reject</button>
-        </div>
       </div>
     </div>
   );
 };
 
-export default ReportHeadOfficer;
+export default CompletedEnquiryModal;

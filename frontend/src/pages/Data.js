@@ -30,6 +30,7 @@ const Data = () => {
   const [products, setProducts] = useState([]);
   const [mosques, setMosques] = useState([]);
   const [prayerRoom, setPrayerRoom] = useState([]);
+  const [restaurant, setRestaurant] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [filter, setFilter] = useState('');
   const [visibleRows, setVisibleRows] = useState(10);
@@ -56,12 +57,12 @@ const Data = () => {
   useEffect(() => {
     if (selectedCategory === 'Products') {
       fetchProducts();
-    }
-    else if(selectedCategory === 'Mosques') {
+    } else if (selectedCategory === 'Mosques') {
       fetchMosques();
-    }
-    else if(selectedCategory === 'Prayer Room') {
+    } else if (selectedCategory === 'Prayer Room') {
       fetchPrayerRoom();
+    } else if (selectedCategory === 'Restaurants') {
+      fetchRestaurants();
     }
   }, [selectedCountry, selectedCategory]);
 
@@ -125,6 +126,26 @@ const Data = () => {
     setIsFetching(false);
   };
 
+  const fetchRestaurants = async () => {
+    setIsFetching(true);
+    try {
+      let endpoint = '';
+      if (selectedCountry === 'THAILAND') {
+        endpoint = 'http://localhost:8085/thailandrestaurant';
+      } else if (selectedCountry === 'KOREA') {
+        endpoint = 'http://localhost:8085/korearestaurant';
+      } else {
+        // Default to MALAYSIA
+        endpoint = 'http://localhost:8085/malaysiarestaurant';
+      }
+      const response = await axios.get(endpoint);
+      setRestaurant(response.data);
+    } catch (error) {
+      console.error('Error fetching restaurant:', error);
+    }
+    setIsFetching(false);
+  };
+
   const handleFilterChange = (e) => {
     setFilter(e.target.value.toLowerCase());
   };
@@ -176,9 +197,19 @@ const Data = () => {
     return matchesFilter;
   });
 
+  const filteredRestaurant = restaurant.filter((restaurant) => {
+    const restaurantName = restaurant.name || "";
+
+    const matchesFilter = filterBy === 'name'
+    ? restaurantName.toLowerCase().includes(filter)
+    : false;
+        
+    return matchesFilter;
+  });
+
   useEffect(() => {
     setVisibleRows(5); // Reset visible rows on product change
-  }, [products,prayerRoom, mosques]);
+  }, [products,prayerRoom, mosques, restaurant]);
 
   const handleScroll = (e) => {
     const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
@@ -190,6 +221,7 @@ const Data = () => {
   const displayedProducts = filteredProducts.slice(0, visibleRows);
   const displayedMosques = filteredMosques.slice(0, visibleRows);
   const displayedPrayerRoom = filteredPrayerRoom.slice(0, visibleRows);
+  const displayedRestaurant = filteredRestaurant.slice(0, visibleRows);
 
   const getImageUrl = (country, imageURL) => {
     switch (country) {
@@ -287,6 +319,39 @@ const Data = () => {
                   </tbody>
                 </table>
               </div>
+              )}{selectedCategory === 'Restaurants' && (
+                <div className="scrollable-table-container" onScroll={handleScroll}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Location</th>
+                      <th>State</th>
+                      <th>Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody className="table-scroll">
+                    {displayedRestaurant.map((restaurant) => (
+                      <tr key={restaurant.restaurantID}>
+                        <td>{restaurant.restaurantID}</td>
+                        <td>{restaurant.name}</td>
+                        <td>{restaurant.address}</td>
+                        <td>{restaurant.region}</td>
+                        <td>
+                          <button
+                            onClick={() => navigate(`/editRestaurant/${restaurant.restaurantID}?country=${selectedCountry}`)}
+                            disabled={userRole !== 'data admin'}
+                            className="edit-button"
+                          >
+                            Edit
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                </div>
               )}
               {selectedCategory === 'Mosques' && (
                 <div className="scrollable-table-container" onScroll={handleScroll}>
@@ -320,6 +385,7 @@ const Data = () => {
                 </table>
                 </div>
               )}
+              
               {selectedCategory === 'Prayer Room' && (
                 <div className="scrollable-table-container" onScroll={handleScroll}>
                 <table>

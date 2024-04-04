@@ -4,6 +4,7 @@ const cors = require("cors");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const util = require('util')
 const { check, validationResult } = require('express-validator');
 
 const app = express();
@@ -17,6 +18,67 @@ const db = mysql.createConnection({
   password: "",
   database: "myhalalchecker"
 })
+
+const query = util.promisify(db.query).bind(db);
+app.get('/api/data', async (req, res) => {
+  try {
+    const categories = ['product', 'restaurant', 'mosque', 'pr'];
+    const countries = ['malaysia', 'korea', 'thailand'];
+
+    const data = {};
+
+    await Promise.all(countries.map(async (country) => {
+      data[country] = await Promise.all(categories.map(async (category) => {
+        const tableName = `${country}${category}`;
+        // Use the promisified `query` function here
+        const rows = await query(`SELECT COUNT(*) AS count FROM ${tableName}`);
+        return rows[0].count; // Adjust based on the structure `query` returns
+      }));
+    }));
+
+    res.json({ data });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/user-count', async (req, res) => {
+  try {
+      const rows = await query('SELECT COUNT(*) AS count FROM user WHERE role = ?', ['user']);
+      res.json({ usersCount: rows[0].count });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Endpoint to get the total reports submitted
+app.get('/reports-count', async (req, res) => {
+  try {
+    const restaurantsReports = await query('SELECT COUNT(*) AS count FROM restaurant_reports');
+    const productsReports = await query('SELECT COUNT(*) AS count FROM product_reports');
+    res.json({
+      totalReports: restaurantsReports[0].count + productsReports[0].count,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({error: 'Internal server error'});
+  }
+});
+
+app.get('/enquiries-count', async (req, res) => {
+  try {
+    const restaurantsEnquiry = await query('SELECT COUNT(*) AS count FROM restaurant_enquiry');
+    const productsEnquiry = await query('SELECT COUNT(*) AS count FROM product_enquiry');
+    res.json({
+      totalEnquiries: restaurantsEnquiry[0].count + productsEnquiry[0].count,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({error: 'Internal server error'});
+  }
+});
 
 const imagesDir = path.join(__dirname, '../frontend/src/images');
 app.use('/images', express.static(imagesDir));
@@ -530,6 +592,51 @@ app.get('/masproduct', (req, res) => {
     });
   });
 
+  app.get('/malaysiarestaurant', (req, res) => {
+    // Assuming you have a database connection setup with a query function
+    const sql = 'SELECT * FROM malaysiarestaurant'; // Selects all products
+    db.query(sql, (err, results) => {
+      if (err) {
+        // Handle error
+        console.log('here')
+        console.error(err);
+        res.status(500).json({ message: 'Error retrieving products' });
+      } else {
+        res.json(results);
+      }
+    });
+  });
+
+  app.get('/thailandrestaurant', (req, res) => {
+    // Assuming you have a database connection setup with a query function
+    const sql = 'SELECT * FROM thailandrestaurant'; // Selects all products
+    db.query(sql, (err, results) => {
+      if (err) {
+        // Handle error
+        console.log('here')
+        console.error(err);
+        res.status(500).json({ message: 'Error retrieving products' });
+      } else {
+        res.json(results);
+      }
+    });
+  });
+
+  app.get('/korearestaurant', (req, res) => {
+    // Assuming you have a database connection setup with a query function
+    const sql = 'SELECT * FROM korearestaurant'; // Selects all products
+    db.query(sql, (err, results) => {
+      if (err) {
+        // Handle error
+        console.log('here')
+        console.error(err);
+        res.status(500).json({ message: 'Error retrieving products' });
+      } else {
+        res.json(results);
+      }
+    });
+  });
+
   app.get('/masproduct/:id', (req, res) => {
     const productId = req.params.id; // Get the product ID from the route parameter
     const sql = 'SELECT * FROM malaysiaproduct WHERE productID = ?'; // SQL query to select the product by ID
@@ -763,5 +870,6 @@ app.put('/malaysiamosque/:id', (req, res) => {
     }
   });
 });
+
 
 app.listen(8085, ()=> {console.log("listening");})

@@ -26,7 +26,7 @@ const LayoutWithConditionalNavbar = () => {
         <Route path='/home' element={<Home />} />
         <Route path='/data' element={<Data />} />
         <Route path="/editProduct/:productId" element={<EditProductPage />} />
-        <Route path="/editMosque/:productId" element={<EditMosquePage />} />
+        <Route path="/editMosque/:mosqueprId" element={<EditMosquePage />} />
         <Route path="/editPrayerRoom/:productId" element={<EditMosquePage />} />
         <Route path='/profile' element={<Profile />} />
         <Route path='/report' element={<ReportPage />} />

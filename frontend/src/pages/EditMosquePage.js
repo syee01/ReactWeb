@@ -4,34 +4,30 @@ import axios from 'axios';
 import '../cssFolder/editProduct.css';
 
 const EditMosquePage = () => {
-  const { productId } = useParams();
+  const { mosqueprId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [editedProduct, setEditedProduct] = useState({
+  const [editedMosque, setEditedMosque] = useState({
     name: '',
-    brand: '',
-    date: '',
-    imageURL: '',
+    location: '',
+    state: '',
+    district: '',
   });
-  const [imageFile, setImageFile] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
 
   const searchParams = new URLSearchParams(location.search);
   const country = searchParams.get('country');
   let datacountry = '';
-  let datacountryIMG = '';
+
   switch (country) {
     case 'THAILAND':
-      datacountry = 'thai';
-      datacountryIMG = 'thailand';
+      datacountry = 'thailand';
       break;
     case 'MALAYSIA':
-      datacountry = 'mas';
-      datacountryIMG = 'malaysia';
+      datacountry = 'malaysia';
       break;
     case 'KOREA':
-      datacountry = 'kr';
-      datacountryIMG = 'korea';
+      datacountry = 'korea';
       break;
     default:
       // Handle other cases or default case as needed
@@ -39,31 +35,24 @@ const EditMosquePage = () => {
   }
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchMosque = async () => {
       setIsFetching(true);
       try {
-        const response = await axios.get(`http://localhost:8085/${datacountry}product/${productId}`);
-        setEditedProduct(response.data);
+        const response = await axios.get(`http://localhost:8085/${datacountry}mosque/${mosqueprId}`);
+        console.log(mosqueprId)
+        setEditedMosque(response.data);
       } catch (error) {
-        console.error('Error fetching product:', error);
+      console.error('Error fetching mosque:', error);
       }
       setIsFetching(false);
     };
 
-    fetchProduct();
-  }, [productId, datacountry]);
+    fetchMosque();
+  }, [mosqueprId, datacountry]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditedProduct({ ...editedProduct, [name]: value });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validate file type if necessary
-      setImageFile(file);
-    }
+    setEditedMosque({ ...editedMosque, [name]: value });
   };
   
   const handleSave = async (event) => {
@@ -71,23 +60,13 @@ const EditMosquePage = () => {
     
     const formData = new FormData();
     formData.append('country', datacountry);
-    formData.append('name', editedProduct.name);
-    formData.append('brand', editedProduct.brand);
-    formData.append('date', editedProduct.date);
-
-    // Only append the new image if it has been selected
-    if (imageFile) {
-      const extension = imageFile.name.match(/\.(png|jpg|jpeg)$/i)[0];
-      const filename = `image_${productId}${extension}`;
-      formData.append('image', imageFile, filename);
-    } else {
-      // If no new image file is selected, send the original image URL
-      formData.append('imageURL', editedProduct.imageURL);
-    }
-    
+    formData.append('name', editedMosque.name);
+    formData.append('location', editedMosque.address);
+    formData.append('state', editedMosque.state);
+    formData.append('district', editedMosque.district);
     try {
       console.log(datacountry)
-      const response = await axios.put(`http://localhost:8085/${datacountry}product/${productId}`, formData, {
+      const response = await axios.put(`http://localhost:8085/${datacountry}mosque/${mosqueprId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -100,54 +79,47 @@ const EditMosquePage = () => {
   };
 
   if (isFetching) return <div>Loading...</div>;
-  if (!editedProduct) return <div>Product not found.</div>;
+  if (!editedMosque) return <div>Mosque not found.</div>;
 
   return (
     <div className='edit-form'>
-      <h2>Edit Product</h2>
+      <h2>Edit Mosque</h2>
       <form onSubmit={handleSave}>
       <div>
           <label>Name:</label>
           <input
             type="text"
             name="name"
-            value={editedProduct.name || ''}
+            value={editedMosque.name || ''}
             onChange={handleInputChange}
           />
         </div>
         <div>
-          <label>Brand:</label>
+          <label>Location:</label>
           <input
             type="text"
-            name="brand"
-            value={editedProduct.brand || ''}
+            name="address"
+            value={editedMosque.address|| ''}
             onChange={handleInputChange}
           />
         </div>
         <div>
-          <label>Expired Date:</label>
+          <label>State:</label>
           <input
-            type="date"
-            name="date"
-            value={editedProduct.date ? editedProduct.date.split('T')[0] : ''}
+            type="text"
+            name="address"
+            value={editedMosque.state|| ''}
             onChange={handleInputChange}
-            disabled={country === 'KOREA'}
           />
         </div>
         <div>
-          <label>Image:</label>
-          {editedProduct.imageURL && (
-            <img
-              src={`http://localhost:8085/images/${datacountryIMG}ProductImage/${editedProduct.imageURL}`}
-              alt="Product"
-              style={{ width: '100px', height: 'auto' }}
-            />
-          )}
+          <label>District:</label>
           <input
-            type="file"
-            name="image"
-            accept=".png, .jpg, .jpeg"
-            onChange={handleImageChange}
+            type="text"
+            name="address"
+            value={editedMosque.district|| ''}
+            disabled={country !== 'MALAYSIA'}
+            onChange={handleInputChange}
           />
         </div>
         <button type="submit">Save</button>

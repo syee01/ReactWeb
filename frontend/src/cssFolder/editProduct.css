@@ -1,48 +1,44 @@
-.edit-form {
-  max-width: 1400px;
-  margin: 20px auto;
-  padding: 20px;
-  background: #f4f7f6;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.edit-product-modal label {
+  display: block; /* Ensures the label is a block-level element */
+  margin-bottom: 5px; /* Adds a little space between the label and the input */
 }
 
-.edit-form h2 {
-  margin-bottom: 20px;
-  font-size: 24px;
-  color: #333;
+.edit-product-modal .form-input {
+  display: block; /* Ensures the input also behaves as a block-level element */
+  width: 100%; /* Makes the input take the full width of its container */
+  box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
 }
 
-.edit-form label {
-  font-weight: bold;
-  display: block;
-  margin-bottom: 5px;
+.buttoncontainer {
+  display: flex; /* Use Flexbox to layout the buttons */
+  justify-content: flex-end; /* Align buttons to the right */
+  margin-top: 10px; /* Space above the button container */
 }
 
-.edit-form input[type="text"],
-.edit-form input[type="date"],
-.edit-form input[type="email"],
-.edit-form input[type="password"] {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-  box-sizing: border-box;
+.form-button {
+  margin-left: 10px; /* Space between buttons */
+  padding: 8px 15px; /* Padding inside the buttons */
+  font-size: 1rem; /* Button text size */
+  border: none; /* No border */
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer; /* Change cursor to pointer */
+  transition: background-color 0.3s; /* Smooth background color transition */
 }
 
-.edit-form button {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  background-color: #0F7C5D;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  margin-top: 10px;
+.save-button {
+  background-color: #007bff; /* Bootstrap primary blue */
+  color: white; /* White text */
 }
 
-.edit-form button:hover {
-  background-color: #0F7C5D;
+.save-button:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+
+.cancel-button {
+  background-color: #6c757d; /* Bootstrap secondary gray */
+  color: white; /* White text */
+}
+
+.cancel-button:hover {
+  background-color: #5a6268; /* Darker shade on hover */
 }

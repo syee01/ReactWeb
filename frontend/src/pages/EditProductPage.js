@@ -3,24 +3,24 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import '../cssFolder/editProduct.css';
 
-const EditProductPage = () => {
-  const { productId } = useParams();
+const EditProductPage = ({ productData, country, onClose, onSave }) => {
+  const productId = productData.productID;
   const navigate = useNavigate();
   const location = useLocation();
   const [editedProduct, setEditedProduct] = useState({
     name: '',
     brand: '',
     date: '',
-    imageURL: '',
+    imageURL: '', // assuming there's an image URL
+    productId: null, // Ensure you have a productId to work with for PUT requests
+    ...productData
   });
   const [imageFile, setImageFile] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
 
-  const searchParams = new URLSearchParams(location.search);
-  const country = searchParams.get('country');
   let datacountry = '';
   let datacountryIMG = '';
-  switch (country) {
+  switch (productData.country) {
     case 'THAILAND':
       datacountry = 'thai';
       datacountryIMG = 'thailand';
@@ -43,6 +43,7 @@ const EditProductPage = () => {
       setIsFetching(true);
       try {
         const response = await axios.get(`http://localhost:8085/${datacountry}product/${productId}`);
+        console.log(response.data)
         setEditedProduct(response.data);
       } catch (error) {
         console.error('Error fetching product:', error);
@@ -53,11 +54,6 @@ const EditProductPage = () => {
     fetchProduct();
   }, [productId, datacountry]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditedProduct({ ...editedProduct, [name]: value });
-  };
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -65,7 +61,13 @@ const EditProductPage = () => {
       setImageFile(file);
     }
   };
-  
+
+  // Handle changes in form fields
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedProduct({ ...editedProduct, [name]: value });
+  };
+
   const handleSave = async (event) => {
     event.preventDefault();
     
@@ -74,28 +76,30 @@ const EditProductPage = () => {
     formData.append('name', editedProduct.name);
     formData.append('brand', editedProduct.brand);
     formData.append('date', editedProduct.date);
-
-    // Only append the new image if it has been selected
+  
+    // Handle image file if selected
     if (imageFile) {
       const extension = imageFile.name.match(/\.(png|jpg|jpeg)$/i)[0];
       const filename = `image_${productId}${extension}`;
       formData.append('image', imageFile, filename);
     } else {
-      // If no new image file is selected, send the original image URL
       formData.append('imageURL', editedProduct.imageURL);
     }
     
     try {
-      console.log(datacountry)
+      // Assuming onSave is also handling refresh or any post-save actions
       const response = await axios.put(`http://localhost:8085/${datacountry}product/${productId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log(response.data);
-      navigate('/Data'); // Or your desired route after saving
+      // Call onSave if provided for any additional actions
+      if (onSave) onSave();
+      // Close the modal
+      onClose();
     } catch (error) {
       console.error('Error saving product:', error);
+      // Optionally handle error state here (e.g., displaying an error message)
     }
   };
 
@@ -103,8 +107,7 @@ const EditProductPage = () => {
   if (!editedProduct) return <div>Product not found.</div>;
 
   return (
-    <div className='edit-form'>
-      <h2>Edit Product</h2>
+    <div className="edit-product-modal">
       <form onSubmit={handleSave}>
       <div>
           <label>Name:</label>
@@ -113,6 +116,7 @@ const EditProductPage = () => {
             name="name"
             value={editedProduct.name || ''}
             onChange={handleInputChange}
+            className="form-input"
           />
         </div>
         <div>
@@ -122,6 +126,7 @@ const EditProductPage = () => {
             name="brand"
             value={editedProduct.brand || ''}
             onChange={handleInputChange}
+            className="form-input"
           />
         </div>
         <div>
@@ -150,7 +155,10 @@ const EditProductPage = () => {
             onChange={handleImageChange}
           />
         </div>
-        <button type="submit">Save</button>
+        <div className="buttoncontainer">
+          <button type="submit" className="form-button save-button">Save</button>
+          <button type="button" onClick={onClose} className="form-button cancel-button">Cancel</button>
+        </div>
       </form>
     </div>
   );

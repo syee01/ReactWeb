@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../cssFolder/data.css';
 import { useNavigate } from 'react-router-dom';
+import EditProductPage from './EditProductPage';
 
 // Tab component for country selection
 const Tab = ({ name, isSelected, onClick }) => (
@@ -39,9 +40,29 @@ const Data = () => {
   const navigate = useNavigate();
   const userRole = localStorage.getItem('role');
 
-  const handleEditProduct = (productId, country) => {
-    navigate(`/editProduct/${productId}?country=${country}`);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentProductData, setCurrentProductData] = useState(null);
+
+  const handleEditProduct = (product) => {
+    setCurrentProductData({ productID: product, country: selectedCountry });
+    setIsEditModalOpen(true);
   };
+
+  const closeModal = () => {
+    setIsEditModalOpen(false);
+    setCurrentProductData(null); // Optionally reset any modal-specific data
+  };
+  
+
+  // Call this after saving the product to refresh data, if necessary
+  const afterSave = () => {
+    // Code to refresh products list goes here
+    closeModal();
+  };
+
+  // const handleEditProduct = (productId, country) => {
+  //   navigate(`/editProduct/${productId}?country=${country}`);
+  // };
 
   const handleEditMosques = (mosqueId, country) => {
     navigate(`/editMosque/${mosqueId}?country=${country}`);
@@ -423,6 +444,19 @@ const Data = () => {
           )}
         </div>
       </div>
+      {isEditModalOpen && (
+        <div className="modalbackdrop">
+          <div className="modalcontent">
+          <button className="closebutton" onClick={closeModal}>&times;</button> {/* Close button */}
+            <EditProductPage 
+              productData={currentProductData}
+              onClose={closeModal} // Here you're passing closeModal function from Data as onClose prop
+              onSave={afterSave}
+            />
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

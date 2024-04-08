@@ -214,3 +214,91 @@
     cursor: not-allowed;
     opacity: 0.7;
   }
+
+/* Close Button */
+.close-button {
+  float: right;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.modalbackdrop {
+  position: fixed; /* Positioned relative to the viewport */
+  top: 0;
+  left: 0;
+  width: 100vw; /* Full width */
+  height: 100vh; /* Full height */
+  background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+  z-index: 1000; /* Ensure it sits on top of other content */
+  display: flex;
+  justify-content: center; /* Center modal content horizontally */
+  align-items: center; /* Center modal content vertically */
+}
+
+.modalcontent {
+  position: relative; 
+  background-color: #fff; /* White background */
+  padding: 30px; /* Padding around the content */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow for a bit of depth */
+  width: 800px; /* Maximum width */
+  z-index: 1001; /* Above the backdrop */
+}
+
+.edit-product-modal form {
+  padding-left: 20px; /* Match the left padding of .modal-content */
+  padding-right: 20px; /* Match the right padding of .modal-content */
+}
+
+/* You can add additional styles here for the modal internals, like buttons */
+.modalcontent .edit-product-modal form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modalcontent .edit-product-modal form input[type="text"],
+.modalcontent .edit-product-modal form input[type="date"],
+.modalcontent .edit-product-modal form input[type="file"] {
+  margin-bottom: 15px; /* Spacing between inputs */
+  padding: 8px; /* Padding inside inputs */
+  border: 1px solid #ccc; /* Border */
+  border-radius: 4px; /* Rounded borders for inputs */
+}
+
+.modalcontent .edit-product-modal .form-input {
+  display: block; /* Ensures the input is treated as a block-level element, allowing width to be set */
+  width: 100%; /* Makes the input stretch to the full width of its parent container */
+  max-width: 700px; /* Optionally, set a max-width to prevent the input from becoming too wide */
+  margin-bottom: 10px; /* Keeps the spacing consistent */
+  padding: 8px; /* Provides internal spacing */
+  border: 1px solid #ccc; /* Standard border styling */
+  border-radius: 4px; /* Rounded corners */
+  box-sizing: border-box; /* Includes padding and border in the element's total width */
+}
+
+.modalcontent .edit-product-modal form button {
+  cursor: pointer;
+  padding: 10px 10px;
+  margin-top: 10px; /* Space above the button */
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff; /* Bootstrap primary blue */
+  color: white;
+}
+
+.modalcontent .edit-product-modal form button:hover {
+  background-color: #0056b3; /* A darker shade for hover effect */
+}
+
+.closebutton {
+  position: absolute; /* Absolute position for the close button */
+  top: 10px; /* Space from the top of the modalcontent */
+  right: 10px; /* Space from the right of the modalcontent */
+  border: none; /* Remove border */
+  background: none; /* Remove any background */
+  font-size: 1.5rem; /* Increase the size of the 'X' */
+  cursor: pointer; /* Change cursor to indicate it's clickable */
+}

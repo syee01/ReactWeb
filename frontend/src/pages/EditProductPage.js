@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import '../cssFolder/editProduct.css';
 
 const EditProductPage = ({ productData, country, onClose, onSave }) => {
   const productId = productData.productID;
-  const navigate = useNavigate();
-  const location = useLocation();
   const [editedProduct, setEditedProduct] = useState({
     name: '',
     brand: '',
@@ -43,7 +40,6 @@ const EditProductPage = ({ productData, country, onClose, onSave }) => {
       setIsFetching(true);
       try {
         const response = await axios.get(`http://localhost:8085/${datacountry}product/${productId}`);
-        console.log(response.data)
         setEditedProduct(response.data);
       } catch (error) {
         console.error('Error fetching product:', error);
@@ -108,6 +104,7 @@ const EditProductPage = ({ productData, country, onClose, onSave }) => {
 
   return (
     <div className="edit-product-modal">
+      <h2>Edit Product</h2>
       <form onSubmit={handleSave}>
       <div>
           <label>Name:</label>

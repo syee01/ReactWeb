@@ -3,6 +3,9 @@ import axios from 'axios';
 import '../cssFolder/data.css';
 import { useNavigate } from 'react-router-dom';
 import EditProductPage from './EditProductPage';
+import EditMosquePage from './EditMosquePage';
+import EditPrayerRoom from './EditPrayerRoom'
+import EditRestaurantPage from './EditRestaurantPage';
 
 // Tab component for country selection
 const Tab = ({ name, isSelected, onClick }) => (
@@ -37,39 +40,52 @@ const Data = () => {
   const [visibleRows, setVisibleRows] = useState(10);
   const [filterBy, setFilterBy] = useState('name');
   const [statusFilter, setStatusFilter] = useState('');
-  const navigate = useNavigate();
   const userRole = localStorage.getItem('role');
 
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isEditModalProductOpen, setIsEditModalProductOpen] = useState(false);
+  const [isEditModalMosqueOpen, setIsEditModalMosqueOpen] = useState(false);
+  const [isEditModalPrayerRoomOpen, setIsEditModalPrayerRoomOpen] = useState(false);
+  const [isEditModalRestaurantOpen, setIsEditModalRestaurantOpen] = useState(false);
   const [currentProductData, setCurrentProductData] = useState(null);
+  const [currentMosqueData, setCurrentMosqueData] = useState(null);
+  const [currentPrayerRoomData, setCurrentPrayerRoomData] = useState(null);
+  const [currentRestaurantData, setCurrentRestaurantData] = useState(null);
 
   const handleEditProduct = (product) => {
     setCurrentProductData({ productID: product, country: selectedCountry });
-    setIsEditModalOpen(true);
+    setIsEditModalProductOpen(true);
+  };
+
+  const handleEditMosques = (mosque) => {
+    setCurrentMosqueData({ mosqueprID: mosque, country: selectedCountry });
+    setIsEditModalMosqueOpen(true);
+  };
+
+  const handleEditPrayerRoom = (prayerroom) => {
+    setCurrentPrayerRoomData({ mosqueprID: prayerroom, country: selectedCountry });
+    setIsEditModalPrayerRoomOpen(true);
+  };
+
+  const handleEditRestaurant = (restaurant) => {
+    setCurrentRestaurantData({ restaurantID: restaurant, country: selectedCountry });
+    setIsEditModalRestaurantOpen(true);
   };
 
   const closeModal = () => {
-    setIsEditModalOpen(false);
+    setIsEditModalProductOpen(false);
+    setIsEditModalMosqueOpen(false);
+    setIsEditModalPrayerRoomOpen(false);
+    setIsEditModalRestaurantOpen(false);
     setCurrentProductData(null); // Optionally reset any modal-specific data
+    setCurrentMosqueData(null);
+    setCurrentPrayerRoomData(null);
+    setCurrentRestaurantData(null);
   };
-  
 
   // Call this after saving the product to refresh data, if necessary
   const afterSave = () => {
     // Code to refresh products list goes here
     closeModal();
-  };
-
-  // const handleEditProduct = (productId, country) => {
-  //   navigate(`/editProduct/${productId}?country=${country}`);
-  // };
-
-  const handleEditMosques = (mosqueId, country) => {
-    navigate(`/editMosque/${mosqueId}?country=${country}`);
-  };
-
-  const handleEditPrayerRoom = (prId, country) => {
-    navigate(`/editPrayerRoom/${prId}?country=${country}`);
   };
 
   const countries = ['MALAYSIA', 'THAILAND', 'KOREA'];
@@ -360,11 +376,7 @@ const Data = () => {
                         <td>{restaurant.address}</td>
                         <td>{restaurant.region}</td>
                         <td>
-                          <button
-                            onClick={() => navigate(`/editRestaurant/${restaurant.restaurantID}?country=${selectedCountry}`)}
-                            disabled={userRole !== 'data admin'}
-                            className="edit-button"
-                          >
+                        <button onClick={() => handleEditRestaurant(restaurant.restaurantID, selectedCountry)} disabled={userRole !== 'data admin'} className="edit-button">
                             Edit
                           </button>
                         </td>
@@ -396,7 +408,7 @@ const Data = () => {
                         <td>{mosque.state}</td>
                         {selectedCountry === 'MALAYSIA' && <td>{mosque.district}</td>}
                         <td>
-                          <button onClick={() => handleEditMosques(mosque.mosqueprID, selectedCountry)} disabled={userRole !== 'data admin'} className="edit-button">
+                        <button onClick={() => handleEditMosques(mosque.mosqueprID, selectedCountry)} disabled={userRole !== 'data admin'} className="edit-button">
                             Edit
                           </button>
                         </td>
@@ -444,7 +456,7 @@ const Data = () => {
           )}
         </div>
       </div>
-      {isEditModalOpen && (
+      {isEditModalProductOpen && (
         <div className="modalbackdrop">
           <div className="modalcontent">
           <button className="closebutton" onClick={closeModal}>&times;</button> {/* Close button */}
@@ -456,7 +468,42 @@ const Data = () => {
           </div>
         </div>
       )}
-
+      {isEditModalMosqueOpen && (
+        <div className="modalbackdrop">
+          <div className="modalcontent">
+          <button className="closebutton" onClick={closeModal}>&times;</button>
+            <EditMosquePage 
+              mosqueData={currentMosqueData}
+              onClose={closeModal} // Here you're passing closeModal function from Data as onClose prop
+              onSave={afterSave}
+            />
+          </div>
+        </div>
+      )}
+      {isEditModalPrayerRoomOpen && (
+        <div className="modalbackdrop">
+          <div className="modalcontent">
+          <button className="closebutton" onClick={closeModal}>&times;</button>
+            <EditPrayerRoom
+              prayerRoomData={currentPrayerRoomData}
+              onClose={closeModal} // Here you're passing closeModal function from Data as onClose prop
+              onSave={afterSave}
+            />
+          </div>
+        </div>
+      )}
+      {isEditModalRestaurantOpen && (
+        <div className="modalbackdrop">
+          <div className="modalcontent">
+          <button className="closebutton" onClick={closeModal}>&times;</button>
+            <EditRestaurantPage
+              restaurantData={currentRestaurantData}
+              onClose={closeModal} // Here you're passing closeModal function from Data as onClose prop
+              onSave={afterSave}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -3,6 +3,14 @@
   margin-bottom: 5px; /* Adds a little space between the label and the input */
 }
 
+.edit-product-modal h2 {
+  font-size: 30px;
+  font-weight: bold;
+  color: #333; /* dark gray */
+  margin-bottom: 30px;
+  padding-left: 20px;
+}
+
 .edit-product-modal .form-input {
   display: block; /* Ensures the input also behaves as a block-level element */
   width: 100%; /* Makes the input take the full width of its container */
@@ -42,3 +50,4 @@
 .cancel-button:hover {
   background-color: #5a6268; /* Darker shade on hover */
 }
+

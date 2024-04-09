@@ -1,37 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import '../cssFolder/editProduct.css';
 
-const EditProductPage = () => {
-  const { productId } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [editedProduct, setEditedProduct] = useState({
+const EditPrayerRoomPage = ({ prayerRoomData, country, onClose, onSave }) => {
+  const mosqueprId = prayerRoomData.mosqueprID;
+  const [editedPrayerRoom, setEditedPrayerRoom] = useState({
     name: '',
-    brand: '',
-    date: '',
-    imageURL: '',
+    location: '',
+    state: '',
+    district: '',
+    ...prayerRoomData
   });
-  const [imageFile, setImageFile] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
 
-  const searchParams = new URLSearchParams(location.search);
-  const country = searchParams.get('country');
   let datacountry = '';
-  let datacountryIMG = '';
-  switch (country) {
+
+  switch (prayerRoomData.country) {
     case 'THAILAND':
-      datacountry = 'thai';
-      datacountryIMG = 'thailand';
+      datacountry = 'thailand';
       break;
     case 'MALAYSIA':
-      datacountry = 'mas';
-      datacountryIMG = 'malaysia';
+      datacountry = 'malaysia';
       break;
     case 'KOREA':
-      datacountry = 'kr';
-      datacountryIMG = 'korea';
+      datacountry = 'korea';
       break;
     default:
       // Handle other cases or default case as needed
@@ -39,121 +31,104 @@ const EditProductPage = () => {
   }
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchMosque = async () => {
       setIsFetching(true);
       try {
-        const response = await axios.get(`http://localhost:8085/${datacountry}product/${productId}`);
-        setEditedProduct(response.data);
+        const response = await axios.get(`http://localhost:8085/${datacountry}/pr/${mosqueprId}`);
+        setEditedPrayerRoom(response.data);
       } catch (error) {
-        console.error('Error fetching product:', error);
+      console.error('Error fetching mosque:', error);
       }
       setIsFetching(false);
     };
 
-    fetchProduct();
-  }, [productId, datacountry]);
+    fetchMosque();
+  }, [mosqueprId, datacountry]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditedProduct({ ...editedProduct, [name]: value });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validate file type if necessary
-      setImageFile(file);
-    }
+    setEditedPrayerRoom({ ...editedPrayerRoom, [name]: value });
   };
   
   const handleSave = async (event) => {
     event.preventDefault();
     
-    const formData = new FormData();
-    formData.append('country', datacountry);
-    formData.append('name', editedProduct.name);
-    formData.append('brand', editedProduct.brand);
-    formData.append('date', editedProduct.date);
-
-    // Only append the new image if it has been selected
-    if (imageFile) {
-      const extension = imageFile.name.match(/\.(png|jpg|jpeg)$/i)[0];
-      const filename = `image_${productId}${extension}`;
-      formData.append('image', imageFile, filename);
-    } else {
-      // If no new image file is selected, send the original image URL
-      formData.append('imageURL', editedProduct.imageURL);
-    }
-    
+    const data = {
+      country: datacountry,
+      name: editedPrayerRoom.name,
+      address: editedPrayerRoom.address,
+      state: editedPrayerRoom.state,
+      district: editedPrayerRoom.district,
+  };
     try {
-      console.log(datacountry)
-      const response = await axios.put(`http://localhost:8085/${datacountry}product/${productId}`, formData, {
+      const response = await axios.put(`http://localhost:8085/${datacountry}pr/${mosqueprId}`, data, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
       });
-      console.log(response.data);
-      navigate('/Data'); // Or your desired route after saving
+      if (onSave) onSave();
+      // Close the modal
+      onClose();
     } catch (error) {
-      console.error('Error saving product:', error);
+      console.error('Error saving mosque:', error);
     }
   };
 
   if (isFetching) return <div>Loading...</div>;
-  if (!editedProduct) return <div>Product not found.</div>;
+  if (!editedPrayerRoom) return <div>Prayer Room not found.</div>;
 
   return (
-    <div className='edit-form'>
-      <h2>Edit Product</h2>
+    <div className='edit-product-modal'>
+      <h2>Edit Prayer Room</h2>
       <form onSubmit={handleSave}>
       <div>
           <label>Name:</label>
           <input
             type="text"
             name="name"
-            value={editedProduct.name || ''}
+            value={editedPrayerRoom.name || ''}
             onChange={handleInputChange}
+            className="form-input"
           />
         </div>
         <div>
-          <label>Brand:</label>
+          <label>Location:</label>
           <input
             type="text"
-            name="brand"
-            value={editedProduct.brand || ''}
+            name="address"
+            value={editedPrayerRoom.address|| ''}
             onChange={handleInputChange}
+            className="form-input"
           />
         </div>
         <div>
-          <label>Expired Date:</label>
+          <label>State:</label>
           <input
-            type="date"
-            name="date"
-            value={editedProduct.date ? editedProduct.date.split('T')[0] : ''}
+            type="text"
+            name="state"
+            value={editedPrayerRoom.state|| ''}
             onChange={handleInputChange}
-            disabled={country === 'KOREA'}
+            className="form-input"
           />
         </div>
         <div>
-          <label>Image:</label>
-          {editedProduct.imageURL && (
-            <img
-              src={`http://localhost:8085/images/${datacountryIMG}ProductImage/${editedProduct.imageURL}`}
-              alt="Product"
-              style={{ width: '100px', height: 'auto' }}
-            />
-          )}
+          <label>District:</label>
           <input
-            type="file"
-            name="image"
-            accept=".png, .jpg, .jpeg"
-            onChange={handleImageChange}
+            type="text"
+            name="district"
+            value={editedPrayerRoom.district|| ''}
+            disabled={prayerRoomData.country !== 'MALAYSIA'}
+            onChange={handleInputChange}
+            className="form-input"
           />
         </div>
-        <button type="submit">Save</button>
+        <div className="buttoncontainer">
+          <button type="submit" className="form-button save-button">Save</button>
+          <button type="button" onClick={onClose} className="form-button cancel-button">Cancel</button>
+        </div>
       </form>
     </div>
   );
 };
 
-export default EditProductPage;
+export default EditPrayerRoomPage;

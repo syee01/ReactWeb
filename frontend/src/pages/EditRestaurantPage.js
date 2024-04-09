@@ -2,20 +2,20 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../cssFolder/editProduct.css';
 
-const EditMosquePage = ({ mosqueData, country, onClose, onSave }) => {
-  const mosqueprId = mosqueData.mosqueprID;
-  const [editedMosque, setEditedMosque] = useState({
+const EditRestaurantPage = ({ restaurantData, country, onClose, onSave }) => {
+  const restaurantId = restaurantData.restaurantID;
+  const [editedRestaurant, setEditedRestaurant] = useState({
     name: '',
     address: '',
-    state: '',
-    district: '',
-    ...mosqueData
+    region: '',
+    date: '',
+    ...restaurantData
   });
   const [isFetching, setIsFetching] = useState(false);
 
   let datacountry = '';
 
-  switch (mosqueData.country) {
+  switch (restaurantData.country) {
     case 'THAILAND':
       datacountry = 'thailand';
       break;
@@ -31,23 +31,23 @@ const EditMosquePage = ({ mosqueData, country, onClose, onSave }) => {
   }
 
   useEffect(() => {
-    const fetchMosque = async () => {
+    const fetchRestaurant = async () => {
       setIsFetching(true);
       try {
-        const response = await axios.get(`http://localhost:8085/${datacountry}/mosque/${mosqueprId}`);
-        setEditedMosque(response.data);
+        const response = await axios.get(`http://localhost:8085/${datacountry}/restaurant/${restaurantId}`);
+        setEditedRestaurant(response.data);
       } catch (error) {
-      console.error('Error fetching mosque:', error);
+      console.error('Error fetching restaurant:', error);
       }
       setIsFetching(false);
     };
 
-    fetchMosque();
-  }, [mosqueprId, datacountry]);
+    fetchRestaurant();
+  }, [restaurantId, datacountry]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditedMosque({ ...editedMosque, [name]: value });
+    setEditedRestaurant({ ...editedRestaurant, [name]: value });
   };
   
   const handleSave = async (event) => {
@@ -55,14 +55,13 @@ const EditMosquePage = ({ mosqueData, country, onClose, onSave }) => {
     
     const data = {
       country: datacountry,
-      name: editedMosque.name,
-      address: editedMosque.address,
-      state: editedMosque.state,
-      district: editedMosque.district,
+      name: editedRestaurant.name,
+      address: editedRestaurant.address,
+      region: editedRestaurant.region,
+      date: editedRestaurant.date,
   };
-
     try {
-      const response = await axios.put(`http://localhost:8085/${datacountry}mosque/${mosqueprId}`, data, {
+      const response = await axios.put(`http://localhost:8085/${datacountry}restaurant/${restaurantId}`, data, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -71,23 +70,23 @@ const EditMosquePage = ({ mosqueData, country, onClose, onSave }) => {
       // Close the modal
       onClose();
     } catch (error) {
-      console.error('Error saving mosque:', error);
+      console.error('Error saving restaurant:', error);
     }
   };
 
   if (isFetching) return <div>Loading...</div>;
-  if (!editedMosque) return <div>Mosque not found.</div>;
+  if (!editedRestaurant) return <div>Restaurant not found.</div>;
 
   return (
     <div className='edit-product-modal'>
-      <h2>Edit Mosque</h2>
+      <h2>Edit Restaurant</h2>
       <form onSubmit={handleSave}>
       <div>
           <label>Name:</label>
           <input
             type="text"
             name="name"
-            value={editedMosque.name || ''}
+            value={editedRestaurant.name || ''}
             onChange={handleInputChange}
             className="form-input"
           />
@@ -97,7 +96,7 @@ const EditMosquePage = ({ mosqueData, country, onClose, onSave }) => {
           <input
             type="text"
             name="address"
-            value={editedMosque.address|| ''}
+            value={editedRestaurant.address|| ''}
             onChange={handleInputChange}
             className="form-input"
           />
@@ -106,21 +105,20 @@ const EditMosquePage = ({ mosqueData, country, onClose, onSave }) => {
           <label>State:</label>
           <input
             type="text"
-            name="state"
-            value={editedMosque.state|| ''}
+            name="region"
+            value={editedRestaurant.region|| ''}
             onChange={handleInputChange}
             className="form-input"
           />
         </div>
         <div>
-          <label>District:</label>
+          <label>Expired Date:</label>
           <input
-            type="text"
-            name="district"
-            value={editedMosque.district|| ''}
-            disabled={mosqueData.country !== 'MALAYSIA'}
+            type="date"
+            name="date"
+            value={editedRestaurant.date ? editedRestaurant.date.split('T')[0] : ''}
             onChange={handleInputChange}
-            className="form-input"
+            disabled={restaurantData.country !== 'MALAYSIA'}
           />
         </div>
         <div className="buttoncontainer">
@@ -132,4 +130,4 @@ const EditMosquePage = ({ mosqueData, country, onClose, onSave }) => {
   );
 };
 
-export default EditMosquePage;
+export default EditRestaurantPage;

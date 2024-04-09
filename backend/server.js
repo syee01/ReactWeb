@@ -815,8 +815,6 @@ app.put('/updateUserProfile/:userID', (req, res) => {
   const query = `UPDATE user SET ${fieldName} = ? WHERE UserID = ?`;
   const values = [fieldValue, userID];
 
-  // Perform the database query
-  // Replace with your actual database code
   db.query(query, values, (error, results, fields) => {
       if (error) {
           res.status(500).send('Error updating user profile');
@@ -825,7 +823,6 @@ app.put('/updateUserProfile/:userID', (req, res) => {
       res.send('Profile updated successfully');
   });
 });
-
 
 app.put('/changePassword/:userID', (req, res) => {
   const userID = req.params.userID;
@@ -844,19 +841,20 @@ app.put('/changePassword/:userID', (req, res) => {
   });
 });
 
-app.get('/malaysiamosque/:id', (req, res) => {
+app.get('/:datacountry/mosque/:id', (req, res) => {
+  const datacountry = req.params.datacountry; // Get the datacountry from the route parameter
   const mosqueprId = req.params.id; // Get the product ID from the route parameter
-  const sql = 'SELECT * FROM malaysiamosque WHERE mosqueprID = ?'; // SQL query to select the product by ID
+  const sql = `SELECT * FROM ${datacountry}mosque WHERE mosqueprID = ?`; // SQL query to select the product by ID and datacountry
   db.query(sql, [mosqueprId], (err, results) => {
       if (err) {
           // Handle error
           console.error(err);
-          res.status(500).json({ message: 'Error retrieving product' });
+          res.status(500).json({ message: 'Error retrieving mosque' });
       } else {
           if (results.length > 0) {
               res.json(results[0]); // Send back the found product
           } else {
-              res.status(404).json({ message: 'Product not found' }); // No product found for the given ID
+              res.status(404).json({ message: 'Mosque not found' }); // No product found for the given ID
           }
       }
   });
@@ -864,120 +862,233 @@ app.get('/malaysiamosque/:id', (req, res) => {
 
 
 app.put('/malaysiamosque/:id', (req, res) => {
-  // Extract the product ID from the URL path
+
   const mosqueprId = req.params.id;
-  // Extract updated data from the request body
+
   const { name, address, state, district } = req.body;
 
-  // Construct the SQL query for updating the product information
   const sql = `UPDATE malaysiamosque SET name = ?, address = ?, state = ?, district = ? WHERE mosqueprID = ?`;
 
-  // Execute the query with the provided data
   db.query(sql, [name, address, state, district, mosqueprId], (err, result) => {
     if (err) {
-      // If an error occurs, log it and return a server error response
       console.error('Error updating product:', err);
-      res.status(500).json({ message: 'Error updating product' });
+      res.status(500).json({ message: 'Error updating mosque' });
     } else {
-      // If the update is successful, return a success response
-      // result.affectedRows checks how many rows were affected. If no rows were affected, it means the product was not found
       if (result.affectedRows > 0) {
-        res.json({ message: 'Product updated successfully' });
+        res.json({ message: 'Mosque updated successfully' });
       } else {
-        res.status(404).json({ message: 'Product not found' });
+        res.status(404).json({ message: 'Mosque not found' });
       }
     }
   });
 });
-
-app.get('/thailandmosque/:id', (req, res) => {
-  const mosqueprId = req.params.id; // Get the product ID from the route parameter
-  const sql = 'SELECT * FROM thailandmosque WHERE mosqueprID = ?'; // SQL query to select the product by ID
-  db.query(sql, [mosqueprId], (err, results) => {
-      if (err) {
-          // Handle error
-          console.error(err);
-          res.status(500).json({ message: 'Error retrieving product' });
-      } else {
-          if (results.length > 0) {
-              res.json(results[0]); // Send back the found product
-          } else {
-              res.status(404).json({ message: 'Product not found' }); // No product found for the given ID
-          }
-      }
-  });
-});
-
 
 app.put('/thailandmosque/:id', (req, res) => {
-  // Extract the product ID from the URL path
+  
   const mosqueprId = req.params.id;
-  // Extract updated data from the request body
+
   const { name, address, state } = req.body;
 
-  // Construct the SQL query for updating the product information
   const sql = `UPDATE thailandmosque SET name = ?, address = ?, state = ? WHERE mosqueprID = ?`;
 
-  // Execute the query with the provided data
   db.query(sql, [name, address, state, mosqueprId], (err, result) => {
     if (err) {
-      // If an error occurs, log it and return a server error response
-      console.error('Error updating product:', err);
-      res.status(500).json({ message: 'Error updating product' });
+      console.error('Error updating mosque:', err);
+      res.status(500).json({ message: 'Error updating mosque' });
     } else {
-      // If the update is successful, return a success response
-      // result.affectedRows checks how many rows were affected. If no rows were affected, it means the product was not found
       if (result.affectedRows > 0) {
-        res.json({ message: 'Product updated successfully' });
+        res.json({ message: 'Mosque updated successfully' });
       } else {
-        res.status(404).json({ message: 'Product not found' });
+        res.status(404).json({ message: 'Mosque not found' });
       }
     }
   });
 });
 
+app.put('/koreamosque/:id', (req, res) => {
 
-app.get('/koreamosque/:id', (req, res) => {
+  const mosqueprId = req.params.id;
+ 
+  const { name, address, state } = req.body;
+
+  const sql = `UPDATE koreamosque SET name = ?, address = ?, state = ? WHERE mosqueprID = ?`;
+
+  db.query(sql, [name, address, state, mosqueprId], (err, result) => {
+    if (err) {
+      console.error('Error updating mosque:', err);
+      res.status(500).json({ message: 'Error updating mosque' });
+    } else {
+      if (result.affectedRows > 0) {
+        res.json({ message: 'Mosque updated successfully' });
+      } else {
+        res.status(404).json({ message: 'Mosque not found' });
+      }
+    }
+  });
+});
+
+app.get('/:datacountry/pr/:id', (req, res) => {
+  const datacountry = req.params.datacountry; // Get the datacountry from the route parameter
   const mosqueprId = req.params.id; // Get the product ID from the route parameter
-  const sql = 'SELECT * FROM koreamosque WHERE mosqueprID = ?'; // SQL query to select the product by ID
+  const sql = `SELECT * FROM ${datacountry}pr WHERE mosqueprID = ?`; // SQL query to select the product by ID and datacountry
   db.query(sql, [mosqueprId], (err, results) => {
       if (err) {
           // Handle error
           console.error(err);
-          res.status(500).json({ message: 'Error retrieving product' });
+          res.status(500).json({ message: 'Error retrieving mosque' });
       } else {
           if (results.length > 0) {
               res.json(results[0]); // Send back the found product
           } else {
-              res.status(404).json({ message: 'Product not found' }); // No product found for the given ID
+              res.status(404).json({ message: 'Mosque not found' }); // No product found for the given ID
           }
       }
   });
 });
 
-
-app.put('/koreamosque/:id', (req, res) => {
-  // Extract the product ID from the URL path
+app.put('/malaysiapr/:id', (req, res) => {
+  
   const mosqueprId = req.params.id;
-  // Extract updated data from the request body
+
+  const { name, address, state, district } = req.body;
+
+  const sql = `UPDATE malaysiapr SET name = ?, address = ?, state = ?, district = ? WHERE mosqueprID = ?`;
+
+  db.query(sql, [name, address, state, district, mosqueprId], (err, result) => {
+    if (err) {
+      console.error('Error updating product:', err);
+      res.status(500).json({ message: 'Error updating mosque' });
+    } else {
+      if (result.affectedRows > 0) {
+        res.json({ message: 'Mosque updated successfully' });
+      } else {
+        res.status(404).json({ message: 'Mosque not found' });
+      }
+    }
+  });
+});
+
+app.put('/thailandpr/:id', (req, res) => {
+  const mosqueprId = req.params.id;
+  
   const { name, address, state } = req.body;
 
-  // Construct the SQL query for updating the product information
-  const sql = `UPDATE koreamosque SET name = ?, address = ?, state = ? WHERE mosqueprID = ?`;
+  const sql = `UPDATE thailandpr SET name = ?, address = ?, state = ? WHERE mosqueprID = ?`;
 
-  // Execute the query with the provided data
+  db.query(sql, [name, address, state, mosqueprId], (err, result) => {
+    if (err) {
+      console.error('Error updating product:', err);
+      res.status(500).json({ message: 'Error updating prayer room' });
+    } else {
+    
+      if (result.affectedRows > 0) {
+        res.json({ message: 'Prayer Room updated successfully' });
+      } else {
+        res.status(404).json({ message: 'Prayer Room not found' });
+      }
+    }
+  });
+});
+
+app.put('/koreapr/:id', (req, res) => {
+  const mosqueprId = req.params.id;
+
+  const { name, address, state } = req.body;
+
+  const sql = `UPDATE koreapr SET name = ?, address = ?, state = ? WHERE mosqueprID = ?`;
+
   db.query(sql, [name, address, state, mosqueprId], (err, result) => {
     if (err) {
       // If an error occurs, log it and return a server error response
       console.error('Error updating product:', err);
-      res.status(500).json({ message: 'Error updating product' });
+      res.status(500).json({ message: 'Error updating prayer room' });
     } else {
-      // If the update is successful, return a success response
-      // result.affectedRows checks how many rows were affected. If no rows were affected, it means the product was not found
       if (result.affectedRows > 0) {
-        res.json({ message: 'Product updated successfully' });
+        res.json({ message: 'Prayer Room updated successfully' });
       } else {
-        res.status(404).json({ message: 'Product not found' });
+        res.status(404).json({ message: 'Prayer Room not found' });
+      }
+    }
+  });
+});
+
+app.get('/:datacountry/restaurant/:id', (req, res) => {
+  const datacountry = req.params.datacountry; // Get the datacountry from the route parameter
+  const restaurantId = req.params.id; // Get the product ID from the route parameter
+  const sql = `SELECT * FROM ${datacountry}restaurant WHERE restaurantID = ?`; // SQL query to select the product by ID and datacountry
+  db.query(sql, [restaurantId], (err, results) => {
+      if (err) {
+          // Handle error
+          console.error(err);
+          res.status(500).json({ message: 'Error retrieving mosque' });
+      } else {
+          if (results.length > 0) {
+              res.json(results[0]); // Send back the found product
+          } else {
+              res.status(404).json({ message: 'Mosque not found' }); // No product found for the given ID
+          }
+      }
+  });
+});
+
+app.put('/malaysiarestaurant/:id', (req, res) => {
+  const restaurantId = req.params.id;
+
+  const { name, address, region, date } = req.body;
+
+  const sql = `UPDATE malaysiarestaurant SET name = ?, address = ?, region = ?, date = ? WHERE restaurantID = ?`;
+
+  db.query(sql, [ name, address, region, date, restaurantId], (err, result) => {
+    if (err) {
+      console.error('Error updating restaurant:', err);
+      res.status(500).json({ message: 'Error updating restaurant' });
+    } else {
+      if (result.affectedRows > 0) {
+        res.json({ message: 'Restaurant updated successfully' });
+      } else {
+        res.status(404).json({ message: 'Restaurant not found' });
+      }
+    }
+  });
+});
+
+app.put('/thailandrestaurant/:id', (req, res) => {
+  const restaurantId = req.params.id;
+
+  const { name, address, region  } = req.body;
+
+  const sql = `UPDATE thailandrestaurant SET name = ?, address = ?, region = ? WHERE restaurantID = ?`;
+
+  db.query(sql, [ name, address, region, restaurantId], (err, result) => {
+    if (err) {
+      console.error('Error updating restaurant:', err);
+      res.status(500).json({ message: 'Error updating restaurant' });
+    } else {
+      if (result.affectedRows > 0) {
+        res.json({ message: 'Restaurant updated successfully' });
+      } else {
+        res.status(404).json({ message: 'Restaurant not found' });
+      }
+    }
+  });
+});
+
+app.put('/korearestaurant/:id', (req, res) => {
+  const restaurantId = req.params.id;
+
+  const { name, address, region  } = req.body;
+
+  const sql = `UPDATE korearestaurant SET name = ?, address = ?, region = ? WHERE restaurantID = ?`;
+
+  db.query(sql, [ name, address, region, restaurantId], (err, result) => {
+    if (err) {
+      console.error('Error updating restaurant:', err);
+      res.status(500).json({ message: 'Error updating restaurant' });
+    } else {
+      if (result.affectedRows > 0) {
+        res.json({ message: 'Restaurant updated successfully' });
+      } else {
+        res.status(404).json({ message: 'Restaurant not found' });
       }
     }
   });

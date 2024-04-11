@@ -53,11 +53,7 @@ const Dashboard = () => {
       const enquiriesData = await fetchData('enquiries-count');
       setEnquiriesCount(enquiriesData.totalEnquiries);
 
-      // Fetch and set data for the graph
-      // This is a placeholder - replace it with your actual data fetching logic
       const graphDataResponse = await fetchData('api/data');
-      // Assuming the response data is an array of counts
-      // Adjust according to your actual data structure
       setGraphData({
         ...graphData,
         datasets: graphData.datasets.map((dataset, index) => {
@@ -95,6 +91,9 @@ const Dashboard = () => {
           <h2 className='smalltitle'>Total Enquiries Submitted</h2>
           <p>{enquiriesCount}</p>
         </div>
+      </div>
+      <div className="dashboard-title">
+        <h2>Total Dataset</h2>
       </div>
       <div className="graph-container">
         <Bar data={graphData} options={{ responsive: true, scales: { y: { beginAtZero: true } } }} />

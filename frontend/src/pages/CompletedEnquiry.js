@@ -121,11 +121,11 @@ const CompletedEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
               {reportImages.map((imagePath, index) => (
                 <div key={index} className="image-wrapper">
                   <img
-                    src={`http://localhost:8082/assets/${imagePath}`}
+                    src={`http://localhost:8085/assets/${imagePath}`}
                     alt={`Report ${index + 1}`}
                     onClick={() => {
                       window.open(
-                        `http://localhost:8082/assets/${imagePath}`,
+                        `http://localhost:8085/assets/${imagePath}`,
                         '_blank'
                       );
                     }}

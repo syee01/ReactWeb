@@ -87,7 +87,7 @@ const EnquiryPage = () => {
   return (
     <>
       <div className='reportTitle'>
-        <h2 className="reportTitle">Report Submitted</h2>
+        <h2 className="reportTitle">Enquiry Submitted</h2>
       </div>
       <div className="tabs">
         {['PENDING', 'REVIEWED', 'TO BE CONFIRMED', 'COMPLETED'].map((tab) => (

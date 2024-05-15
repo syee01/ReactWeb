@@ -3,15 +3,27 @@
     display: flex; /* Re-enable flex if it was disabled */
     justify-content: space-between;
     align-items: center;
-    padding: 0 10px;
+    padding: 15px;
     box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2);
     color: #0F7C5D;
     background-color: #FFF;
 }
 
+.logocontainer {
+    display: flex;
+    align-items: center; /* Align vertically */
+    margin-right: 10px; /* Adjust this value to control space between logo and h4 */
+}
+
+.logo1 {
+    height: 55px; 
+    width: 55px;
+    margin-right: 10px; /* Reduce or adjust margin to make logo closer to text */
+}
+
 .navbar h4 {
     margin: 0;
-    padding-left: 20px;
+    /* padding-left: 20px; */
     /* flex-shrink: 0; */
     font-family: 'Spectral',serif;
     font-weight: bold;
@@ -38,27 +50,27 @@
     text-decoration: underline;
 }
 
-
 .user-menu {
     position:relative;
     cursor: pointer;
 }
 
 .dropdown {
-    display: none; /* Hidden by default */
-    position:fixed;
-    /* top: 100px;  */
+    display: none; /* Initially hidden */
+    position: fixed; /* Position relative to the viewport */
+    top: 50px; /* Distance from the top of the viewport */
+    right: 20px; /* Distance from the right of the viewport, adjust this value based on your layout */
     background-color: white;
     border: 1px solid #ccc;
-    z-index: 1;
-    padding: 10px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-    /* min-width: 120px; */
-    /* We remove grid as it's not necessary unless designing a grid layout in the dropdown */
+    z-index: 100; /* High z-index to keep it above other content */
+    padding: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    width: 100px; /* Set a fixed width or adjust as needed */
 }
 
-.user-menu:hover .dropdown {
-    display:block;
+.user-menu:hover + .dropdown,
+.dropdown:hover {
+    display: block; /* Ensures the dropdown shows when hovered */
 }
 
 .dropdown a, 
@@ -76,93 +88,13 @@
     cursor: pointer;
 }
 
-/* Adjust the dropdown link styling */
-.dropdown a {
-    text-decoration: none;
-    color: #0F7C5D; /* Keep the text color consistent with the navbar */
-    padding: 8px 0;
-}
-
 .dropdown a:hover {
     text-decoration: underline;
 }
 
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 10px;
-    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2);
-    color: #0F7C5D;
-    background-color: #FFF;
-}
-
-.navbar .links {
-    display: flex;
-    align-items: center;
-    position: relative; /* Add this line */
-}
-.navbar h4 {
-    margin: 0;
-    padding-left: 20px;
-}
-
-.navbar .links a, 
-.navbar .links .user-menu {
-    color: #0F7C5D;
-    padding: 10px 15px;
-    text-decoration: none;
-}
-
-.navbar .links a:hover,
-.navbar .links .user-menu:hover {
-    text-decoration: underline;
-}
-
-.user-menu {
-    display: inline-block; /* Keeps the user menu to its content size */
-    position: relative; /* Context for absolute positioning */
-    width: auto; /* Adjust width as needed, or use auto */
-}
-
-/* Modify existing .dropdown styles */
-.dropdown {
-    display: none; /* Initially hidden */
-    position: absolute; /* Takes it out of document flow */
-    top: 100%; /* Positions it right below the user menu */
-    right: 0; /* Aligns to the right side of the user menu */
-    background-color: white;
-    border: 1px solid #ccc;
-    z-index: 10; /* High index to be on top of other elements */
-    padding: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    width: max-content; /* Width as wide as the content, up to the max available width */
-}
-
-/* Add this new style */
-.user-menu:hover .dropdown {
-    display: block; /* Shows dropdown when user-menu is hovered */
-}
-
-.dropdown a, 
-.dropdown button {
-    display: block;
-    padding: 8px 0;
-    color: #0F7C5D;
-    text-align: left;
-    border: none;
-    background: none;
-    width: 100%;
-    cursor: pointer;
-}
-
-.dropdown a:hover {
-    text-decoration: underline;
-}
-
-/* Additional styling for the dropdown links and buttons */
-.dropdown a, .dropdown button {
-    padding: 10px;
+.logo{
+    height: 80px; 
+    width: 80px;
 }
 
 /* Ensure the user-menu does not grow with the dropdown */

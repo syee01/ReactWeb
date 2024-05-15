@@ -1,7 +1,5 @@
-/* Adjust the font URL as needed */
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
 
-/* CSS reset for consistent cross-browser experience */
 * {
   margin: 0;
   padding: 0;
@@ -14,142 +12,114 @@ body, html {
 }
 
 .login-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: url('../images/web.png') no-repeat center center fixed;  /* Background image scoped to login-container */
+  background-size: cover;
+  width: 100%;  /* Ensuring it covers the desired area */
+  height: 100%;
+}
+
+.logo-container {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  height: 100vh;
-  background-image: url('../images/court.png'); 
+  margin-bottom: 20px;
 }
 
-.login-box {
-  background-color: #fff;
-  padding-left: 80px;
-  padding-right: 80px;
-  padding-bottom: 50px;
-  padding-top: 20px;
-  border-radius: 15px;
-  box-shadow: 0 0 2px 2px  #c2bfbf;
+.logo-container .logo {
+  height: 80px; 
+  width: 80px;
+  margin-right: 10px;
 }
 
-.login-box h1 {
-  color: #0F7C5D;
-  text-align: center;
-  margin-top: 0.5em;
-  font-weight: bold;
-  font-size:35px;
-  font-family: 'Spectral',serif;
-}
-
-.login-box p {
-  font-size:15px;
-  font-family: 'Spectral',serif;
-  font-weight: 100;
-  align-items: center; 
-  justify-content: center; 
-  text-align: center; 
-  padding-bottom:30px;
-  margin: 5px;
-  color: #666;
-}
-
-.input-group {
-  position: relative;
-  margin-bottom: 1em;
-}
-
-.input-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
+.logo-container h1 {
+  font-size: 1.5rem;
   color: #333;
 }
 
-.input-field {
-  width: 600px;
-  padding: 10px 10px 10px 35px;
-  font-size: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  outline: none;
-  font-family:'Spectral',serif;
+.login-box {
+  position: fixed; 
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
+  width: 400px;
+  padding: 20px;
+  border-radius: 10px;
+  /* background-color: rgba(255, 255, 255, 0.95); */
+  /* box-shadow: 0 4px 8px rgba(0,0,0,0.1); */
+  margin-left: 350px;
+  text-align: center;
+}
+
+.welcome{
+  margin-bottom: 30px;
+  font-size: 40px;
 }
 
 .input-group {
-  position: relative;
-  margin-bottom: 1em;
+  display: flex;
+  align-items: center;  
+  margin-bottom: 30px;
 }
 
-.input-field:focus {
-  border-color: #0F7C5D;
+.input-icon {
+  margin-right: 10px;  /* Space between the icon and the input field */
+  color: #333;
+  transform: translateY(90%);
+}
+
+.input-field {
+  flex-grow: 1;       
+  border-radius: 100px;
+  /* font-size: 16px; */
+  position: relative;
+  outline: none;
+  padding: 10px 10px 10px 10px;
+}
+
+.login-btn {
+  width: 100%;
+  background-color: #0F7C5D;
+  color: white;
+  padding: 12px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.login-btn:hover {
+  background-color: #13916d;
+}
+
+.forgot-password {
+  color: #0F7C5D;
+  text-decoration: none;
+  margin-top: 10px;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
 }
 
 .error {
   color: red;
   font-size: 0.875em;
-  margin-top: -1em;
-  margin-bottom: 1em;
-}
-
-.login-btn {
-  background-color: #0F7C5D;
-  color: white;
-  border: none;
-  padding: 10px;
-  width: 100%;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  margin-top: 1em;
-}
-
-.login-btn:hover {
-  background-color: #0d684b; /* A darker shade for hover effect */
-}
-
-.footer {
   text-align: center;
-  margin-top: 2em;
+  margin-top: 10px;
 }
 
-.forgot-password{
-  display: block;
-  color: #0F7C5D;
-  text-decoration: none;
-  margin-top: 0.5em;
-  font-family: 'Spectral',serif;
-}
-
-.forgot-password:hover{
-  text-decoration: underline;
-}
-
-.error {
-  color: red; /* Red color for errors */
-  font-size: 0.875em; /* Smaller font size for error messages */
-  margin-top: 0.5em; /* Space above the error message */
-  margin-bottom: 1em; /* Space below the error message */
-  text-align: left; /* Align to the left, or center if you prefer */
-}
-
-.below-password {
-  display: block; 
-}
-
-.login-label{
-  font-size:15px;
-  font-family: 'Spectral',serif;
-  font-weight: bold;
-  text-align: center; 
-  padding-bottom:10px;
-}
-
-/* Responsive Design */
 @media (max-width: 600px) {
+  .login-container {
+    position: static; 
+  }
+
   .login-box {
-    padding: 1em;
+    position: static;
+    transform: none;
+    margin-top: 20px; 
   }
 }

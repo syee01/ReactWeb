@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useUser } from './UserContext'; // Adjust the path as necessary
+import { useUser } from './UserContext';
 import './Navbar.css';
 import logo from "./images/logo.png";
 
 const Navbar = () => {
     const { user, setUser, loading } = useUser();
-    const [showDropdown, setShowDropdown] = useState(false);
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -15,8 +14,6 @@ const Navbar = () => {
         setUser(null);
         navigate('/');
     };
-
-    const toggleDropdown = () => setShowDropdown(!showDropdown);
 
     if (loading) {
         return null; // Optionally, return a loading spinner here
@@ -34,16 +31,12 @@ const Navbar = () => {
                 <Link to="/enquiry">Enquiry</Link>
                 <Link to="/data">Data</Link>
                 {user && (
-                    <div>
-                        <div className="user-menu" onClick={toggleDropdown}>
-                            {user.username}
+                    <div className="dropdown">
+                        <button className="dropbtn">{user.username}</button>
+                        <div className="dropdown-content">
+                            <Link to="/profile">Profile</Link>
+                            <button onClick={handleLogout} className="dropdown-item">Log out</button>
                         </div>
-                        {showDropdown && (
-                            <div className="dropdown">
-                                <Link to="/profile">Profile</Link>
-                                <button onClick={handleLogout}>Log out</button>
-                            </div>
-                        )}
                     </div>
                 )}
             </div>

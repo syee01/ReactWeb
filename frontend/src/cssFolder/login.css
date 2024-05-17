@@ -13,12 +13,12 @@ body, html {
 
 .login-container {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  /* top: 20px; */
+  /* left: 20px; */
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  background: url('../images/web.png') no-repeat center center fixed;  /* Background image scoped to login-container */
+  background: url('../images/webfrontpage.png') no-repeat center center fixed;  /* Background image scoped to login-container */
   background-size: cover;
   width: 100%;  /* Ensuring it covers the desired area */
   height: 100%;

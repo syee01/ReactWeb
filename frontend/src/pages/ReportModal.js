@@ -3,7 +3,7 @@ import axios from 'axios';
 import moment from 'moment';
 import '../cssFolder/modalProducts.css';
 
-const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
+const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
   const [reportData, setReportData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -25,8 +25,7 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
       const fetchData = async () => {
         setIsLoading(true);
         try {
-          const endpoint = `http://localhost:8085/specificEnquiry/${category}/${reportId}`;
-          console.log(endpoint)
+          const endpoint = `http://localhost:8085/specificReports/${category}/${reportId}`;
           const response = await axios.get(endpoint);
           setReportData(response.data);
         } catch (err) {
@@ -40,7 +39,7 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
       fetchData();
       const fetchReportImages = async () => {
         try {
-          const endpoint = `http://localhost:8085/enquiryImages/${reportId}`;
+          const endpoint = `http://localhost:8085/reportImages/${reportId}`;
           const response = await axios.get(endpoint);
           setReportImages(response.data);
         } catch (err) {
@@ -51,7 +50,7 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
       if (isOpen) {
         setIsLoading(true);
         fetchData();
-        fetchReportImages().then(() => setIsLoading(false)); 
+        fetchReportImages().then(() => setIsLoading(false));
       }
     }
   }, [isOpen, reportId, category]);
@@ -63,7 +62,7 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
   
   const handleSubmit = async () => {
     try {
-      const endpoint = `http://localhost:8085/update_enquiry/${category}`;
+      const endpoint = `http://localhost:8085/update_report/${category}`;
       await axios.post(endpoint, {
         reportId,
         halalStatus: isHalal,
@@ -82,7 +81,7 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-backdrop">
+    <div className="modalbackground">
       <div className="modal-container">
         <div className="modal-header">
           <h2 className="reportTitle">{reportData.ReportID}</h2>
@@ -156,7 +155,7 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
             </div>
             <div className="form-group">
               <p className="bold-text"> {/* Added class for bold text */}
-                <strong>Halal Status: </strong>
+                <strong>Halal Status:</strong>
               </p>
               <div className="halal-buttons">
                 <button
@@ -175,7 +174,7 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
             </div>
             <div className="form-group">
               <label htmlFor="comment" className="bold-text"> {/* Added class for bold text */}
-                <strong>Comment: </strong>
+                <strong>Comment:</strong>
               </label>
               <input
                 type="text"
@@ -194,4 +193,4 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
   );
 };
 
-export default ProductEnquiryModal;
+export default ProductReportModal;

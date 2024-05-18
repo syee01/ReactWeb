@@ -9,7 +9,8 @@ import { UserProvider } from './UserContext'; // Ensure this is correctly import
 import EditProductPage from './pages/EditProductPage';
 import EditMosquePage from './pages/EditMosquePage';
 import ReportPage from './pages/Reports';
-import ProductReportPage from './pages/ProductReport';
+import ReportModal from './pages/ReportModal';
+import EnquiryModal from './pages/EnquiryModal';
 import ReportHeadOfficer from './pages/ReportHeadOfficer';
 import EnquiryPage from './pages/Enquiry';
 import EnquiryHeadOfficer from './pages/EnquiryHeadOfficer';
@@ -31,7 +32,8 @@ const LayoutWithConditionalNavbar = () => {
         <Route path="/editPrayerRoom/:productId" element={<EditMosquePage />} />
         <Route path='/profile' element={<Profile />} />
         <Route path='/report' element={<ReportPage />} />
-        <Route path="/productReport/:reportId/:category" element={<ProductReportPage />} />
+        <Route path="/reportModal/:reportId/:category" element={<ReportModal />} />
+        <Route path="/enquiryModal/:reportId/:category" element={<EnquiryModal />} />
         <Route path="/reportHeadOfficer/:reportId/:category" element={<ReportHeadOfficer />} />
         <Route path='/enquiry' element={<EnquiryPage />} />
         <Route path='/verifyData' element={<VerifyData />} />

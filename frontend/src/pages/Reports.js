@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../cssFolder/report.css';
 import moment from 'moment'; 
-import ProductReportModal from './ProductReport';
+import ProductReportModal from './ReportModal';
 import ReportHeadOfficer from './ReportHeadOfficer';
 import CompletedReportModal from './CompletedReport';
 

@@ -1,23 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../cssFolder/verifyData.css';  // Assuming CSS is tailored for this component
+import '../cssFolder/verifyData.css'; // Make sure the path is correct
+import ProductDetailsModal from './VerifyProduct';
+
+const countries = ['MALAYSIA', 'THAILAND', 'KOREA'];
+const categories = ['Products', 'Restaurants', 'Mosques', 'Prayer Room'];
 
 const Tab = ({ name, isSelected, onClick }) => (
-  <button
-    className={`tab ${isSelected ? 'selected' : ''}`}
-    onClick={() => onClick(name)}
-  >
-    {name}
-  </button>
+  <button className={`tab ${isSelected ? 'selected' : ''}`} onClick={() => onClick(name)}>{name}</button>
 );
 
 const Category = ({ name, isSelected, onClick }) => (
-  <button
-    className={`category ${isSelected ? 'selected' : ''}`}
-    onClick={() => onClick(name)}
-  >
-    {name}
-  </button>
+  <button className={`category ${isSelected ? 'selected' : ''}`} onClick={() => onClick(name)}>{name}</button>
 );
 
 const VerifyData = () => {
@@ -25,6 +19,7 @@ const VerifyData = () => {
   const [selectedCategory, setSelectedCategory] = useState('Products');
   const [data, setData] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
+  const [viewingProduct, setViewingProduct] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -33,9 +28,7 @@ const VerifyData = () => {
   const fetchData = async () => {
     setIsFetching(true);
     try {
-      // Dynamically build the endpoint based on selected country and category
       const endpoint = `http://localhost:8085/${selectedCountry.toLowerCase()}/${selectedCategory.toLowerCase()}/reviewed`;
-      console.log('Fetching data from:', endpoint);  // This will log the actual request URL
       const response = await axios.get(endpoint);
       setData(response.data);
     } catch (error) {
@@ -43,24 +36,24 @@ const VerifyData = () => {
     }
     setIsFetching(false);
   };
-  
-  const editItem = (item) => {
-    console.log('Editing item:', item);
-    // Here you could set state to open a modal or perform other actions
+
+  const handleViewProduct = (product) => {
+    setViewingProduct(product);
   };
 
-  const countries = ['MALAYSIA', 'THAILAND', 'KOREA'];
-  const categories = ['Products', 'Restaurants', 'Mosques', 'Prayer Room'];
+  const closeViewModal = () => {
+    setViewingProduct(null);
+  };
 
   return (
     <div>
       <div className="tabs">
-        {countries.map((country) => (
+        {countries.map(country => (
           <Tab key={country} name={country} isSelected={selectedCountry === country} onClick={setSelectedCountry} />
         ))}
       </div>
       <div className="categories">
-        {categories.map((category) => (
+        {categories.map(category => (
           <Category key={category} name={category} isSelected={selectedCategory === category} onClick={setSelectedCategory} />
         ))}
       </div>
@@ -85,7 +78,7 @@ const VerifyData = () => {
                     <td>{item.details}</td>
                     <td>{item.status}</td>
                     <td>
-                      <button onClick={() => editItem(item)}>Edit/Verify</button>
+                      <button onClick={() => handleViewProduct(item)}>Verify</button>
                     </td>
                   </tr>
                 ))}
@@ -94,6 +87,7 @@ const VerifyData = () => {
           ) : <p>No item found.</p>
         )}
       </div>
+      {viewingProduct && <ProductDetailsModal product={viewingProduct} onClose={closeViewModal} />}
     </div>
   );
 };

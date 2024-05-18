@@ -302,3 +302,22 @@
   font-size: 1.5rem; /* Increase the size of the 'X' */
   cursor: pointer; /* Change cursor to indicate it's clickable */
 }
+
+.data-component .filter-controls .search-and-add {
+  display: flex;
+  justify-content: space-between; /* Aligns children (search bar and button) on opposite ends */
+  align-items: center; /* Vertically centers children in the container */
+}
+
+.data-component .filter-controls .filter-input {
+  flex-grow: 1; /* Allows the search bar to take up available space */
+  margin-right: 10px; /* Adds spacing between the search bar and the button */
+}
+
+.add-data-button {
+  padding: 8px 16px; /* Adjust padding as necessary */
+  background-color: #007bff; /* Example button color */
+  color: white; /* Text color for the button */
+  border: none;
+  cursor: pointer;
+}

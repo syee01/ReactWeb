@@ -50,6 +50,29 @@ const Data = () => {
   const [currentMosqueData, setCurrentMosqueData] = useState(null);
   const [currentPrayerRoomData, setCurrentPrayerRoomData] = useState(null);
   const [currentRestaurantData, setCurrentRestaurantData] = useState(null);
+ 
+  const [isAddModalProductOpen, setIsAddModalProductOpen] = useState(false);
+  const [isAddModalMosqueOpen, setIsAddModalMosqueOpen] = useState(false);
+  const [isAddModalPrayerRoomOpen, setIsAddModalPrayerRoomOpen] = useState(false);
+  const [isAddModalRestaurantOpen, setIsAddModalRestaurantOpen] = useState(false);
+
+  // Handle opening the Add Data modals
+  const handleAddProduct = () => {
+    setCurrentProductData(null);
+    setIsAddModalProductOpen(true);
+  };
+  const handleAddMosque = () => {
+    setCurrentMosqueData(null);
+    setIsAddModalMosqueOpen(true);
+  };
+  const handleAddPrayerRoom = () => {
+    setCurrentPrayerRoomData(null);
+    setIsAddModalPrayerRoomOpen(true);
+  };
+  const handleAddRestaurant = () => {
+    setCurrentRestaurantData(null);
+    setIsAddModalRestaurantOpen(true);
+  };
 
   const handleEditProduct = (product) => {
     setCurrentProductData({ productID: product, country: selectedCountry });
@@ -76,6 +99,10 @@ const Data = () => {
     setIsEditModalMosqueOpen(false);
     setIsEditModalPrayerRoomOpen(false);
     setIsEditModalRestaurantOpen(false);
+    setIsAddModalProductOpen(false);
+    setIsAddModalMosqueOpen(false);
+    setIsAddModalPrayerRoomOpen(false);
+    setIsAddModalRestaurantOpen(false);
     setCurrentProductData(null); // Optionally reset any modal-specific data
     setCurrentMosqueData(null);
     setCurrentPrayerRoomData(null);
@@ -295,7 +322,18 @@ const Data = () => {
           </select>
         )}
         <input type="text" placeholder="Type to search..." className="filter-input" value={filter} onChange={handleFilterChange} />
-
+        {selectedCategory === 'Products' && (
+        <button className="add-data-button" onClick={handleAddProduct}>Add Product</button>
+        )}
+        {selectedCategory === 'Restaurants' && (
+          <button className="add-data-button" onClick={handleAddRestaurant}>Add Restaurant</button>
+        )}
+        {selectedCategory === 'Mosques' && (
+          <button className="add-data-button" onClick={handleAddMosque}>Add Mosque</button>
+        )}
+        {selectedCategory === 'Prayer Room' && (
+          <button className="add-data-button" onClick={handleAddPrayerRoom}>Add Prayer Room</button>
+        )}
         </div>
         <div className="content">
           {isFetching ? (
@@ -462,8 +500,10 @@ const Data = () => {
           <button className="closebutton" onClick={closeModal}>&times;</button> {/* Close button */}
             <EditProductPage 
               productData={currentProductData}
+              country={selectedCountry}
               onClose={closeModal} // Here you're passing closeModal function from Data as onClose prop
               onSave={afterSave}
+              isAdding={false}
             />
           </div>
         </div>
@@ -504,6 +544,14 @@ const Data = () => {
           </div>
         </div>
       )}
+      {isAddModalProductOpen && (
+          <div className="modalbackdrop">
+              <div className="modalcontent">
+                  <button className="closebutton" onClick={closeModal}>&times;</button>
+                  <EditProductPage onSave={afterSave} onClose={closeModal} country={selectedCountry} isAdding={true} />
+              </div>
+          </div>
+        )}
     </div>
   );
 };

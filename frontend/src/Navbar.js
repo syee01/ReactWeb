@@ -30,6 +30,7 @@ const Navbar = () => {
                 <Link to="/report">Report</Link>
                 <Link to="/enquiry">Enquiry</Link>
                 <Link to="/data">Data</Link>
+                <Link to="/verifyData">Verify Data</Link>
                 {user && (
                     <div className="dropdown">
                         <button className="dropbtn">{user.username}</button>

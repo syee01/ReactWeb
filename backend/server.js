@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const util = require('util')
 const { check, validationResult } = require('express-validator');
+const { table } = require("console");
 
 const app = express();
 app.use(cors());
@@ -1216,5 +1217,31 @@ app.put('/korearestaurant/:id', (req, res) => {
     }
   });
 });
+
+
+app.get('/:country/:category/reviewed', async (req, res) => {
+  const { country, category } = req.params;
+  let tableCategory = ''
+  if (category == 'products')
+      tableCategory = 'product'
+  else if(category == 'restaurants')
+      tableCategory ='restaurant'
+  else if(category =='mosques')
+      tableCategory ='mosque'
+  
+  const tableName = `${country}${tableCategory}`;
+  console.log(`Constructed table name: ${tableName}`);
+  try {
+      const sql = `SELECT * FROM ${tableName} WHERE status = 'reviewed'`;
+      console.log(`Executing SQL: ${sql}`);
+      const results = await query(sql);
+      console.log('SQL results:', results);
+      res.json(results);
+  } catch (error) {
+      console.error('Error fetching reviewed items:', error);
+      res.status(500).json({ message: 'Error fetching data', error });
+  }
+});
+
 
 app.listen(8085, ()=> {console.log("listening");})

@@ -1,0 +1,323 @@
+/* Data.css */
+.data-component {
+  font-family: Arial, sans-serif;
+  width: 100%; /* Take full width of the parent container */
+  max-width: 95%; /* Allow maximum width */
+  margin: 20px auto;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  max-height: fit-content;
+}
+  
+  /* Tab styles */
+  .tabs {
+    display: flex;
+    /* justify-content: center; */
+    margin-top: 30px;
+    margin-left: 30px;
+    margin-bottom: 40px;
+    margin-top: 40px;
+  }
+  
+  .tab {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: 2px solid #ccc;
+    border-radius: 15px;
+    background: none;
+    cursor: pointer;
+    outline: none;
+    font-size: 16px;
+  }
+  
+  .tab.selected {
+    border-color: #007bff;
+    color: #007bff;
+  }
+  
+  /* Category styles */
+  .categories {
+    display: flex;
+    /* justify-content: center; */
+    margin-bottom: 20px;
+    margin-left: 30px;
+  }
+  
+  .category {
+    padding: 5px 10px;
+    margin: 0 5px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    outline: none;
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+  
+  .category.selected {
+    border-bottom-color: #000;
+  }
+  
+  /* Add New Data button styles */
+  .add-new-data {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .add-data-button {
+    padding: 10px 20px;
+    border: 2px dashed #ccc;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .add-data-button:hover {
+    border-style: solid;
+  }
+
+  .content {
+    overflow-x: auto;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .add-new-data {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .add-data-button {
+    padding: 10px 20px;
+    border: 2px dashed #ccc;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+  
+  .add-data-button:hover {
+    border-style: solid;
+  }
+  
+  /* Style for the filter input */
+  .filter-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Align items and add space between them */
+    margin-bottom: 20px;
+  }
+  
+  .filter-input {
+    flex: 1; /* Take up remaining space */
+    font-size: 16px;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  .scrollable-table-container {
+    max-height: 300px; 
+    overflow-y: auto; 
+    overflow-x: auto; /* Hides the horizontal scrollbar */
+  }
+  
+  /* Style for the table and its cells */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    /* table-layout: auto;  */
+  }
+  
+  th, td {
+    padding: 8px;
+    border: 1px solid #ddd; /* Border for cells */
+    text-align: left;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  /* Define column widths */
+  th:nth-child(1), td:nth-child(1) { min-width: 60px; max-width: 100px }
+  th:nth-child(2), td:nth-child(2) { min-width: 60px; max-width: 200px; }
+  th:nth-child(3), td:nth-child(3) { min-width: 60px; max-width: 200px; }
+  th:nth-child(4), td:nth-child(4) { min-width: 60px; max-width: 280px; }
+
+
+  .filter-controls {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .filter-type-selector {
+    font-size: 16px;
+    padding: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+ 
+  .status-filter {
+    margin-bottom: 20px;
+  }
+  
+  .status-selector {
+    font-size: 14px;
+    padding: 5px;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .pagination-controls button {
+    margin: 0 10px;
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .pagination-controls button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  
+  .edit-button {
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+  }
+  
+  .edit-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .edit-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+/* Close Button */
+.close-button {
+  float: right;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.modalbackdrop {
+  position: fixed; /* Positioned relative to the viewport */
+  top: 0;
+  left: 0;
+  width: 100vw; /* Full width */
+  height: 100vh; /* Full height */
+  background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+  z-index: 1000; /* Ensure it sits on top of other content */
+  display: flex;
+  justify-content: center; /* Center modal content horizontally */
+  align-items: center; /* Center modal content vertically */
+}
+
+.modalcontent {
+  position: relative; 
+  background-color: #fff; /* White background */
+  padding: 30px; /* Padding around the content */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow for a bit of depth */
+  width: 800px; /* Maximum width */
+  z-index: 1001; /* Above the backdrop */
+}
+
+.edit-product-modal form {
+  padding-left: 20px; /* Match the left padding of .modal-content */
+  padding-right: 20px; /* Match the right padding of .modal-content */
+}
+
+/* You can add additional styles here for the modal internals, like buttons */
+.modalcontent .edit-product-modal form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modalcontent .edit-product-modal form input[type="text"],
+.modalcontent .edit-product-modal form input[type="date"],
+.modalcontent .edit-product-modal form input[type="file"] {
+  margin-bottom: 15px; /* Spacing between inputs */
+  padding: 8px; /* Padding inside inputs */
+  border: 1px solid #ccc; /* Border */
+  border-radius: 4px; /* Rounded borders for inputs */
+}
+
+.modalcontent .edit-product-modal .form-input {
+  display: block; /* Ensures the input is treated as a block-level element, allowing width to be set */
+  width: 100%; /* Makes the input stretch to the full width of its parent container */
+  max-width: 700px; /* Optionally, set a max-width to prevent the input from becoming too wide */
+  margin-bottom: 10px; /* Keeps the spacing consistent */
+  padding: 8px; /* Provides internal spacing */
+  border: 1px solid #ccc; /* Standard border styling */
+  border-radius: 4px; /* Rounded corners */
+  box-sizing: border-box; /* Includes padding and border in the element's total width */
+}
+
+.modalcontent .edit-product-modal form button {
+  cursor: pointer;
+  padding: 10px 10px;
+  margin-top: 10px; /* Space above the button */
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff; /* Bootstrap primary blue */
+  color: white;
+}
+
+.modalcontent .edit-product-modal form button:hover {
+  background-color: #0056b3; /* A darker shade for hover effect */
+}
+
+.closebutton {
+  position: absolute; /* Absolute position for the close button */
+  top: 10px; /* Space from the top of the modalcontent */
+  right: 10px; /* Space from the right of the modalcontent */
+  border: none; /* Remove border */
+  background: none; /* Remove any background */
+  font-size: 1.5rem; /* Increase the size of the 'X' */
+  cursor: pointer; /* Change cursor to indicate it's clickable */
+}
+
+.data-component .filter-controls .search-and-add {
+  display: flex;
+  justify-content: space-between; /* Aligns children (search bar and button) on opposite ends */
+  align-items: center; /* Vertically centers children in the container */
+}
+
+.data-component .filter-controls .filter-input {
+  flex-grow: 1; /* Allows the search bar to take up available space */
+  margin-right: 10px; /* Adds spacing between the search bar and the button */
+}
+
+.add-data-button {
+  padding: 8px 16px; /* Adjust padding as necessary */
+  background-color: #007bff; /* Example button color */
+  color: white; /* Text color for the button */
+  border: none;
+  cursor: pointer;
+}

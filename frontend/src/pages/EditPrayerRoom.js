@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../cssFolder/editProduct.css';
 
-const EditPrayerRoomPage = ({ prayerRoomData, country, onClose, onSave }) => {
-  const mosqueprId = prayerRoomData.mosqueprID;
+const EditPrayerRoomPage = ({ prayerRoomData, onClose, onSave, country, isAdding }) => {
+  const mosqueprId = prayerRoomData ? prayerRoomData.mosqueprID : null;
   const [editedPrayerRoom, setEditedPrayerRoom] = useState({
     name: '',
     location: '',
@@ -13,114 +13,114 @@ const EditPrayerRoomPage = ({ prayerRoomData, country, onClose, onSave }) => {
   });
   const [isFetching, setIsFetching] = useState(false);
 
+  // Initialize datacountry based on the country from prayerRoomData or from props
   let datacountry = '';
-
-  switch (prayerRoomData.country) {
-    case 'THAILAND':
-      datacountry = 'thailand';
-      break;
-    case 'MALAYSIA':
-      datacountry = 'malaysia';
-      break;
-    case 'KOREA':
-      datacountry = 'korea';
-      break;
-    default:
-      // Handle other cases or default case as needed
-      break;
+  if (prayerRoomData && prayerRoomData.country) {
+    switch (prayerRoomData.country) {
+      case 'THAILAND':
+        datacountry = 'thailand';
+        break;
+      case 'MALAYSIA':
+        datacountry = 'malaysia';
+        break;
+      case 'KOREA':
+        datacountry = 'korea';
+        break;
+      default:
+        break;
+    }
+  } else {
+    switch (country) {
+      case 'THAILAND':
+        datacountry = 'thailand';
+        break;
+      case 'MALAYSIA':
+        datacountry = 'malaysia';
+        break;
+      case 'KOREA':
+        datacountry = 'korea';
+        break;
+      default:
+        break;
+    }
   }
 
   useEffect(() => {
     const fetchMosque = async () => {
-      setIsFetching(true);
-      try {
-        const response = await axios.get(`http://localhost:8085/${datacountry}/pr/${mosqueprId}`);
-        setEditedPrayerRoom(response.data);
-      } catch (error) {
-      console.error('Error fetching mosque:', error);
+      if (!isAdding && mosqueprId) {
+        setIsFetching(true);
+        try {
+          const response = await axios.get(`http://localhost:8085/${datacountry}/pr/${mosqueprId}`);
+          setEditedPrayerRoom(response.data);
+        } catch (error) {
+          console.error('Error fetching mosque:', error);
+        }
+        setIsFetching(false);
       }
-      setIsFetching(false);
     };
 
     fetchMosque();
-  }, [mosqueprId, datacountry]);
+  }, [mosqueprId, datacountry, isAdding]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditedPrayerRoom({ ...editedPrayerRoom, [name]: value });
+    setEditedPrayerRoom(prev => ({ ...prev, [name]: value }));
   };
-  
+
   const handleSave = async (event) => {
     event.preventDefault();
     
     const data = {
-      country: datacountry,
       name: editedPrayerRoom.name,
       address: editedPrayerRoom.address,
       state: editedPrayerRoom.state,
       district: editedPrayerRoom.district,
-  };
+      status: 'reviewed',  // Assume default status is 'reviewed'
+    };
+
+    const apiEndpoint = isAdding ? 
+      `http://localhost:8085/${datacountry}pr/add` : 
+      `http://localhost:8085/${datacountry}pr/${mosqueprId}`;
+
     try {
-      const response = await axios.put(`http://localhost:8085/${datacountry}pr/${mosqueprId}`, data, {
+      const response = await axios({
+        method: isAdding ? 'post' : 'put',
+        url: apiEndpoint,
+        data: data,
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      if (onSave) onSave();
-      // Close the modal
-      onClose();
+      
+      if (onSave) onSave(response.data); 
+      onClose(); 
     } catch (error) {
-      console.error('Error saving mosque:', error);
+      console.error('Error saving prayer room:', error);
     }
   };
 
   if (isFetching) return <div>Loading...</div>;
-  if (!editedPrayerRoom) return <div>Prayer Room not found.</div>;
+  if (!isAdding && !editedPrayerRoom) return <div>Prayer Room not found.</div>;
 
   return (
     <div className='edit-product-modal'>
-      <h2>Edit Prayer Room</h2>
+      <h2>{isAdding ? 'Add New Prayer Room' : 'Edit Prayer Room'}</h2>
       <form onSubmit={handleSave}>
-      <div>
+        <div>
           <label>Name:</label>
-          <input
-            type="text"
-            name="name"
-            value={editedPrayerRoom.name || ''}
-            onChange={handleInputChange}
-            className="form-input"
-          />
+          <input type="text" name="name" value={editedPrayerRoom.name || ''} onChange={handleInputChange} className="form-input" />
         </div>
         <div>
           <label>Location:</label>
-          <input
-            type="text"
-            name="address"
-            value={editedPrayerRoom.address|| ''}
-            onChange={handleInputChange}
-            className="form-input"
-          />
+          <input type="text" name="address" value={editedPrayerRoom.address || ''} onChange={handleInputChange} className="form-input" />
         </div>
         <div>
           <label>State:</label>
-          <input
-            type="text"
-            name="state"
-            value={editedPrayerRoom.state|| ''}
-            onChange={handleInputChange}
-            className="form-input"
-          />
+          <input type="text" name="state" value={editedPrayerRoom.state || ''} onChange={handleInputChange} className="form-input" />
         </div>
         <div>
           <label>District:</label>
-          <input
-            type="text"
-            name="district"
-            value={editedPrayerRoom.district|| ''}
-            disabled={prayerRoomData.country !== 'MALAYSIA'}
-            onChange={handleInputChange}
-            className="form-input"
-          />
+          <input type="text" name="district" value={editedPrayerRoom.district || ''} disabled={datacountry !== 'malaysia'} onChange={handleInputChange} className="form-input" />
         </div>
         <div className="buttoncontainer">
           <button type="submit" className="form-button save-button">Save</button>

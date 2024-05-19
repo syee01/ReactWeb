@@ -989,11 +989,11 @@ app.put('/malaysiamosque/:id', (req, res) => {
 
   const mosqueprId = req.params.id;
 
-  const { name, address, state, district } = req.body;
+  const { name, address, state, district, status } = req.body;
 
-  const sql = `UPDATE malaysiamosque SET name = ?, address = ?, state = ?, district = ? WHERE mosqueprID = ?`;
+  const sql = `UPDATE malaysiamosque SET name = ?, address = ?, state = ?, district = ?, status = ? WHERE mosqueprID = ?`;
 
-  db.query(sql, [name, address, state, district, mosqueprId], (err, result) => {
+  db.query(sql, [name, address, state, district, status, mosqueprId], (err, result) => {
     if (err) {
       console.error('Error updating product:', err);
       res.status(500).json({ message: 'Error updating mosque' });
@@ -1007,15 +1007,28 @@ app.put('/malaysiamosque/:id', (req, res) => {
   });
 });
 
+app.post('/malaysiamosque/add', (req, res) => {
+  const { name, address, state, district, status } = req.body;
+
+  const sql = `INSERT INTO malaysiamosque (name, address, state, district, status) VALUES (?, ?, ?, ?, ?)`;
+
+  db.query(sql, [name, address, state, district, status], (err, result) => {
+    if (err) {
+      console.error('Error adding new mosque:', err);
+      res.status(500).json({ message: 'Error updating mosque' });
+    } 
+  });
+});
+
 app.put('/thailandmosque/:id', (req, res) => {
   
   const mosqueprId = req.params.id;
 
-  const { name, address, state } = req.body;
+  const { name, address, state, status } = req.body;
 
-  const sql = `UPDATE thailandmosque SET name = ?, address = ?, state = ? WHERE mosqueprID = ?`;
+  const sql = `UPDATE thailandmosque SET name = ?, address = ?, state = ?, status = ? WHERE mosqueprID = ?`;
 
-  db.query(sql, [name, address, state, mosqueprId], (err, result) => {
+  db.query(sql, [name, address, state,status, mosqueprId], (err, result) => {
     if (err) {
       console.error('Error updating mosque:', err);
       res.status(500).json({ message: 'Error updating mosque' });
@@ -1029,15 +1042,28 @@ app.put('/thailandmosque/:id', (req, res) => {
   });
 });
 
+app.post('/thailandmosque/add', (req, res) => {
+  const { name, address, state, status } = req.body;
+
+  const sql = `INSERT INTO thailandmosque (name, address, state, status) VALUES (?, ?, ?, ?)`;
+
+  db.query(sql, [name, address, state, status], (err, result) => {
+    if (err) {
+      console.error('Error adding new mosque:', err);
+      res.status(500).json({ message: 'Error updating mosque' });
+    } 
+  });
+});
+
 app.put('/koreamosque/:id', (req, res) => {
 
   const mosqueprId = req.params.id;
  
-  const { name, address, state } = req.body;
+  const { name, address, state, status } = req.body;
 
-  const sql = `UPDATE koreamosque SET name = ?, address = ?, state = ? WHERE mosqueprID = ?`;
+  const sql = `UPDATE koreamosque SET name = ?, address = ?, state = ?, status = ? WHERE mosqueprID = ?`;
 
-  db.query(sql, [name, address, state, mosqueprId], (err, result) => {
+  db.query(sql, [name, address, state, status, mosqueprId], (err, result) => {
     if (err) {
       console.error('Error updating mosque:', err);
       res.status(500).json({ message: 'Error updating mosque' });
@@ -1048,6 +1074,19 @@ app.put('/koreamosque/:id', (req, res) => {
         res.status(404).json({ message: 'Mosque not found' });
       }
     }
+  });
+});
+
+app.post('/koreamosque/add', (req, res) => {
+  const { name, address, state, status } = req.body;
+
+  const sql = `INSERT INTO koreamosque (name, address, state, status) VALUES (?, ?, ?, ?)`;
+
+  db.query(sql, [name, address, state, status], (err, result) => {
+    if (err) {
+      console.error('Error adding new mosque:', err);
+      res.status(500).json({ message: 'Error updating mosque' });
+    } 
   });
 });
 
@@ -1074,13 +1113,13 @@ app.put('/malaysiapr/:id', (req, res) => {
   
   const mosqueprId = req.params.id;
 
-  const { name, address, state, district } = req.body;
+  const { name, address, state, district, status } = req.body;
 
-  const sql = `UPDATE malaysiapr SET name = ?, address = ?, state = ?, district = ? WHERE mosqueprID = ?`;
+  const sql = `UPDATE malaysiapr SET name = ?, address = ?, state = ?, district = ?, status = ? WHERE mosqueprID = ?`;
 
-  db.query(sql, [name, address, state, district, mosqueprId], (err, result) => {
+  db.query(sql, [name, address, state, district, status, mosqueprId], (err, result) => {
     if (err) {
-      console.error('Error updating product:', err);
+      console.error('Error updating prayer room:', err);
       res.status(500).json({ message: 'Error updating mosque' });
     } else {
       if (result.affectedRows > 0) {
@@ -1092,16 +1131,29 @@ app.put('/malaysiapr/:id', (req, res) => {
   });
 });
 
+app.post('/malaysiapr/add', (req, res) => {
+  const { name, address, state, district, status } = req.body;
+
+  const sql = `INSERT INTO koreapr (name, address, state, district, status) VALUES (?, ?, ?, ?, ?)`;
+
+  db.query(sql, [name, address, state, district, status], (err, result) => {
+    if (err) {
+      console.error('Error adding new prayer room:', err);
+      res.status(500).json({ message: 'Error updating prayer room' });
+    } 
+  });
+});
+
 app.put('/thailandpr/:id', (req, res) => {
   const mosqueprId = req.params.id;
   
-  const { name, address, state } = req.body;
+  const { name, address, state, status} = req.body;
 
-  const sql = `UPDATE thailandpr SET name = ?, address = ?, state = ? WHERE mosqueprID = ?`;
+  const sql = `UPDATE thailandpr SET name = ?, address = ?, state = ?, status = ? WHERE mosqueprID = ?`;
 
-  db.query(sql, [name, address, state, mosqueprId], (err, result) => {
+  db.query(sql, [name, address, state, status, mosqueprId], (err, result) => {
     if (err) {
-      console.error('Error updating product:', err);
+      console.error('Error updating prayer room:', err);
       res.status(500).json({ message: 'Error updating prayer room' });
     } else {
     
@@ -1114,17 +1166,30 @@ app.put('/thailandpr/:id', (req, res) => {
   });
 });
 
+app.post('/thailandpr/add', (req, res) => {
+  const { name, address, state, status } = req.body;
+
+  const sql = `INSERT INTO thailandpr (name, address, state, status) VALUES (?, ?, ?, ?)`;
+
+  db.query(sql, [name, address, state, status], (err, result) => {
+    if (err) {
+      console.error('Error adding new prayer room:', err);
+      res.status(500).json({ message: 'Error updating prayer room' });
+    } 
+  });
+});
+
 app.put('/koreapr/:id', (req, res) => {
   const mosqueprId = req.params.id;
 
-  const { name, address, state } = req.body;
+  const { name, address, state, status } = req.body;
 
-  const sql = `UPDATE koreapr SET name = ?, address = ?, state = ? WHERE mosqueprID = ?`;
+  const sql = `UPDATE koreapr SET name = ?, address = ?, state = ?, status = ? WHERE mosqueprID = ?`;
 
-  db.query(sql, [name, address, state, mosqueprId], (err, result) => {
+  db.query(sql, [name, address, state, status, mosqueprId], (err, result) => {
     if (err) {
       // If an error occurs, log it and return a server error response
-      console.error('Error updating product:', err);
+      console.error('Error updating prayer room:', err);
       res.status(500).json({ message: 'Error updating prayer room' });
     } else {
       if (result.affectedRows > 0) {
@@ -1135,6 +1200,20 @@ app.put('/koreapr/:id', (req, res) => {
     }
   });
 });
+
+app.post('/koreapr/add', (req, res) => {
+  const { name, address, state, status } = req.body;
+
+  const sql = `INSERT INTO koreapr (name, address, state, status) VALUES (?, ?, ?, ?)`;
+
+  db.query(sql, [name, address, state, status], (err, result) => {
+    if (err) {
+      console.error('Error adding new prayer room:', err);
+      res.status(500).json({ message: 'Error updating prayer room' });
+    } 
+  });
+});
+
 
 app.get('/:datacountry/restaurant/:id', (req, res) => {
   const datacountry = req.params.datacountry; // Get the datacountry from the route parameter
@@ -1263,7 +1342,6 @@ app.post('/korearestaurant/add', (req, res) => {
     }
   });
 });
-
 
 app.get('/:country/:category/reviewed', async (req, res) => {
   const { country, category } = req.params;

@@ -553,13 +553,29 @@ const Data = () => {
           </div>
         )}
         {isAddModalRestaurantOpen && (
-      <div className="modalbackdrop">
-          <div className="modalcontent">
-              <button className="closebutton" onClick={closeModal}>&times;</button>
-              <EditRestaurantPage onSave={afterSave} onClose={closeModal} country={selectedCountry} isAdding={true} />
+          <div className="modalbackdrop">
+            <div className="modalcontent">
+                <button className="closebutton" onClick={closeModal}>&times;</button>
+                <EditRestaurantPage onSave={afterSave} onClose={closeModal} country={selectedCountry} isAdding={true} />
+            </div>
           </div>
-      </div>
-    )}
+        )}
+        {isAddModalMosqueOpen && (
+          <div className="modalbackdrop">
+            <div className="modalcontent">
+                <button className="closebutton" onClick={closeModal}>&times;</button>
+                <EditMosquePage onSave={afterSave} onClose={closeModal} country={selectedCountry} isAdding={true} />
+            </div>
+          </div>
+        )}
+        {isAddModalPrayerRoomOpen && (
+          <div className="modalbackdrop">
+            <div className="modalcontent">
+                <button className="closebutton" onClick={closeModal}>&times;</button>
+                <EditPrayerRoom onSave={afterSave} onClose={closeModal} country={selectedCountry} isAdding={true} />
+            </div>
+          </div>
+        )}
     </div>
   );
 };

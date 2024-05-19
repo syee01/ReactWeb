@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../cssFolder/editProduct.css';
 
-const EditMosquePage = ({ mosqueData, country, onClose, onSave }) => {
-  const mosqueprId = mosqueData.mosqueprID;
+const EditMosquePage = ({ mosqueData, country, onClose, onSave, isAdding }) => {
+  const mosqueprId = mosqueData ? mosqueData.mosqueprID: null;
   const [editedMosque, setEditedMosque] = useState({
     name: '',
     address: '',
@@ -14,20 +14,34 @@ const EditMosquePage = ({ mosqueData, country, onClose, onSave }) => {
   const [isFetching, setIsFetching] = useState(false);
 
   let datacountry = '';
-
-  switch (mosqueData.country) {
-    case 'THAILAND':
-      datacountry = 'thailand';
-      break;
-    case 'MALAYSIA':
-      datacountry = 'malaysia';
-      break;
-    case 'KOREA':
-      datacountry = 'korea';
-      break;
-    default:
-      // Handle other cases or default case as needed
-      break;
+  if (mosqueData && mosqueData.country) {
+    switch (mosqueData.country) {
+      case 'THAILAND':
+        datacountry = 'thailand';
+        break;
+      case 'MALAYSIA':
+        datacountry = 'malaysia';
+        break;
+      case 'KOREA':
+        datacountry = 'korea';
+        break;
+      default:
+        break;
+    }
+  } else {
+    switch (country) {
+      case 'THAILAND':
+        datacountry = 'thailand';
+        break;
+      case 'MALAYSIA':
+        datacountry = 'malaysia';
+        break;
+      case 'KOREA':
+        datacountry = 'korea';
+        break;
+      default:
+        break;
+    }
   }
 
   useEffect(() => {
@@ -59,17 +73,25 @@ const EditMosquePage = ({ mosqueData, country, onClose, onSave }) => {
       address: editedMosque.address,
       state: editedMosque.state,
       district: editedMosque.district,
+      status:'reviewed'
   };
 
+    const apiEndpoint = isAdding ? 
+    `http://localhost:8085/${datacountry}mosque/add` : 
+    `http://localhost:8085/${datacountry}mosque/${mosqueprId}`;
+
     try {
-      const response = await axios.put(`http://localhost:8085/${datacountry}mosque/${mosqueprId}`, data, {
+      const response = await axios({
+        method: isAdding ? 'post' : 'put',
+        url: apiEndpoint,
+        data: data,
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      if (onSave) onSave();
-      // Close the modal
-      onClose();
+      
+      if (onSave) onSave(response.data); 
+      onClose(); 
     } catch (error) {
       console.error('Error saving mosque:', error);
     }
@@ -80,7 +102,7 @@ const EditMosquePage = ({ mosqueData, country, onClose, onSave }) => {
 
   return (
     <div className='edit-product-modal'>
-      <h2>Edit Mosque</h2>
+      <h2>{isAdding ? 'Add Mosque' : 'Edit Mosque'}</h2>
       <form onSubmit={handleSave}>
       <div>
           <label>Name:</label>
@@ -118,7 +140,7 @@ const EditMosquePage = ({ mosqueData, country, onClose, onSave }) => {
             type="text"
             name="district"
             value={editedMosque.district|| ''}
-            disabled={mosqueData.country !== 'MALAYSIA'}
+            disabled={datacountry !== 'malaysia'}
             onChange={handleInputChange}
             className="form-input"
           />

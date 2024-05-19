@@ -1405,6 +1405,9 @@ app.put('/:country/:category/:id/status', async (req, res) => {
       tableCategory = 'mosque';
       idColumnName = 'mosqueprID';
       break;
+    case 'pr':
+      tableCategory = 'pr';
+      idColumnName = 'mosqueprID';
     default:
       res.status(400).json({ message: 'Invalid category' });
       return;

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../cssFolder/verifyData.css'; // Make sure the path is correct
+import '../cssFolder/verifyData.css'; 
 import ProductDetailsModal from './VerifyProduct';
+import RestaurantDetailsModal from './VerifyRestaurant';
+import MosqueDetailsModal from './VerifyMosque';
+import PrayerRoomDetailsModal from './VerifyPrayerRoom';
 
 const countries = ['MALAYSIA', 'THAILAND', 'KOREA'];
 const categories = ['Products', 'Restaurants', 'Mosques', 'Prayer Room'];
@@ -19,7 +22,7 @@ const VerifyData = () => {
   const [selectedCategory, setSelectedCategory] = useState('Products');
   const [data, setData] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
-  const [viewingProduct, setViewingProduct] = useState(null);
+  const [viewingDetail, setViewingDetail] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -37,12 +40,27 @@ const VerifyData = () => {
     setIsFetching(false);
   };
 
-  const handleViewProduct = (product) => {
-    setViewingProduct(product);
+  const handleViewDetails = (detail) => {
+    setViewingDetail(detail);
   };
 
   const closeViewModal = () => {
-    setViewingProduct(null);
+    setViewingDetail(null);
+  };
+
+  const renderDetailsModal = () => {
+    switch (selectedCategory) {
+      case 'Products':
+        return viewingDetail && <ProductDetailsModal productData={viewingDetail} country={selectedCountry} onClose={closeViewModal} />;
+      case 'Restaurants':
+        return viewingDetail && <RestaurantDetailsModal restaurantData={viewingDetail} country={selectedCountry} onClose={closeViewModal} />;
+      case 'Mosques':
+        return viewingDetail && <MosqueDetailsModal mosqueData={viewingDetail} country={selectedCountry} onClose={closeViewModal} />;
+      case 'Prayer Room':
+        return viewingDetail && <PrayerRoomDetailsModal prayerRoomData={viewingDetail} country={selectedCountry} onClose={closeViewModal} />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -78,7 +96,7 @@ const VerifyData = () => {
                     <td>{item.details}</td>
                     <td>{item.status}</td>
                     <td>
-                      <button onClick={() => handleViewProduct(item)}>Verify</button>
+                      <button onClick={() => handleViewDetails(item)}>Verify</button>
                     </td>
                   </tr>
                 ))}
@@ -87,7 +105,7 @@ const VerifyData = () => {
           ) : <p>No item found.</p>
         )}
       </div>
-      {viewingProduct && <ProductDetailsModal productData={viewingProduct} country={selectedCountry} onClose={closeViewModal} />}
+      {renderDetailsModal()}
     </div>
   );
 };

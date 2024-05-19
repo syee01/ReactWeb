@@ -80,8 +80,8 @@ const ProductDetailsModal = ({ productData, country, onClose }) => {
           />
         )}
         <div className="action-buttons">
-          <button className="approve-button" onClick={() => handleStatusChange('Approved')}>Approve</button>
-          <button className="reject-button" onClick={() => handleStatusChange('Rejected')}>Reject</button>
+          <button className="approve-button" onClick={() => handleStatusChange('approved')}>Approve</button>
+          <button className="reject-button" onClick={() => handleStatusChange('rejected')}>Reject</button>
         </div>
       </div>
       {zoomImageSrc && <ZoomImageModal src={zoomImageSrc} onClose={closeZoomModal} />}

@@ -87,7 +87,7 @@ const VerifyData = () => {
           ) : <p>No item found.</p>
         )}
       </div>
-      {viewingProduct && <ProductDetailsModal product={viewingProduct} onClose={closeViewModal} />}
+      {viewingProduct && <ProductDetailsModal productData={viewingProduct} country={selectedCountry} onClose={closeViewModal} />}
     </div>
   );
 };

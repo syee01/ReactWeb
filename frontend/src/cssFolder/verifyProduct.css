@@ -1,30 +1,108 @@
-/* ProductDetailsModal.css */
 .modalBackdrop1 {
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.5);
   }
   
   .modalContent1 {
-    padding: 20px;
+    position: relative;
+    padding: 50px;
     background: white;
     border-radius: 5px;
-    display: flex;
-    flex-direction: column;
-    max-width: 500px;
-    max-height: 80%;
-    overflow-y: auto;
+    width: 50%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
   }
   
-  .modal-closebutton {
-    background: none;
+  .closeButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
     border: none;
-    font-size: 1.5rem;
+    background: none;
+    color: #aaa;
+    font-size: 24px;
     cursor: pointer;
-    }
+  }
+  
+  .closeButton:hover {
+    color: #777;
+  }
+  
+  .titlePosition{
+    padding-bottom: 20px;
+  }
+
+  .zoomImageModalBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050; /* Make sure it's above other content */
+  }
+  
+  .zoomImageModalContent {
+    position: relative;
+    margin: auto;
+    padding: 20px;
+    max-width: 90%; /* Limits the width, adjust based on your needs */
+    max-height: 90%; /* Limits the height, adjust based on your needs */
+  }
+  
+  .zoomImageModalContent img {
+    width: auto; /* Maintain aspect ratio */
+    height: auto; /* Maintain aspect ratio */
+    max-width: 100%; /* Ensure it doesn't overflow the modal */
+    max-height: 100%; /* Ensure it doesn't overflow the modal */
+  }
+  
+  .zoomModalCloseButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5em;
+    color: white;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .zoomModalCloseButton:hover {
+    color: #ccc;
+  }
+  
+  .action-buttons {
+    margin-top: auto; /* Pushes the buttons to the bottom */
+    display: flex;
+    justify-content: flex-end; /* Aligns buttons to the right */
+    padding-top: 20px; /* Optional: Adds some space above the buttons */
+  }
+  
+  .approve-button, .reject-button {
+    margin-left: 10px;
+    padding: 5px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .approve-button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+  }
+  
+  .reject-button {
+    background-color: #f44336; /* Red */
+    color: white;
+  }

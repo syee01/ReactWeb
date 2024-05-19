@@ -1230,16 +1230,51 @@ app.get('/:country/:category/reviewed', async (req, res) => {
       tableCategory ='mosque'
   
   const tableName = `${country}${tableCategory}`;
-  console.log(`Constructed table name: ${tableName}`);
   try {
       const sql = `SELECT * FROM ${tableName} WHERE status = 'reviewed'`;
-      console.log(`Executing SQL: ${sql}`);
       const results = await query(sql);
-      console.log('SQL results:', results);
       res.json(results);
   } catch (error) {
       console.error('Error fetching reviewed items:', error);
       res.status(500).json({ message: 'Error fetching data', error });
+  }
+});
+
+app.put('/:country/:category/:id/status', async (req, res) => {
+  const { country, category, id } = req.params;
+  const { status } = req.body; // Assuming status is sent in the body of the request
+
+  let tableCategory = '';
+  let idColumnName = '';
+
+  switch (category) {
+    case 'products':
+      tableCategory = 'product';
+      idColumnName = 'productID';
+      break;
+    case 'restaurants':
+      tableCategory = 'restaurant';
+      idColumnName = 'restaurantID';
+      break;
+    case 'mosques':
+      tableCategory = 'mosque';
+      idColumnName = 'mosqueprID';
+      break;
+    default:
+      res.status(400).json({ message: 'Invalid category' });
+      return;
+  }
+
+  const tableName = `${country}${tableCategory}`;
+
+  try {
+    const sql = `UPDATE ${tableName} SET status = ? WHERE ${idColumnName} = ?`;
+    await query(sql, [status, id]);
+    console.log(`Status updated to ${status} for ${idColumnName} = ${id} in table ${tableName}`);
+    res.json({ message: 'Status updated successfully' });
+  } catch (error) {
+    console.error('Error updating status:', error);
+    res.status(500).json({ message: 'Error updating data', error });
   }
 });
 

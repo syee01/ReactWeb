@@ -323,16 +323,16 @@ const Data = () => {
         )}
         <input type="text" placeholder="Type to search..." className="filter-input" value={filter} onChange={handleFilterChange} />
         {selectedCategory === 'Products' && (
-        <button className="add-data-button" onClick={handleAddProduct}>Add Product</button>
+        <button className="add-data-button" onClick={handleAddProduct}>Add Data</button>
         )}
         {selectedCategory === 'Restaurants' && (
-          <button className="add-data-button" onClick={handleAddRestaurant}>Add Restaurant</button>
+          <button className="add-data-button" onClick={handleAddRestaurant}>Add Data</button>
         )}
         {selectedCategory === 'Mosques' && (
-          <button className="add-data-button" onClick={handleAddMosque}>Add Mosque</button>
+          <button className="add-data-button" onClick={handleAddMosque}>Add Data</button>
         )}
         {selectedCategory === 'Prayer Room' && (
-          <button className="add-data-button" onClick={handleAddPrayerRoom}>Add Prayer Room</button>
+          <button className="add-data-button" onClick={handleAddPrayerRoom}>Add Data</button>
         )}
         </div>
         <div className="content">

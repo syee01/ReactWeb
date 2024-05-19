@@ -19,14 +19,12 @@ function Login() {
     };
 
     const handleSubmit = event => {
-        console.log('submir')
         event.preventDefault();
         const validationErrors = Validation(values);
         console.log(Object.keys(validationErrors).length)
         setErrors(validationErrors);
 
-        if (Object.keys(validationErrors).length === 2) {
-            console.log('enter')
+        if (Object.keys(validationErrors).length === 0) {
             axios.post('http://localhost:8085/login', values)
             .then(res => {
                 if (res.data.status === "Success") {
@@ -50,7 +48,7 @@ function Login() {
         <div className="login-container">
             <div className="logo-container">
                 <img src={logo} alt="myHalal Checker Logo" className="logo" />
-                <h1>myHalal Checker</h1>
+                <h1 className="webNamePage">myHalal Checker</h1>
             </div>
             <div className="login-box">
                 <h1 className="welcome">Welcome Back</h1>

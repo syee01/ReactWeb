@@ -552,6 +552,14 @@ const Data = () => {
               </div>
           </div>
         )}
+        {isAddModalRestaurantOpen && (
+      <div className="modalbackdrop">
+          <div className="modalcontent">
+              <button className="closebutton" onClick={closeModal}>&times;</button>
+              <EditRestaurantPage onSave={afterSave} onClose={closeModal} country={selectedCountry} isAdding={true} />
+          </div>
+      </div>
+    )}
     </div>
   );
 };

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../cssFolder/editProduct.css';
 
-const EditRestaurantPage = ({ restaurantData, country, onClose, onSave }) => {
-  const restaurantId = restaurantData.restaurantID;
+const EditRestaurantPage = ({ restaurantData, onClose, onSave, country, isAdding }) => {
+  const restaurantId = restaurantData ? restaurantData.restaurantID : null;
   const [editedRestaurant, setEditedRestaurant] = useState({
     name: '',
     address: '',
@@ -14,32 +14,53 @@ const EditRestaurantPage = ({ restaurantData, country, onClose, onSave }) => {
   const [isFetching, setIsFetching] = useState(false);
 
   let datacountry = '';
-
-  switch (restaurantData.country) {
-    case 'THAILAND':
-      datacountry = 'thailand';
-      break;
-    case 'MALAYSIA':
-      datacountry = 'malaysia';
-      break;
-    case 'KOREA':
-      datacountry = 'korea';
-      break;
-    default:
-      // Handle other cases or default case as needed
-      break;
+  // Ensure restaurantData is defined before accessing its properties
+  if (restaurantData) {
+    switch (restaurantData.country) {
+      case 'THAILAND':
+        datacountry = 'thailand';
+        break;
+      case 'MALAYSIA':
+        datacountry = 'malaysia';
+        break;
+      case 'KOREA':
+        datacountry = 'korea';
+        break;
+      default:
+        datacountry = ''; // default or error handling
+        break;
+    }
   }
+  else{
+    switch (country) {
+      case 'THAILAND':
+        datacountry = 'thailand';
+        break;
+      case 'MALAYSIA':
+        datacountry = 'malaysia';
+        break;
+      case 'KOREA':
+        datacountry = 'korea';
+        break;
+      default:
+        datacountry = ''; // default or error handling
+        break;
+    }
+  }
+
 
   useEffect(() => {
     const fetchRestaurant = async () => {
-      setIsFetching(true);
-      try {
-        const response = await axios.get(`http://localhost:8085/${datacountry}/restaurant/${restaurantId}`);
-        setEditedRestaurant(response.data);
-      } catch (error) {
-      console.error('Error fetching restaurant:', error);
+      if (restaurantId && datacountry) { // Ensure restaurantId and datacountry are set
+        setIsFetching(true);
+        try {
+          const response = await axios.get(`http://localhost:8085/${datacountry}/restaurant/${restaurantId}`);
+          setEditedRestaurant(response.data);
+        } catch (error) {
+          console.error('Error fetching restaurant:', error);
+        }
+        setIsFetching(false);
       }
-      setIsFetching(false);
     };
 
     fetchRestaurant();
@@ -47,7 +68,7 @@ const EditRestaurantPage = ({ restaurantData, country, onClose, onSave }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditedRestaurant({ ...editedRestaurant, [name]: value });
+    setEditedRestaurant(prev => ({ ...prev, [name]: value }));
   };
   
   const handleSave = async (event) => {
@@ -59,68 +80,55 @@ const EditRestaurantPage = ({ restaurantData, country, onClose, onSave }) => {
       address: editedRestaurant.address,
       region: editedRestaurant.region,
       date: editedRestaurant.date,
-  };
+      status: 'reviewed',
+    };
+  
+    const apiEndpoint = isAdding ? 
+        `http://localhost:8085/${datacountry}restaurant/add` : 
+        `http://localhost:8085/${datacountry}restaurant/${restaurantId}`;
+    console.log(apiEndpoint)
     try {
-      const response = await axios.put(`http://localhost:8085/${datacountry}restaurant/${restaurantId}`, data, {
+      const response = await axios({
+        method: isAdding ? 'post' : 'put',
+        url: apiEndpoint,
+        data: data,
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      if (onSave) onSave();
-      // Close the modal
-      onClose();
+      
+      if (onSave) onSave(response.data); 
+      onClose(); 
     } catch (error) {
       console.error('Error saving restaurant:', error);
     }
   };
 
   if (isFetching) return <div>Loading...</div>;
-  if (!editedRestaurant) return <div>Restaurant not found.</div>;
+  if (!isAdding && !editedRestaurant) return <div>Restaurant not found.</div>;
 
   return (
     <div className='edit-product-modal'>
-      <h2>Edit Restaurant</h2>
+      <h2>{isAdding ? 'Add New Restaurant' : 'Edit Restaurant'}</h2>
       <form onSubmit={handleSave}>
-      <div>
+        <div>
           <label>Name:</label>
-          <input
-            type="text"
-            name="name"
-            value={editedRestaurant.name || ''}
-            onChange={handleInputChange}
-            className="form-input"
-          />
+          <input type="text" name="name" value={editedRestaurant.name || ''} onChange={handleInputChange} className="form-input" />
         </div>
         <div>
           <label>Location:</label>
-          <input
-            type="text"
-            name="address"
-            value={editedRestaurant.address|| ''}
-            onChange={handleInputChange}
-            className="form-input"
-          />
+          <input type="text" name="address" value={editedRestaurant.address || ''} onChange={handleInputChange} className="form-input" />
         </div>
         <div>
           <label>State:</label>
-          <input
-            type="text"
-            name="region"
-            value={editedRestaurant.region|| ''}
-            onChange={handleInputChange}
-            className="form-input"
-          />
+          <input type="text" name="region" value={editedRestaurant.region || ''} onChange={handleInputChange} className="form-input" />
         </div>
-        <div>
-          <label>Expired Date:</label>
-          <input
-            type="date"
-            name="date"
-            value={editedRestaurant.date ? editedRestaurant.date.split('T')[0] : ''}
-            onChange={handleInputChange}
-            disabled={restaurantData.country !== 'MALAYSIA'}
-          />
-        </div>
+        {restaurantData && restaurantData.country === 'MALAYSIA' && (
+          <div>
+            <label>Expired Date:</label>
+            <input type="date" name="date" value={editedRestaurant.date ? editedRestaurant.date.split('T')[0] : ''} onChange={handleInputChange} />
+          </div>
+        )}
         <div className="buttoncontainer">
           <button type="submit" className="form-button save-button">Save</button>
           <button type="button" onClick={onClose} className="form-button cancel-button">Cancel</button>

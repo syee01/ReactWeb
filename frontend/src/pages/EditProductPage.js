@@ -44,7 +44,6 @@ const EditProductPage = ({ productData, country, onClose, onSave, isAdding }) =>
         try {
           const response = await axios.get(`http://localhost:8085/${datacountry}product/${productId}`);
           if (response.data) {
-            console.log('Product data received:', response.data);
             setEditedProduct(response.data);
           } else {
             console.error('No product data received');
@@ -93,7 +92,6 @@ const EditProductPage = ({ productData, country, onClose, onSave, isAdding }) =>
       const apiEndpoint = isAdding ? 
         `http://localhost:8085/${datacountry}product/add` : 
         `http://localhost:8085/${datacountry}product/${productId}`;
-        console.log('Requesting:', apiEndpoint, 'Method:', isAdding ? 'post' : 'put');
       const response = await axios({
         method: isAdding ? 'post' : 'put',
         url: apiEndpoint,

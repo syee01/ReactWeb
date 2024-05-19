@@ -1158,11 +1158,11 @@ app.get('/:datacountry/restaurant/:id', (req, res) => {
 app.put('/malaysiarestaurant/:id', (req, res) => {
   const restaurantId = req.params.id;
 
-  const { name, address, region, date } = req.body;
+  const { name, address, region, date, status } = req.body;
 
-  const sql = `UPDATE malaysiarestaurant SET name = ?, address = ?, region = ?, date = ? WHERE restaurantID = ?`;
+  const sql = `UPDATE malaysiarestaurant SET name = ?, address = ?, region = ?, date = ?, status = ? WHERE restaurantID = ?`;
 
-  db.query(sql, [ name, address, region, date, restaurantId], (err, result) => {
+  db.query(sql, [ name, address, region, date, status, restaurantId], (err, result) => {
     if (err) {
       console.error('Error updating restaurant:', err);
       res.status(500).json({ message: 'Error updating restaurant' });
@@ -1176,14 +1176,30 @@ app.put('/malaysiarestaurant/:id', (req, res) => {
   });
 });
 
+app.post('/malaysiarestaurant/add', (req, res) => {
+  const { name, address, region, date, status } = req.body;
+
+  const sql = `INSERT INTO malaysiarestaurant (name, address, region, date, status) VALUES (?, ?, ?, ?, ?)`;
+
+  db.query(sql, [name, address, region, date, status], (err, result) => {
+    if (err) {
+      console.error('Error adding new restaurant:', err);
+      res.status(500).json({ message: 'Error adding new restaurant' });
+    } else {
+      res.status(201).json({ message: 'Restaurant added successfully', restaurantID: result.insertId });
+    }
+  });
+});
+
+
 app.put('/thailandrestaurant/:id', (req, res) => {
   const restaurantId = req.params.id;
 
-  const { name, address, region  } = req.body;
+  const { name, address, region, status } = req.body;
 
-  const sql = `UPDATE thailandrestaurant SET name = ?, address = ?, region = ? WHERE restaurantID = ?`;
+  const sql = `UPDATE thailandrestaurant SET name = ?, address = ?, region = ?, status = ? WHERE restaurantID = ?`;
 
-  db.query(sql, [ name, address, region, restaurantId], (err, result) => {
+  db.query(sql, [ name, address, region, status, restaurantId], (err, result) => {
     if (err) {
       console.error('Error updating restaurant:', err);
       res.status(500).json({ message: 'Error updating restaurant' });
@@ -1193,6 +1209,21 @@ app.put('/thailandrestaurant/:id', (req, res) => {
       } else {
         res.status(404).json({ message: 'Restaurant not found' });
       }
+    }
+  });
+});
+
+app.post('/thailandrestaurant/add', (req, res) => {
+  const { name, address, region, status } = req.body;
+
+  const sql = `INSERT INTO thailandrestaurant (name, address, region, status) VALUES (?, ?, ?, ?)`;
+
+  db.query(sql, [name, address, region, status], (err, result) => {
+    if (err) {
+      console.error('Error adding new restaurant:', err);
+      res.status(500).json({ message: 'Error adding new restaurant' });
+    } else {
+      res.status(201).json({ message: 'Restaurant added successfully', restaurantID: result.insertId });
     }
   });
 });
@@ -1200,11 +1231,11 @@ app.put('/thailandrestaurant/:id', (req, res) => {
 app.put('/korearestaurant/:id', (req, res) => {
   const restaurantId = req.params.id;
 
-  const { name, address, region  } = req.body;
+  const { name, address, region, status } = req.body;
 
-  const sql = `UPDATE korearestaurant SET name = ?, address = ?, region = ? WHERE restaurantID = ?`;
+  const sql = `UPDATE korearestaurant SET name = ?, address = ?, region = ?, status = ? WHERE restaurantID = ?`;
 
-  db.query(sql, [ name, address, region, restaurantId], (err, result) => {
+  db.query(sql, [ name, address, region, status, restaurantId], (err, result) => {
     if (err) {
       console.error('Error updating restaurant:', err);
       res.status(500).json({ message: 'Error updating restaurant' });
@@ -1214,6 +1245,21 @@ app.put('/korearestaurant/:id', (req, res) => {
       } else {
         res.status(404).json({ message: 'Restaurant not found' });
       }
+    }
+  });
+});
+
+app.post('/korearestaurant/add', (req, res) => {
+  const { name, address, region, status } = req.body;
+
+  const sql = `INSERT INTO korearestaurant (name, address, region, status) VALUES (?, ?, ?, ?)`;
+
+  db.query(sql, [name, address, region, status], (err, result) => {
+    if (err) {
+      console.error('Error adding new restaurant:', err);
+      res.status(500).json({ message: 'Error adding new restaurant' });
+    } else {
+      res.status(201).json({ message: 'Restaurant added successfully', restaurantID: result.insertId });
     }
   });
 });
@@ -1270,7 +1316,6 @@ app.put('/:country/:category/:id/status', async (req, res) => {
   try {
     const sql = `UPDATE ${tableName} SET status = ? WHERE ${idColumnName} = ?`;
     await query(sql, [status, id]);
-    console.log(`Status updated to ${status} for ${idColumnName} = ${id} in table ${tableName}`);
     res.json({ message: 'Status updated successfully' });
   } catch (error) {
     console.error('Error updating status:', error);

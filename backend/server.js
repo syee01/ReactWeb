@@ -44,6 +44,23 @@ app.get('/api/data', async (req, res) => {
   }
 });
 
+app.get('/user-role/:userID', (req, res) => {
+  const userID = req.params.userID;
+  // Your database query here, for example:
+  db.query('SELECT role FROM user WHERE UserID = ?', [userID], (err, results) => {
+      if (err) {
+          console.error('Database error:', err);
+          return res.status(500).send('Server error');
+      }
+      if (results.length > 0) {
+          res.json({ role: results[0].role });
+      } else {
+          res.status(404).send('User not found');
+      }
+  });
+});
+
+
 app.get('/user-count', async (req, res) => {
   try {
       const rows = await query('SELECT COUNT(*) AS count FROM user WHERE role = ?', ['user']);

@@ -50,7 +50,7 @@ const EditPrayerRoomPage = ({ prayerRoomData, onClose, onSave, country, isAdding
       if (!isAdding && mosqueprId) {
         setIsFetching(true);
         try {
-          const response = await axios.get(`http://localhost:8085/${datacountry}/pr/${mosqueprId}`);
+          const response = await axios.get(`http://localhost:8085/${datacountry}pr/${mosqueprId}`);
           setEditedPrayerRoom(response.data);
         } catch (error) {
           console.error('Error fetching mosque:', error);
@@ -77,11 +77,12 @@ const EditPrayerRoomPage = ({ prayerRoomData, onClose, onSave, country, isAdding
       district: editedPrayerRoom.district,
       status: 'reviewed',  // Assume default status is 'reviewed'
     };
-
+    
     const apiEndpoint = isAdding ? 
       `http://localhost:8085/${datacountry}pr/add` : 
       `http://localhost:8085/${datacountry}pr/${mosqueprId}`;
 
+    console.log(apiEndpoint)
     try {
       const response = await axios({
         method: isAdding ? 'post' : 'put',
@@ -92,7 +93,7 @@ const EditPrayerRoomPage = ({ prayerRoomData, onClose, onSave, country, isAdding
         },
       });
       
-      if (onSave) onSave(response.data); 
+      if (onSave) onSave(response.data);
       onClose(); 
     } catch (error) {
       console.error('Error saving prayer room:', error);

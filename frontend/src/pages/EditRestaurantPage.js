@@ -86,7 +86,7 @@ const EditRestaurantPage = ({ restaurantData, onClose, onSave, country, isAdding
     const apiEndpoint = isAdding ? 
         `http://localhost:8085/${datacountry}restaurant/add` : 
         `http://localhost:8085/${datacountry}restaurant/${restaurantId}`;
-    console.log(apiEndpoint)
+  
     try {
       const response = await axios({
         method: isAdding ? 'post' : 'put',

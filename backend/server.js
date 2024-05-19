@@ -1016,7 +1016,10 @@ app.post('/malaysiamosque/add', (req, res) => {
     if (err) {
       console.error('Error adding new mosque:', err);
       res.status(500).json({ message: 'Error updating mosque' });
-    } 
+    } else {
+      // Send a response back to the client
+      res.json({ message: 'Prayer room added successfully', insertId: result.insertId });
+    }
   });
 });
 
@@ -1051,7 +1054,10 @@ app.post('/thailandmosque/add', (req, res) => {
     if (err) {
       console.error('Error adding new mosque:', err);
       res.status(500).json({ message: 'Error updating mosque' });
-    } 
+    } else {
+      // Send a response back to the client
+      res.json({ message: 'Prayer room added successfully', insertId: result.insertId });
+    }
   });
 });
 
@@ -1086,7 +1092,10 @@ app.post('/koreamosque/add', (req, res) => {
     if (err) {
       console.error('Error adding new mosque:', err);
       res.status(500).json({ message: 'Error updating mosque' });
-    } 
+    } else {
+      // Send a response back to the client
+      res.json({ message: 'Prayer room added successfully', insertId: result.insertId });
+    }
   });
 });
 
@@ -1140,7 +1149,10 @@ app.post('/malaysiapr/add', (req, res) => {
     if (err) {
       console.error('Error adding new prayer room:', err);
       res.status(500).json({ message: 'Error updating prayer room' });
-    } 
+    }else {
+      // Send a response back to the client
+      res.json({ message: 'Prayer room added successfully', insertId: result.insertId });
+    }
   });
 });
 
@@ -1167,6 +1179,7 @@ app.put('/thailandpr/:id', (req, res) => {
 });
 
 app.post('/thailandpr/add', (req, res) => {
+  console.log('here')
   const { name, address, state, status } = req.body;
 
   const sql = `INSERT INTO thailandpr (name, address, state, status) VALUES (?, ?, ?, ?)`;
@@ -1175,7 +1188,10 @@ app.post('/thailandpr/add', (req, res) => {
     if (err) {
       console.error('Error adding new prayer room:', err);
       res.status(500).json({ message: 'Error updating prayer room' });
-    } 
+    } else {
+      // Send a response back to the client
+      res.json({ message: 'Prayer room added successfully', insertId: result.insertId });
+    }
   });
 });
 
@@ -1210,7 +1226,10 @@ app.post('/koreapr/add', (req, res) => {
     if (err) {
       console.error('Error adding new prayer room:', err);
       res.status(500).json({ message: 'Error updating prayer room' });
-    } 
+    } else {
+      // Send a response back to the client
+      res.json({ message: 'Prayer room added successfully', insertId: result.insertId });
+    }
   });
 });
 
@@ -1352,6 +1371,8 @@ app.get('/:country/:category/reviewed', async (req, res) => {
       tableCategory ='restaurant'
   else if(category =='mosques')
       tableCategory ='mosque'
+  else if(category =="prayer room")
+    tableCategory = 'pr'
   
   const tableName = `${country}${tableCategory}`;
   try {

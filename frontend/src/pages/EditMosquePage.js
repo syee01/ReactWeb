@@ -48,7 +48,7 @@ const EditMosquePage = ({ mosqueData, country, onClose, onSave, isAdding }) => {
     const fetchMosque = async () => {
       setIsFetching(true);
       try {
-        const response = await axios.get(`http://localhost:8085/${datacountry}/mosque/${mosqueprId}`);
+        const response = await axios.get(`http://localhost:8085/${datacountry}mosque/${mosqueprId}`);
         setEditedMosque(response.data);
       } catch (error) {
       console.error('Error fetching mosque:', error);

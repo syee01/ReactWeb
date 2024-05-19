@@ -54,6 +54,16 @@ app.get('/user-count', async (req, res) => {
   }
 });
 
+app.get('/officer-count', async (req, res) => {
+  try {
+      const rows = await query('SELECT COUNT(*) AS count FROM user WHERE role = ?', ['officer']);
+      res.json({ officerCount: rows[0].count });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Endpoint to get the total reports submitted
 app.get('/reports-count', async (req, res) => {
   try {
@@ -78,6 +88,26 @@ app.get('/enquiries-count', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({error: 'Internal server error'});
+  }
+});
+
+app.get('/status-details', async (req, res) => {
+  try {
+    const categories = ['restaurant_reports', 'product_reports', 'restaurant_enquiry', 'product_enquiry'];
+    let results = {};
+
+    for (const category of categories) {
+      results[category] = {};
+      for (const status of ['Pending', 'Reviewed', 'To Be Confirmed', 'Completed']) {
+        const queryResult = await query(`SELECT COUNT(*) AS count FROM ${category} WHERE status = ?`, [status]);
+        results[category][status] = queryResult[0].count;
+      }
+    }
+
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -1422,6 +1452,31 @@ app.put('/:country/:category/:id/status', async (req, res) => {
   } catch (error) {
     console.error('Error updating status:', error);
     res.status(500).json({ message: 'Error updating data', error });
+  }
+});
+
+app.get('/review-counts', async (req, res) => {
+  const categories = ['product', 'restaurant', 'mosque', 'pr']; // assuming these are your categories
+  const countries = ['malaysia', 'korea', 'thailand']; // assuming these are your countries
+
+  try {
+    const results = await Promise.all(countries.map(async (country) => {
+      return Promise.all(categories.map(async (category) => {
+        const tableName = `${country}${category}`;
+        const count = await query(`SELECT COUNT(*) AS count FROM ${tableName} WHERE status = 'reviewed'`);
+        return {[category]: count[0].count};
+      }));
+    }));
+
+    const counts = countries.reduce((acc, country, index) => {
+      acc[country] = results[index].reduce((obj, item) => ({...obj, ...item}), {});
+      return acc;
+    }, {});
+
+    res.json(counts);
+  } catch (error) {
+    console.error('Error fetching review counts:', error);
+    res.status(500).json({ message: 'Error fetching data', error });
   }
 });
 

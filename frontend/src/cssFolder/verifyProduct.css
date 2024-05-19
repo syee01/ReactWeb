@@ -36,6 +36,8 @@
   
   .titlePosition{
     padding-bottom: 20px;
+    font-size: 30px;
+    font-weight: bold;
   }
 
   .zoomImageModalBackdrop {
@@ -100,9 +102,28 @@
   .approve-button {
     background-color: #4CAF50; /* Green */
     color: white;
+    transition: background-color 0.3s;
+    padding-top: 8px;
+    padding-bottom:10px;
   }
   
   .reject-button {
     background-color: #f44336; /* Red */
     color: white;
+    transition: background-color 0.3s;
   }
+  
+  .approve-button:hover {
+    background-color: #60af63; /* Green */
+    color: white;
+    transition: background-color 0.3s;
+    padding-top: 8px;
+    padding-bottom:10px;
+  }
+  
+  .reject-button:hover {
+    background-color: #f56459; /* Red */
+    color: white;
+    transition: background-color 0.3s;
+  }
+  

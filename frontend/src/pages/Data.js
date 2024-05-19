@@ -302,6 +302,9 @@ const Data = () => {
 
   return (
     <div>
+    <div className='reportTitle'>
+        <h2 className="reportTitle">Data</h2>
+      </div>
       <div className="tabs">
         {countries.map((country) => (
           <Tab key={country} name={country} isSelected={selectedCountry === country} onClick={setSelectedCountry} />

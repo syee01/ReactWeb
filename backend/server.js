@@ -1388,7 +1388,6 @@ app.get('/:country/:category/reviewed', async (req, res) => {
 app.put('/:country/:category/:id/status', async (req, res) => {
   const { country, category, id } = req.params;
   const { status } = req.body; // Assuming status is sent in the body of the request
-
   let tableCategory = '';
   let idColumnName = '';
 
@@ -1401,13 +1400,14 @@ app.put('/:country/:category/:id/status', async (req, res) => {
       tableCategory = 'restaurant';
       idColumnName = 'restaurantID';
       break;
+    case 'prayerroom':
+      tableCategory = 'pr';
+      idColumnName = 'mosqueprID';
+      break;
     case 'mosques':
       tableCategory = 'mosque';
       idColumnName = 'mosqueprID';
       break;
-    case 'pr':
-      tableCategory = 'pr';
-      idColumnName = 'mosqueprID';
     default:
       res.status(400).json({ message: 'Invalid category' });
       return;

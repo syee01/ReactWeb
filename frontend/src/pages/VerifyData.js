@@ -40,8 +40,23 @@ const VerifyData = () => {
     setIsFetching(false);
   };
 
-  const handleViewDetails = (detail) => {
-    setViewingDetail(detail);
+  const handleViewDetails = (item) => {
+    const idField = getIdField(selectedCategory);
+    setViewingDetail({ ...item, id: item[idField] });
+  };
+
+  const getIdField = (category) => {
+    switch (category) {
+      case 'Products':
+        return 'productID';
+      case 'Restaurants':
+        return 'restaurantID';
+      case 'Mosques':
+      case 'Prayer Room':
+        return 'mosqueprID';
+      default:
+        return 'id'; // Default ID field if not specified
+    }
   };
 
   const closeViewModal = () => {
@@ -49,15 +64,17 @@ const VerifyData = () => {
   };
 
   const renderDetailsModal = () => {
+    if (!viewingDetail) return null;
+    
     switch (selectedCategory) {
       case 'Products':
-        return viewingDetail && <ProductDetailsModal productData={viewingDetail} country={selectedCountry} onClose={closeViewModal} />;
+        return <ProductDetailsModal productData={viewingDetail} country={selectedCountry} onClose={closeViewModal} />;
       case 'Restaurants':
-        return viewingDetail && <RestaurantDetailsModal restaurantData={viewingDetail} country={selectedCountry} onClose={closeViewModal} />;
+        return <RestaurantDetailsModal restaurantData={viewingDetail} country={selectedCountry} onClose={closeViewModal} />;
       case 'Mosques':
-        return viewingDetail && <MosqueDetailsModal mosqueData={viewingDetail} country={selectedCountry} onClose={closeViewModal} />;
+        return <MosqueDetailsModal mosqueData={viewingDetail} country={selectedCountry} onClose={closeViewModal} />;
       case 'Prayer Room':
-        return viewingDetail && <PrayerRoomDetailsModal prayerRoomData={viewingDetail} country={selectedCountry} onClose={closeViewModal} />;
+        return <PrayerRoomDetailsModal prayerRoomData={viewingDetail} country={selectedCountry} onClose={closeViewModal} />;
       default:
         return null;
     }
@@ -65,6 +82,9 @@ const VerifyData = () => {
 
   return (
     <div>
+    <div className='reportTitle'>
+        <h2 className="reportTitle">Data Verification</h2>
+      </div>
       <div className="tabs">
         {countries.map(country => (
           <Tab key={country} name={country} isSelected={selectedCountry === country} onClick={setSelectedCountry} />
@@ -83,26 +103,24 @@ const VerifyData = () => {
                 <tr>
                   <th>ID</th>
                   <th>Name</th>
-                  <th>Details</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {data.map(item => (
-                  <tr key={item.id}>
-                    <td>{item.id}</td>
+                  <tr key={item[getIdField(selectedCategory)]}>
+                    <td>{item[getIdField(selectedCategory)]}</td>
                     <td>{item.name}</td>
-                    <td>{item.details}</td>
                     <td>{item.status}</td>
                     <td>
-                      <button onClick={() => handleViewDetails(item)}>Verify</button>
+                      <button onClick={() => handleViewDetails(item)} className='verify-btn'>Verify</button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          ) : <p>No item found.</p>
+          ) : <p>No item required to be verified.</p>
         )}
       </div>
       {renderDetailsModal()}

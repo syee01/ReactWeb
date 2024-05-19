@@ -3,12 +3,13 @@ import axios from 'axios';
 import '../cssFolder/verifyProduct.css'; // Ensure you have the appropriate CSS
 
 const PrayerRoomDetailsModal = ({ prayerRoomData, country, onClose }) => {
-  console.log(prayerRoomData)
   if (!prayerRoomData) return <div>Product not found.</div>;
-
+  console.log(country)
+  const endpoint = `http://localhost:8085/${country.toLowerCase()}/prayerroom/${prayerRoomData.mosqueprID}/status`
+  console.log(endpoint)
   const handleStatusChange = async (newStatus) => {
     try {
-      const response = await axios.put(`http://localhost:8085/${country.toLowerCase()}/pr/${prayerRoomData.mosqueprID}/status`, {
+      const response = await axios.put(`http://localhost:8085/${country.toLowerCase()}/prayerroom/${prayerRoomData.mosqueprID}/status`, {
         status: newStatus
       });
       alert(`Status updated to ${newStatus}`);

@@ -14,6 +14,8 @@
 
 .profile-header {
   width: 100%;
+  font-size: 30px;
+  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: space-between; /* Ensures elements are spaced out to each end */

@@ -182,7 +182,7 @@ const Dashboard = () => {
               <div key={country} className="column">
                 <div className="country-section">
                   <h4 className="collapsible">{country.toUpperCase()} - Pending Reviews: {Object.values(counts).reduce((a, b) => a + b, 0)}</h4>
-                  <div className="content">
+                  <div className="content1">
                     {Object.entries(counts).map(([category, count]) => (
                       <p key={category}>{`${category}: ${count}`}</p>
                     ))}

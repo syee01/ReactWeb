@@ -20,11 +20,14 @@ function Login() {
 
     const handleSubmit = event => {
         event.preventDefault();
+        console.log('submit')
         const validationErrors = Validation(values);
         console.log(Object.keys(validationErrors).length)
         setErrors(validationErrors);
-
-        if (Object.keys(validationErrors).length === 0) {
+        console.log('length')
+        console.log(Object.keys(validationErrors).length)
+        if (Object.keys(validationErrors).length === 2) {
+            console.log('here')
             axios.post('http://localhost:8085/login', values)
             .then(res => {
                 if (res.data.status === "Success") {
@@ -32,6 +35,7 @@ function Login() {
                     localStorage.setItem('userID', res.data.userID);
                     localStorage.setItem('username', res.data.username);
                     localStorage.setItem('role', res.data.role);
+                    console.log('home')
                     navigate('/home');
                 } else {
                     setBackendError([res.data.message || "Invalid login attempt"]);

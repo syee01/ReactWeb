@@ -78,16 +78,16 @@
     border-radius: 5px;
   }
   
-  .content {
+  .content1 {
     background-color: #f1f1f1;
     overflow: hidden;
     padding: 15px;
-    border-left: 5px solid #3ab288;
+    /* border-left: 5px solid #3ab288; */
     display: block; /* Always displayed */
   }
   
 /* Remove or simplify these if they are no longer needed */
-.collapsible, .content {
+.collapsible, .content1 {
   display: block;
 }
 

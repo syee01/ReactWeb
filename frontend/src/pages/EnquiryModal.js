@@ -82,11 +82,11 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modalbackground">
-      <div className="modal-container">
-        <div className="modal-header">
+    <div className="modalBackdrop">
+      <div className="modalContainer">
+        <div className="modalHeader">
           <h2 className="reportTitle">{reportData.ReportID}</h2>
-          <span className="modal-close-button" onClick={onClose}>
+          <span className="modalclose-button" onClick={onClose}>
             &times;
           </span>
         </div>
@@ -95,7 +95,7 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
         ) : error ? (
           <p>{error}</p>
         ) : (
-          <div className="modal-content">
+          <div className="modalContent">
             {category === 'Products' && (
               <>
                 <h3 className="reportReportID">Product Report Details</h3>

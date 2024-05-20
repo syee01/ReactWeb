@@ -9,7 +9,7 @@ font-size: 30px;
 font-weight: bold;
 }
 
-.modalbackground {
+.modalBackdrop {
   position: fixed;
   top: 0;
   left: 0;
@@ -19,37 +19,38 @@ font-weight: bold;
   justify-content: center;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050; /* Ensure it's on top of other content */
 }
 
-.modal-container {
-background: white;
-padding: 20px;
-border-radius: 10px;
-max-width: 800px;
-width: 90%;
-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.modalContainer {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 800px;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.modal-header {
+.modalHeader {
 display: flex;
 justify-content: space-between;
 align-items: center;
 }
 
-.modal-close-button {
+.modalclose-button {
 background: none;
 border: none;
 font-size: 1.5rem;
 cursor: pointer;
 }
 
-.modal-content {
+.modalContent {
 margin-bottom: 20px;
 margin-left: 20px;
 margin-right: 20px;
 margin-top: 5px;
-overflow-y: auto; /* Change to auto for vertical scroll when needed */
-max-height: 400px; /* Adjust height as needed */
+overflow-y: auto; 
+max-height: 450px; 
 }
 
 .modal-footer {
@@ -57,8 +58,8 @@ text-align: right;
 }
 
 .modal-footer button {
-padding: 10px 20px;
-background-color: #007bff;
+padding: 6px 10px;
+background-color: #0F7C5D;
 color: white;
 border: none;
 border-radius: 5px;
@@ -72,10 +73,10 @@ margin-right: 0; /* Remove margin for the last button */
 }
 
 .modal-footer button:hover {
-background-color: #0056b3;
+background-color: #149b77;
 }
 
-.modal-content input[type="text"] {
+.modalContent input[type="text"] {
 width: calc(100% - 20px); /* Adjusted width for padding */
 padding: 10px;
 margin-bottom: 15px;
@@ -84,8 +85,8 @@ border-radius: 5px;
 box-sizing: border-box;
 }
 
-.modal-content .halalStatus {
-padding: 10px 20px;
+.modalContent .halalStatus {
+padding: 8px 18px;
 margin-right: 10px;
 border: 2px solid #ccc;
 border-radius: 10px;
@@ -95,14 +96,14 @@ outline: none;
 font-size: 16px;
 }
 
-.modal-content .halalStatus.active {
-border-color: #007bff;
-color: #007bff;
+.modalContent .halalStatus.active {
+border-color: #0F7C5D;
+color: #0F7C5D;
 }
 
-.modal-content .submitModal {
+.modalContent .submitModal {
 padding: 10px 20px;
-background-color: #007bff;
+background-color: #0F7C5D;
 color: white;
 border: none;
 border-radius: 5px;
@@ -112,8 +113,8 @@ transition: background-color 0.3s ease;
 margin-top: 20px;
 }
 
-.modal-content .submitModal:hover {
-background-color: #0056b3;
+.modalContent .submitModal:hover {
+background-color:#149b77;
 }
 
 .image-container {

@@ -44,6 +44,59 @@ app.get('/api/data', async (req, res) => {
   }
 });
 
+app.get('/states/:country/:category', async (req, res) => {
+  const { country, category } = req.params;
+  let tableName = `${country}${category}`; // Construct table name based on country and category
+  let column = category === 'restaurant' ? 'region' : 'state';
+
+  db.query(`SELECT DISTINCT ${column} AS state FROM ${tableName}`, (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Server error');
+    }
+
+    // Directly map over results if using MySQL
+    const states = results.map(row => row.state);
+    res.json(states);
+  });
+});
+
+app.get('/district/:category', async (req, res) => {
+  const { category } = req.params;
+  let tableName = `malaysia${category}`; // Construct table name based on country and category
+  db.query(`SELECT DISTINCT district AS state FROM ${tableName}`, (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Server error');
+    }
+
+    // Directly map over results if using MySQL
+    const states = results.map(row => row.state);
+    res.json(states);
+  });
+});
+
+app.get('/districts/:category/:state', async (req, res) => {
+  const { category, state } = req.params;
+  let tableName = `malaysia${category}`;
+
+  // Use placeholders to prevent SQL injection
+  db.query(`SELECT DISTINCT district FROM ?? WHERE state = ?`, [tableName, state], (err, results) => {
+    if (err) {
+      console.error('Database query error:', err);
+      return res.status(500).send('Server error');
+    }
+
+    // Map over results to get the list of districts
+    if (results.length > 0) {
+      const districts = results.map(row => row.district);
+      res.json(districts);
+    } else {
+      res.status(404).send('No districts found for the given state.');
+    }
+  });
+});
+
 app.get('/user-role/:userID', (req, res) => {
   const userID = req.params.userID;
   // Your database query here, for example:
@@ -59,7 +112,6 @@ app.get('/user-role/:userID', (req, res) => {
       }
   });
 });
-
 
 app.get('/user-count', async (req, res) => {
   try {
@@ -1033,7 +1085,7 @@ app.get('/:datacountry/mosque/:id', (req, res) => {
 });
 
 app.put('/malaysiamosque/:id', (req, res) => {
-
+  console.log('mosquemalaysia')
   const mosqueprId = req.params.id;
 
   const { name, address, state, district, status } = req.body;

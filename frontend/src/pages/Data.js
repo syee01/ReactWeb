@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../cssFolder/data.css';
-import { useNavigate } from 'react-router-dom';
 import EditProductPage from './EditProductPage';
 import EditMosquePage from './EditMosquePage';
 import EditPrayerRoom from './EditPrayerRoom'
@@ -40,6 +39,10 @@ const Data = () => {
   const [visibleRows, setVisibleRows] = useState(10);
   const [filterBy, setFilterBy] = useState('name');
   const [statusFilter, setStatusFilter] = useState('');
+  const [stateFilter, setStateFilter] = useState('');
+  const [districtFilter, setDistrictFilter] = useState('');
+  const [states, setStates] = useState([]);
+  const [districts, setDistricts] = useState([]);
   const userRole = localStorage.getItem('role');
 
   const [isEditModalProductOpen, setIsEditModalProductOpen] = useState(false);
@@ -55,6 +58,94 @@ const Data = () => {
   const [isAddModalMosqueOpen, setIsAddModalMosqueOpen] = useState(false);
   const [isAddModalPrayerRoomOpen, setIsAddModalPrayerRoomOpen] = useState(false);
   const [isAddModalRestaurantOpen, setIsAddModalRestaurantOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchStates = async () => {
+      if (!selectedCountry || !selectedCategory || selectedCategory === 'Products') return;
+
+      const categoryMapping = {
+        'Restaurants': 'restaurant',
+        'Prayer Room': 'pr',
+        'Mosques': 'mosque'
+      };
+
+      const categoryParam = categoryMapping[selectedCategory] || selectedCategory.toLowerCase();
+      const countryParam = selectedCountry.toLowerCase();
+
+      try {
+        const response = await axios.get(`http://localhost:8085/states/${countryParam}/${categoryParam}`);
+        setStates(response.data);
+      } catch (error) {
+        console.error('Error fetching states:', error);
+      }
+    };
+
+    fetchStates();
+  }, [selectedCountry, selectedCategory]);
+
+  useEffect(() => {
+    const fetchDistricts = async () => {
+      console.log(selectedCountry)
+      // Adjust the condition to check if the country is 'MALAYSIA' and category is one of the specified
+      if (selectedCountry === 'MALAYSIA' && (selectedCategory === 'Mosques' || selectedCategory === 'Prayer Room')) {
+        const categoryMapping = {
+          'Prayer Room': 'pr',
+          'Mosques': 'mosque'
+        };
+  
+        // Use the mapped category to form the endpoint
+        const categoryParam = categoryMapping[selectedCategory];
+        console.log(categoryParam)
+        try {
+          const response = await axios.get(`http://localhost:8085/district/${categoryParam}`);
+          setDistricts(response.data);
+        } catch (error) {
+          console.error('Error fetching districts:', error);
+        }
+      }
+    };
+  
+    fetchDistricts();
+  }, [selectedCountry, selectedCategory]);
+  
+
+  const handleFilterChange = (e) => {
+    setFilter(e.target.value.toLowerCase());
+  };
+
+  const handleStateFilterChange = async (e) => {
+    const newState = e.target.value;
+    setStateFilter(newState);
+    setDistrictFilter(''); // Reset district filter when state changes
+    
+    if (newState) {
+      if (selectedCategory === 'Mosques' || selectedCategory === 'Prayer Room'){
+        const categoryMapping = {
+          'Prayer Room': 'pr',
+          'Mosques': 'mosque'
+        };
+  
+        // Use the mapped category to form the endpoint
+        const categoryParam = categoryMapping[selectedCategory];
+
+        try {
+          // Assuming the endpoint is structured like this: /districts/{state}
+          const response = await axios.get(`http://localhost:8085/districts/${categoryParam}/${newState}`);
+          setDistricts(response.data);
+        } catch (error) {
+          console.error('Error fetching districts:', error);
+          setDistricts([]); // Reset districts if fetch fails
+        }
+      }
+
+    } else {
+      setDistricts([]); // Clear districts if no state is selected
+    }
+  };
+
+  const handleDistrictFilterChange = (e) => {
+    setDistrictFilter(e.target.value);
+  };
 
   // Handle opening the Add Data modals
   const handleAddProduct = () => {
@@ -210,10 +301,6 @@ const Data = () => {
     setIsFetching(false);
   };
 
-  const handleFilterChange = (e) => {
-    setFilter(e.target.value.toLowerCase());
-  };
-
   const getStatus = (dateString) => {
     if (!dateString) return 'Unknown';
     const today = new Date();
@@ -242,37 +329,30 @@ const Data = () => {
   });
 
   const filteredMosques = mosques.filter((mosque) => {
-    const mosqueName = mosque.name || "";
-
-    const matchesFilter = filterBy === 'name'
-    ? mosqueName.toLowerCase().includes(filter)
-    : false;
-        
-    return matchesFilter;
+    const matchesName = mosque.name.toLowerCase().includes(filter);
+    const matchesState = stateFilter ? mosque.state === stateFilter : true;
+    const matchesDistrict = districtFilter ? mosque.district === districtFilter : true;
+    return matchesName && matchesState && matchesDistrict;
   });
-
+  
   const filteredPrayerRoom = prayerRoom.filter((pr) => {
     const prName = pr.name || "";
-
-    const matchesFilter = filterBy === 'name'
-    ? prName.toLowerCase().includes(filter)
-    : false;
-        
-    return matchesFilter;
-  });
-
+    const matchesName = prName.toLowerCase().includes(filter);
+    const matchesState = stateFilter ? pr.state === stateFilter : true;
+    const matchesDistrict = districtFilter ? pr.district === districtFilter : true;
+    return matchesName && matchesState && matchesDistrict;
+  });  
+  
   const filteredRestaurant = restaurant.filter((restaurant) => {
     const restaurantName = restaurant.name || "";
-
-    const matchesFilter = filterBy === 'name'
-    ? restaurantName.toLowerCase().includes(filter)
-    : false;
-        
-    return matchesFilter;
+    const matchesName = restaurantName.toLowerCase().includes(filter);
+    const matchesState = stateFilter ? restaurant.region === stateFilter : true;
+    return matchesName && matchesState;
   });
+  
 
   useEffect(() => {
-    setVisibleRows(5); // Reset visible rows on product change
+    setVisibleRows(20); // Reset visible rows on product change
   }, [products,prayerRoom, mosques, restaurant]);
 
   const handleScroll = (e) => {
@@ -303,7 +383,7 @@ const Data = () => {
   return (
     <div>
     <div className='reportTitle'>
-        <h2 className="reportTitle">Data</h2>
+        <h2 className="reportTitle">Manage Data</h2>
       </div>
       <div className="tabs">
         {countries.map((country) => (
@@ -326,16 +406,16 @@ const Data = () => {
         )}
         <input type="text" placeholder="Type to search..." className="filter-input" value={filter} onChange={handleFilterChange} />
         {selectedCategory === 'Products' && (
-        <button className="add-data-button" onClick={handleAddProduct}>Add Data</button>
+        <button className="adddata-button" onClick={handleAddProduct}>Add Data</button>
         )}
         {selectedCategory === 'Restaurants' && (
-          <button className="add-data-button" onClick={handleAddRestaurant}>Add Data</button>
+          <button className="adddata-button" onClick={handleAddRestaurant}>Add Data</button>
         )}
         {selectedCategory === 'Mosques' && (
-          <button className="add-data-button" onClick={handleAddMosque}>Add Data</button>
+          <button className="adddata-button" onClick={handleAddMosque}>Add Data</button>
         )}
         {selectedCategory === 'Prayer Room' && (
-          <button className="add-data-button" onClick={handleAddPrayerRoom}>Add Data</button>
+          <button className="adddata-button" onClick={handleAddPrayerRoom}>Add Data</button>
         )}
         </div>
         <div className="content">
@@ -348,12 +428,12 @@ const Data = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>ID</th>
-                      {selectedCountry !== 'KOREA' && <th>Expired Date</th>}
-                      <th>Brand</th>
-                      <th>Name</th>
+                      <th className='table-header'>ID</th>
+                      {selectedCountry !== 'KOREA' && <th className='table-header'>Expired Date</th>}
+                      <th className='table-header'>Brand</th>
+                      <th className='table-header'>Name</th>
                       {selectedCountry !== 'KOREA' && (
-                        <th>
+                        <th className='table-header'>
                           Status
                         <select
                         value={statusFilter}
@@ -368,8 +448,8 @@ const Data = () => {
                       </select>
                         </th>
                       )}
-                      <th>Image</th>
-                      <th>Edit</th>
+                      <th className='table-header'>Image</th>
+                      <th className='table-header'>Edit</th>
                     </tr>
                   </thead>
                   <tbody className="table-scroll">
@@ -388,7 +468,7 @@ const Data = () => {
                           />
                         </td>
                         <td>
-                          <button onClick={() => handleEditProduct(product.productID, selectedCountry)} disabled={userRole !== 'data admin'} className="edit-button">
+                          <button onClick={() => handleEditProduct(product.productID, selectedCountry)} disabled={userRole !== 'data admin'} className="editbutton">
                             Edit
                           </button>
                         </td>
@@ -402,11 +482,19 @@ const Data = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>ID</th>
-                      <th>Name</th>
-                      <th>Location</th>
-                      <th>State</th>
-                      <th>Edit</th>
+                      <th className='table-header'>ID</th>
+                      <th className='table-header'>Name</th>
+                      <th className='table-header'>Location</th>
+                      <th className='table-header'>
+                        State
+                        <select value={stateFilter} onChange={handleStateFilterChange} className="status-selector">
+                          <option value="">All States</option>
+                          {states.map(state => (
+                            <option key={state} value={state}>{state}</option>
+                          ))}
+                        </select>
+                      </th>
+                      <th className='table-header'>Edit</th>
                     </tr>
                   </thead>
                   <tbody className="table-scroll">
@@ -417,7 +505,7 @@ const Data = () => {
                         <td>{restaurant.address}</td>
                         <td>{restaurant.region}</td>
                         <td>
-                        <button onClick={() => handleEditRestaurant(restaurant.restaurantID, selectedCountry)} disabled={userRole !== 'data admin'} className="edit-button">
+                        <button onClick={() => handleEditRestaurant(restaurant.restaurantID, selectedCountry)} disabled={userRole !== 'data admin'} className="editbutton">
                             Edit
                           </button>
                         </td>
@@ -432,12 +520,27 @@ const Data = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>ID</th>
-                      <th>Name</th>
-                      <th>Address</th>
-                      <th>State</th>
-                      {selectedCountry === 'MALAYSIA' && <th>District</th>}
-                      <th>Edit</th>
+                      <th className='table-header'>ID</th>
+                      <th className='table-header'>Name</th>
+                      <th className='table-header'>Address</th>
+                      <th className='table-header'>
+                        State
+                        <select value={stateFilter} onChange={handleStateFilterChange} className="status-selector">
+                          <option value="">All States</option>
+                          {states.map(state => (
+                            <option key={state} value={state}>{state}</option>
+                          ))}
+                        </select>
+                      </th>
+                      {selectedCountry === 'MALAYSIA' && <th className='table-header'>District
+                      <select value={districtFilter} onChange={handleDistrictFilterChange} className="status-selector">
+                        <option value="">All Districts</option>
+                        {districts.map(district => (
+                          <option key={district} value={district}>{district}</option>
+                        ))}
+                      </select>
+                      </th>}
+                      <th className='table-header'>Edit</th>
                     </tr>
                   </thead>
                   <tbody className="table-scroll">
@@ -449,7 +552,7 @@ const Data = () => {
                         <td>{mosque.state}</td>
                         {selectedCountry === 'MALAYSIA' && <td>{mosque.district}</td>}
                         <td>
-                        <button onClick={() => handleEditMosques(mosque.mosqueprID, selectedCountry)} disabled={userRole !== 'data admin'} className="edit-button">
+                        <button onClick={() => handleEditMosques(mosque.mosqueprID, selectedCountry)} disabled={userRole !== 'data admin'} className="editbutton">
                             Edit
                           </button>
                         </td>
@@ -465,12 +568,26 @@ const Data = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>ID</th>
-                      <th>Name</th>
-                      <th>Address</th>
-                      <th>State</th>
-                      {selectedCountry === 'MALAYSIA' && <th>District</th>}
-                      <th>Edit</th>
+                      <th className='table-header'>ID</th>
+                      <th className='table-header'>Name</th>
+                      <th className='table-header'>Address</th>
+                      <th className='table-header'>
+                        State
+                        <select value={stateFilter} onChange={handleStateFilterChange} className="status-selector">
+                          <option value="">All States</option>
+                          {states.map(state => (
+                            <option key={state} value={state}>{state}</option>
+                          ))}
+                        </select>
+                      </th>
+                      {selectedCountry === 'MALAYSIA' && <th className='table-header'>District
+                      <select value={districtFilter} onChange={handleDistrictFilterChange} className="status-selector">
+                        <option value="">All Districts</option>
+                        {districts.map(district => (
+                          <option key={district} value={district}>{district}</option>
+                        ))}
+                      </select></th>}
+                      <th className='table-header'>Edit</th>
                     </tr>
                   </thead>
                   <tbody className="table-scroll">
@@ -480,9 +597,10 @@ const Data = () => {
                         <td>{pr.name}</td>
                         <td>{pr.address}</td>
                         <td>{pr.state}</td>
-                        {selectedCountry === 'MALAYSIA' && <td>{pr.district}</td>}
+                        {selectedCountry === 'MALAYSIA' && <td>{pr.district}
+                        </td>}
                         <td>
-                          <button onClick={() => handleEditPrayerRoom(pr.mosqueprID, selectedCountry)} disabled={userRole !== 'data admin'} className="edit-button">
+                          <button onClick={() => handleEditPrayerRoom(pr.mosqueprID, selectedCountry)} disabled={userRole !== 'data admin'} className="editbutton">
                             Edit
                           </button>
                         </td>

@@ -4,6 +4,7 @@ import '../cssFolder/editProduct.css';
 
 const EditMosquePage = ({ mosqueData, country, onClose, onSave, isAdding }) => {
   const mosqueprId = mosqueData ? mosqueData.mosqueprID: null;
+  console.log(mosqueData)
   const [editedMosque, setEditedMosque] = useState({
     name: '',
     address: '',
@@ -48,7 +49,9 @@ const EditMosquePage = ({ mosqueData, country, onClose, onSave, isAdding }) => {
     const fetchMosque = async () => {
       setIsFetching(true);
       try {
-        const response = await axios.get(`http://localhost:8085/${datacountry}mosque/${mosqueprId}`);
+        const response = await axios.get(`http://localhost:8085/${datacountry}/mosque/${mosqueprId}`);
+        console.log('heer')
+        console.log(response.data)
         setEditedMosque(response.data);
       } catch (error) {
       console.error('Error fetching mosque:', error);
@@ -78,7 +81,9 @@ const EditMosquePage = ({ mosqueData, country, onClose, onSave, isAdding }) => {
 
     const apiEndpoint = isAdding ? 
     `http://localhost:8085/${datacountry}mosque/add` : 
-    `http://localhost:8085/${datacountry}mosque/${mosqueprId}`;
+    `http://localhost:8085/${datacountry}/mosque/${mosqueprId}`;
+
+    console.log(apiEndpoint)
 
     try {
       const response = await axios({

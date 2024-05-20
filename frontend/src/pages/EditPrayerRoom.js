@@ -50,7 +50,7 @@ const EditPrayerRoomPage = ({ prayerRoomData, onClose, onSave, country, isAdding
       if (!isAdding && mosqueprId) {
         setIsFetching(true);
         try {
-          const response = await axios.get(`http://localhost:8085/${datacountry}pr/${mosqueprId}`);
+          const response = await axios.get(`http://localhost:8085/${datacountry}/pr/${mosqueprId}`);
           setEditedPrayerRoom(response.data);
         } catch (error) {
           console.error('Error fetching mosque:', error);

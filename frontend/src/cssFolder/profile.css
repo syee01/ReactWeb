@@ -41,11 +41,15 @@
 .change-password-btn {
   margin-left: 20px; /* Adjust as needed */
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: #4888c3;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.change-password-btn:hover{
+  background-color:#679bcc;
 }
 
 .field-row {
@@ -78,11 +82,15 @@
 
 .save-changes-btn {
   padding: 10px 20px;
-  background-color: #28a745; /* Green for a visually distinct save button */
+  background-color: #0F7C5D; /* Green for a visually distinct save button */
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.save-changes-btn:hover{
+  background-color:#149b77
 }
 
 .modal1 {
@@ -132,11 +140,15 @@
 
 .passwordBtn{
    padding: 10px 20px;
-  background-color: #007bff;
+  background-color:#0F7C5D;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin-right: 10px; /* Add margin between the buttons */
+}
+
+.passwordBtn:hover{
+  background-color:#149b77;
 }

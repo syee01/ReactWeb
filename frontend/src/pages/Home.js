@@ -19,6 +19,15 @@ const Dashboard = () => {
     enquiryData: null  // Initialize as null or with default structure
   });
 
+  function formatCategory(category) {
+    if (!category) return 'Unknown Category';
+    if(category=='pr') return 'Prayer Room';
+    return category
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+  
   const [graphData, setGraphData] = useState({
     labels: ['Products', 'Restaurants', 'Mosques', 'Prayer Rooms'],
     datasets: [{
@@ -162,10 +171,10 @@ const Dashboard = () => {
     <div className="dashboard">
       <h2 className="dashboardTitle">Dashboard</h2>
       <div className="card-container">
-        <div className="card user-count"><h4>User Count</h4><p>{userCount}</p></div>
-        <div className="card officer-count"><h4>Officer Count</h4><p>{officerCount}</p></div>
-        <div className="card reports-count"><h4>Total Reports</h4><p>{reportsCount}</p></div>
-        <div className="card enquiries-count"><h4>Total Enquiries</h4><p>{enquiriesCount}</p></div>
+        <div className="card user-count"><h4>User Count</h4><p className='countCard'>{userCount}</p></div>
+        <div className="card officer-count"><h4>Officer Count</h4><p className='countCard'>{officerCount}</p></div>
+        <div className="card reports-count"><h4>Total Reports</h4><p className='countCard'>{reportsCount}</p></div>
+        <div className="card enquiries-count"><h4>Total Enquiries</h4><p className='countCard'>{enquiriesCount}</p></div>
       </div>
       <div className="row">
         <div className="half-width">
@@ -183,10 +192,11 @@ const Dashboard = () => {
                 <div className="country-section">
                   <h4 className="collapsible">{country.toUpperCase()} - Pending Reviews: {Object.values(counts).reduce((a, b) => a + b, 0)}</h4>
                   <div className="content1">
-                    {Object.entries(counts).map(([category, count]) => (
-                      <p key={category}>{`${category}: ${count}`}</p>
-                    ))}
-                  </div>
+                  {Object.entries(counts).map(([category, count]) => {
+                    const formattedCategory = formatCategory(category);
+                    return <p key={category}><span className="bold-text">{formattedCategory}</span>: {count}</p>;
+                  })}
+                </div>
                 </div>
               </div>
             ))}

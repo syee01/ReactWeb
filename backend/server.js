@@ -8,9 +8,11 @@ const util = require('util')
 const { check, validationResult } = require('express-validator');
 const { table } = require("console");
 
+
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/images', express.static(path.join(__dirname, '../frontend/src/images')));
 
 // create to mysql database
 const db = mysql.createConnection({

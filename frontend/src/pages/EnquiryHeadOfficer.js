@@ -74,7 +74,7 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
         await axios.post(endpoint, { reportId, updateData });
 
         // Prepare the data for email notification
-        const emailSubject = `Update on Your Report #${reportData.ReportID}`;
+        const emailSubject = `Update on Your Enquiry #${reportData.ReportID}`;
         const halalStatusText = halalStatusUpdate === '1' ? 'Halal' : 'Not Halal';
         const emailBody = `Hello, your enquiry with ID: ${reportData.ReportID} is now marked as ${halalStatusText}.`;
 

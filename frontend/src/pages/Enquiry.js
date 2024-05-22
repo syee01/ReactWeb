@@ -61,7 +61,7 @@ const EnquiryPage = () => {
 
         // Prepare and send the email notification
         const emailSubject = `Your Enquiry is Now Under Review`;
-        const emailBody = `Hello, your report with ID: ${report.ReportID} is now under review by our team. We will update you with the final decisions shortly.`;
+        const emailBody = `Hello, your enquiry with ID: ${report.ReportID} is now under review by our team. We will update you with the final decisions shortly.`;
 
         const emailEndpoint = 'http://localhost:8085/send-email';
         await axios.post(emailEndpoint, {

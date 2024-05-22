@@ -75,7 +75,7 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
         await axios.post(updateEndpoint, { reportId, updateData });
 
         // Prepare dynamic email content
-        const emailSubject = `Update on Your ${reportType === 'report' ? 'Report' : 'Enquiry'} #${reportData.ReportID}`;
+        const emailSubject = `Update on Your Report #${reportData.ReportID}`;
         const halalStatusText = halalStatusUpdate === '1' ? 'Halal' : 'Not Halal';
         const emailBody = `Hello, your report with ID: ${reportData.ReportID} is now marked as ${halalStatusText}.`;
 

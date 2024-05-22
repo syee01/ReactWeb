@@ -48,6 +48,7 @@ const EnquiryPage = () => {
             return;
         }
 
+        // Update the report as reviewed
         await axios.put(`http://localhost:8085/viewByEnquiryUpdate/${reportId}`, {
             viewedBy: currentUser,
             category: activeCategory,
@@ -55,10 +56,22 @@ const EnquiryPage = () => {
         });
 
         setIsModalOpen(true);
-        setSelectedReportId(report.ReportID)
+        setSelectedReportId(report.ReportID);
         fetchReports();
+
+        // Prepare and send the email notification
+        const emailSubject = `Your Enquiry is Now Under Review`;
+        const emailBody = `Hello, your report with ID: ${report.ReportID} is now under review by our team. We will update you with the final decisions shortly.`;
+
+        const emailEndpoint = 'http://localhost:8085/send-email';
+        await axios.post(emailEndpoint, {
+            userId: report.UserID, // Assuming you have the UserID in your report object
+            subject: emailSubject,
+            text: emailBody,
+        });
+
     } catch (error) {
-        console.error('Error updating viewedBy:', error);
+        console.error('Error updating viewedBy or sending email:', error);
     }
 };
 

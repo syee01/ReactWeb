@@ -7,6 +7,32 @@ const path = require("path");
 const util = require('util')
 const { check, validationResult } = require('express-validator');
 const { table } = require("console");
+require('dotenv').config();
+const nodemailer = require('nodemailer');
+
+const sendEmail = async (email, subject, text) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USERNAME,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USERNAME, // Your email
+    to: email, // Recipient email
+    subject: subject,
+    text: text,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent:', info.response);
+  } catch (err) {
+    console.error('Email send error:', err);
+  }
+};
 
 
 const app = express();
@@ -21,6 +47,34 @@ const db = mysql.createConnection({
   password: "",
   database: "myhalalchecker"
 })
+
+const getUserEmail = async (userId) => {
+  // Assuming you are using a library like mysql or similar for database operations
+  return new Promise((resolve, reject) => {
+    const query = 'SELECT email FROM user WHERE UserID = ?';
+    db.query(query, [userId], (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(results[0]?.email);
+      }
+    });
+  });
+};
+
+app.post('/send-email', async (req, res) => {
+  const { userId, subject, text } = req.body;
+  try {
+    const userEmail = await getUserEmail(userId); // Ensure getUserEmail is secure and efficient
+    console.log('Sending email to:', userEmail); // Debugging
+    await sendEmail(userEmail, subject, text);
+    res.send({ message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('Failed to send email:', error);
+    res.status(500).send({ message: 'Failed to send email' });
+  }
+});
+
 
 const query = util.promisify(db.query).bind(db);
 app.get('/api/data', async (req, res) => {

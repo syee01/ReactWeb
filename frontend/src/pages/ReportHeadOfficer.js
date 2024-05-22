@@ -60,45 +60,50 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
   }, [isOpen, reportId, category]);
 
 
-  const handleAction = async (action) => {
-    console.log(comment)
+  const handleAction = async (action, reportType) => {
+    console.log(comment); // Debugging
     try {
-      const updateData = {
-        Status: 'Completed',
-        ApprovedBy: localStorage.getItem('userID'),
-        Comment: comment, // Use the state value
-      };
-  
-      
-      if (action === 'approve') {
-        // Keep the original HalalStatus for approval.
-        updateData.HalalStatus = reportData.HalalStatus;
-      } else if (action === 'reject') {
-        // Toggle HalalStatus for rejection.
-        updateData.HalalStatus = reportData.HalalStatus === '0' ? 1 : 0;
-      }
-  
-      const endpoint = `http://localhost:8085/finalise_report/${category}`;
-      await axios.post(endpoint, {
-        reportId,
-        updateData
-      });
-  
-      onClose(); // Close the modal
-      window.location.reload(); // Refresh the page
+        const halalStatusUpdate = action === 'approve' ? reportData.HalalStatus : (reportData.HalalStatus === '0' ? '1' : '0');
+        const updateData = {
+            Status: 'Completed',
+            ApprovedBy: localStorage.getItem('userID'),
+            Comment: comment,
+            HalalStatus: halalStatusUpdate,
+        };
+
+        const updateEndpoint = `http://localhost:8085/finalise_report/${category}`;
+        await axios.post(updateEndpoint, { reportId, updateData });
+
+        // Prepare dynamic email content
+        const emailSubject = `Update on Your ${reportType === 'report' ? 'Report' : 'Enquiry'} #${reportData.ReportID}`;
+        const halalStatusText = halalStatusUpdate === '1' ? 'Halal' : 'Not Halal';
+        const emailBody = `Hello, your report with ID: ${reportData.ReportID} is now marked as ${halalStatusText}.`;
+
+        // Send email
+        const emailEndpoint = 'http://localhost:8085/send-email';
+        await axios.post(emailEndpoint, {
+            userId: reportData.UserID,
+            subject: emailSubject,
+            text: emailBody,
+        });
+
+        onClose(); // Close the modal
+        window.location.reload(); // Refresh the page
     } catch (error) {
-      console.error('Failed to update report:', error);
+        console.error('Failed to update report:', error);
     }
-  };
+};
+
+
 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal-container">
-        <div className="modal-header">
+    <div className="modalBackdrop">
+      <div className="modalContainer">
+        <div className="modalHeader">
           <h2 className="reportTitle">{reportData.ReportID}</h2>
-          <span className="modal-close-button" onClick={onClose}>
+          <span className="modalclose-button" onClick={onClose}>
             &times;
           </span>
         </div>
@@ -107,7 +112,7 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
         ) : error ? (
           <p>{error}</p>
         ) : (
-          <div className="modal-content">
+          <div className="modalContent">
             {category === 'Products' && (
               <>
                 <h3 className="reportReportID">Product Report Details</h3>
@@ -154,11 +159,11 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
               {reportImages.map((imagePath, index) => (
                 <div key={index} className="image-wrapper">
                   <img
-                    src={`http://localhost:8085/assets/${imagePath}`}
+                    src={`http://localhost:8082/assets/${imagePath}`}
                     alt={`Report ${index + 1}`}
                     onClick={() => {
                       window.open(
-                        `http://localhost:8085/assets/${imagePath}`,
+                        `http://localhost:8082/assets/${imagePath}`,
                         '_blank'
                       );
                     }}

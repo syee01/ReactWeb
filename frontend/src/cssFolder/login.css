@@ -18,7 +18,7 @@ body, html {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  background: url('../images/webfrontpage.png') no-repeat center center fixed;  /* Background image scoped to login-container */
+  background: url('../images/webbackground.png') no-repeat center center fixed;  /* Background image scoped to login-container */
   background-size: cover;
   width: 100%;  /* Ensuring it covers the desired area */
   height: 100%;
@@ -43,14 +43,14 @@ body, html {
 
 .logo-container h1 {
   font-size: 1.5rem;
-  color: #054533;
+  color: #05563f;
   margin-top: 15px;
 }
 
 .login-box {
   position: fixed; 
   top: 50%;
-  left: 50%;
+  left: 57%;
   transform: translate(-50%, -50%); 
   width: 400px;
   padding: 20px;

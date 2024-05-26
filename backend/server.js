@@ -82,6 +82,7 @@ app.get('/api/data', async (req, res) => {
     const categories = ['product', 'restaurant', 'mosque', 'pr'];
     const countries = ['malaysia', 'korea', 'thailand'];
 
+
     const data = {};
 
     await Promise.all(countries.map(async (country) => {
@@ -94,6 +95,7 @@ app.get('/api/data', async (req, res) => {
     }));
 
     res.json({ data });
+    console.log(data)
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
@@ -218,23 +220,36 @@ app.get('/enquiries-count', async (req, res) => {
 
 app.get('/status-details', async (req, res) => {
   try {
+    const role = req.query.role; // Assume role is passed as a query parameter
+    console.log(req.query)
     const categories = ['restaurant_reports', 'product_reports', 'restaurant_enquiry', 'product_enquiry'];
     let results = {};
 
+    // Define status filters for different roles
+    let statusFilter = [];
+    if (role === 'head officer') {
+      statusFilter = ['To Be Confirmed', 'Completed'];
+    } else if (role === 'officer') {
+      statusFilter = ['Pending', 'In Progress', 'Completed'];
+    } else if (role === 'data admin') {
+      statusFilter = ['Pending', 'In Progress', 'To Be Confirmed', 'Completed'];
+    }
+    
     for (const category of categories) {
       results[category] = {};
-      for (const status of ['Pending', 'Reviewed', 'To Be Confirmed', 'Completed']) {
+      for (const status of statusFilter) {
+        console.log(status)
         const queryResult = await query(`SELECT COUNT(*) AS count FROM ${category} WHERE status = ?`, [status]);
-        results[category][status] = queryResult[0].count;
+        results[category][status] = queryResult[0] ? queryResult[0].count : 0;
       }
     }
-
     res.json(results);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 const imagesDir = path.join(__dirname, '../frontend/src/images');
 app.use('/images', express.static(imagesDir));
@@ -619,7 +634,7 @@ app.get('/malaysiapr', (req, res) => {
   db.query(sql, (err, results) => {
     if (err) {
       // Handle error
-      console.log('here')
+  
       console.error(err);
       res.status(500).json({ message: 'Error retrieving products' });
     } else {
@@ -634,7 +649,6 @@ app.get('/thailandpr', (req, res) => {
   db.query(sql, (err, results) => {
     if (err) {
       // Handle error
-      console.log('here')
       console.error(err);
       res.status(500).json({ message: 'Error retrieving products' });
     } else {
@@ -649,7 +663,7 @@ app.get('/koreapr', (req, res) => {
   db.query(sql, (err, results) => {
     if (err) {
       // Handle error
-      console.log('here')
+  
       console.error(err);
       res.status(500).json({ message: 'Error retrieving products' });
     } else {
@@ -664,7 +678,6 @@ app.get('/malaysiamosque', (req, res) => {
   db.query(sql, (err, results) => {
     if (err) {
       // Handle error
-      console.log('here')
       console.error(err);
       res.status(500).json({ message: 'Error retrieving products' });
     } else {
@@ -679,7 +692,7 @@ app.get('/thailandmosque', (req, res) => {
   db.query(sql, (err, results) => {
     if (err) {
       // Handle error
-      console.log('here')
+  
       console.error(err);
       res.status(500).json({ message: 'Error retrieving products' });
     } else {
@@ -694,7 +707,6 @@ app.get('/koreamosque', (req, res) => {
   db.query(sql, (err, results) => {
     if (err) {
       // Handle error
-      console.log('here')
       console.error(err);
       res.status(500).json({ message: 'Error retrieving products' });
     } else {
@@ -709,7 +721,6 @@ app.get('/masproduct', (req, res) => {
     db.query(sql, (err, results) => {
       if (err) {
         // Handle error
-        console.log('here')
         console.error(err);
         res.status(500).json({ message: 'Error retrieving products' });
       } else {
@@ -724,7 +735,7 @@ app.get('/masproduct', (req, res) => {
     db.query(sql, (err, results) => {
       if (err) {
         // Handle error
-        console.log('here')
+    
         console.error(err);
         res.status(500).json({ message: 'Error retrieving products' });
       } else {
@@ -739,7 +750,7 @@ app.get('/masproduct', (req, res) => {
     db.query(sql, (err, results) => {
       if (err) {
         // Handle error
-        console.log('here')
+    
         console.error(err);
         res.status(500).json({ message: 'Error retrieving products' });
       } else {
@@ -754,7 +765,7 @@ app.get('/masproduct', (req, res) => {
     db.query(sql, (err, results) => {
       if (err) {
         // Handle error
-        console.log('here')
+    
         console.error(err);
         res.status(500).json({ message: 'Error retrieving products' });
       } else {
@@ -769,7 +780,7 @@ app.get('/masproduct', (req, res) => {
     db.query(sql, (err, results) => {
       if (err) {
         // Handle error
-        console.log('here')
+    
         console.error(err);
         res.status(500).json({ message: 'Error retrieving products' });
       } else {
@@ -784,7 +795,7 @@ app.get('/masproduct', (req, res) => {
     db.query(sql, (err, results) => {
       if (err) {
         // Handle error
-        console.log('here')
+    
         console.error(err);
         res.status(500).json({ message: 'Error retrieving products' });
       } else {
@@ -1334,7 +1345,6 @@ app.put('/thailandpr/:id', (req, res) => {
 });
 
 app.post('/thailandpr/add', (req, res) => {
-  console.log('here')
   const { name, address, state, status } = req.body;
 
   const sql = `INSERT INTO thailandpr (name, address, state, status) VALUES (?, ?, ?, ?)`;

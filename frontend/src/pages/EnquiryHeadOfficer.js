@@ -66,7 +66,7 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
             Status: 'Completed',
             ApprovedBy: localStorage.getItem('userID'),
             Comment: comment,
-            ApprovedDate: new Date().toISOString() 
+            ApprovedDate: new Date().toLocaleString('en-US', { timeZone: 'Asia/Kuala_Lumpur' })
         };
 
         const endpoint = `http://localhost:8085/finalise_enquiry/${category}`;

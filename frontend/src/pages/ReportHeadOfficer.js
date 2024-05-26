@@ -67,7 +67,7 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
             Status: 'Completed',
             ApprovedBy: localStorage.getItem('userID'),
             Comment: comment,
-            ApprovedDate: new Date().toISOString() 
+            ApprovedDate: new Date().toLocaleString('en-US', { timeZone: 'Asia/Kuala_Lumpur' })
         };
 
         const updateEndpoint = `http://localhost:8085/finalise_report/${category}`;
@@ -176,10 +176,6 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
                 </div>
               ))}
             </div>
-            <div className="form-group">
-              <p className="bold-text"> {/* Added class for bold text */}
-                <strong>Halal Status: </strong>{ reportData.HalalStatus === '0' ? 'Not Halal' : 'Halal'}
-              </p>
               <div className="comment-edit">
               <label htmlFor="comment" className="bold-text"> {/* Added class for bold text */}
                 Officer Comment:
@@ -192,13 +188,10 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
                 rows="4"  // Specifies the number of lines you want the textarea to have
               ></textarea>
             </div>
-            </div>
-            
           </div>
         )}
         <div className="modal-footer">
           <button onClick={() => handleAction('approve')}>Approve</button>
-          <button onClick={() => handleAction('reject')}>Reject</button>
         </div>
       </div>
     </div>

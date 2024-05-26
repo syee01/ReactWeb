@@ -62,12 +62,11 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
   const handleAction = async (action) => {
     console.log(comment); // For debugging purposes
     try {
-        const halalStatusUpdate = action === 'approve' ? reportData.HalalStatus : (reportData.HalalStatus === '0' ? '1' : '0');
         const updateData = {
             Status: 'Completed',
             ApprovedBy: localStorage.getItem('userID'),
             Comment: comment,
-            HalalStatus: halalStatusUpdate,
+            ApprovedDate: new Date().toISOString() 
         };
 
         const endpoint = `http://localhost:8085/finalise_enquiry/${category}`;
@@ -75,8 +74,7 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
 
         // Prepare the data for email notification
         const emailSubject = `Update on Your Enquiry #${reportData.ReportID}`;
-        const halalStatusText = halalStatusUpdate === '1' ? 'Halal' : 'Not Halal';
-        const emailBody = `Hello, your enquiry with ID: ${reportData.ReportID} is now marked as ${halalStatusText}.`;
+        const emailBody = `Hello, your enquiry with ID: ${reportData.ReportID} is now marked.`;
 
         const emailEndpoint = 'http://localhost:8085/send-email';
         await axios.post(emailEndpoint, {
@@ -125,6 +123,9 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
                   </p>
                 )}
                 <p>
+                  <strong>Reason:</strong> {reportData.Reason}
+                </p>
+                <p>
                   <strong>Description:</strong> {reportData.Description}
                 </p>
               </>
@@ -140,6 +141,9 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
                     <strong>Location:</strong> {filterNull(reportData.Location)}
                   </p>
                 )}
+                <p>
+                  <strong>Reason:</strong> {reportData.Reason}
+                </p>
                 <p>
                   <strong>Description:</strong> {reportData.Description}
                 </p>
@@ -169,20 +173,17 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
               ))}
             </div>
             <div className="form-group">
-              <p className="bold-text"> {/* Added class for bold text */}
-                <strong>Halal Status: </strong>{ reportData.HalalStatus === '0' ? 'Not Halal' : 'Halal'}
-              </p>
               <div className="comment-edit">
               <label htmlFor="comment" className="bold-text"> {/* Added class for bold text */}
                 Officer Comment:
               </label>
-              <input
-                type="text"
+              <textarea
                 id="comment"
                 value={comment}
                 onChange={handleCommentChange}
-                className="comment-input"
-              />
+                className="comment-textarea"
+                rows="4"  // Specifies the number of lines you want the textarea to have
+              ></textarea>
             </div>
             </div>
             
@@ -190,7 +191,6 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
         )}
         <div className="modal-footer">
           <button onClick={() => handleAction('approve')}>Approve</button>
-          <button onClick={() => handleAction('reject')}>Reject</button>
         </div>
       </div>
     </div>

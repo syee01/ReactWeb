@@ -43,39 +43,59 @@ const ReportPage = () => {
   const handleReview = async (reportId) => {
     try {
         const report = reports.find(report => report.ReportID === reportId);
-        if (report.ViewedBy) {
-            console.log('This report has already been reviewed.');
+
+        // Prevent multiple reviews by the same or different users once reviewed
+        if (report.ViewedBy && report.ViewedBy !== currentUser) {
+            console.log('This report has already been reviewed by another user.');
             return;
         }
 
-        // Update the report as reviewed in the database
-        await axios.put(`http://localhost:8085/viewByReportUpdate/${reportId}`, {
-            viewedBy: currentUser,
-            category: activeCategory,
-            status: 'In Progress'
-        });
+        let newStatus = '';
+        let approvedBy = null; // Initialize approvedBy
+        if (activeTab === 'PENDING') {
+            newStatus = 'In Progress';
+        } else if (activeTab === 'IN PROGRESS') {
+            newStatus = 'To Be Confirmed';  // Transition to the next logical status
+        } else if (activeTab === 'TO BE CONFIRMED') {
+            newStatus = 'Completed';  // Mark the process as complete
+            approvedBy = currentUser; // Set the current user as the one who approved the enquiry
+        }
 
-        // Set modal state to show the report is under review
-        setIsModalOpen(true);
-        setSelectedReportId(report.ReportID);
-        fetchReports();
+        if (newStatus) {
+            // Call API to update the database status
+            await axios.put(`http://localhost:8085/viewByReportUpdate/${reportId}`, {
+                viewedBy: currentUser,
+                approvedBy: approvedBy,
+                category: activeCategory,
+                status: newStatus
+            });
 
-        // Prepare and send the email notification
-        const emailSubject = `Your Report is Now Under Review`;
-        const emailBody = `Hello, your report with ID: ${report.ReportID} is now under review by our team. We will update you with any final decisions or further inquiries as necessary.`;
+            // Update the local state to reflect this change
+            const updatedReports = reports.map(r => 
+                r.ReportID === reportId ? {...r, Status: newStatus, ViewedBy: currentUser, ApprovedBy: approvedBy} : r
+            );
+            setReports(updatedReports);
 
-        // Send email notification
-        const emailEndpoint = 'http://localhost:8085/send-email';
-        await axios.post(emailEndpoint, {
-            userId: report.UserID,  // Assumes that `UserID` is part of the report object
-            subject: emailSubject,
-            text: emailBody,
-        });
+            // Keep the modal open for further actions
+            setSelectedReportId(reportId);
+
+            // Send notification email to the user about the status change
+            const emailSubject = `Update on Your Report #${reportId}`;
+            const emailBody = `Your report has been updated to the next status: ${newStatus}.` + (newStatus === 'Completed' ? ` It was approved by ${approvedBy}.` : '');
+
+            const emailEndpoint = 'http://localhost:8085/send-email';
+            await axios.post(emailEndpoint, {
+                userId: report.UserID,  // Assuming the UserID is available in the report object
+                subject: emailSubject,
+                text: emailBody,
+            });
+        }
 
     } catch (error) {
-        console.error('Error updating viewedBy or sending email:', error);
+        console.error('Error handling review process:', error);
     }
 };
+
 
   const formatDate = (dateString) => {
     return moment(dateString).format('YYYY-MM-DD HH:mm:ss');

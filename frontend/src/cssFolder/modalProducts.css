@@ -123,7 +123,7 @@ flex-wrap: nowrap;
 overflow-x: auto; /* Enable horizontal scroll */
 overflow-y: hidden; /* Disable vertical scroll */
 padding: 20px 0;
-margin-bottom: 15px;
+margin-bottom: 0px;
 height: 200px; 
 }
 
@@ -148,4 +148,16 @@ margin-top:25px;;
 
 .bold-text {
 font-weight: 500;
+}
+
+.comment-textarea {
+  width: 100%; /* Ensures the textarea takes up the full width of its container */
+  height: 100px; /* Sets an initial height for the textarea */
+  padding: 10px; /* Adds padding inside the textarea for text alignment */
+  border: 1px solid #ccc; /* Adds a light grey border around the textarea */
+  border-radius: 5px; /* Rounds the corners of the textarea */
+  resize: vertical; /* Allows vertical resizing of the textarea */
+  font-size: 16px; /* Sets a readable font size */
+  line-height: 1.5; /* Improves readability by increasing line height */
+  box-sizing: border-box; /* Includes padding and border in the width and height */
 }

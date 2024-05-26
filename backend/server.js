@@ -337,7 +337,7 @@ app.post('/finalise_enquiry/:category', (req, res) => {
 
 app.post('/update_report/:category', (req, res) => {
   const { category } = req.params;
-  const { reportId, halalStatus, comment } = req.body;
+  const { reportId, comment } = req.body;
   
   let tableName = '';
   if (category === 'Products') {
@@ -349,8 +349,8 @@ app.post('/update_report/:category', (req, res) => {
     return;
   }
 
-  const sql = `UPDATE ${tableName} SET HalalStatus = ?, Comment = ?, Status = 'To Be Confirmed' WHERE ReportID = ?`;
-  db.query(sql, [halalStatus, comment, reportId], (err, result) => {
+  const sql = `UPDATE ${tableName} SET Comment = ?, Status = 'To Be Confirmed' WHERE ReportID = ?`;
+  db.query(sql, [comment, reportId], (err, result) => {
     if (err) {
       console.error(`Error updating ${category} report:`, err);
       res.status(500).send('Internal Server Error');
@@ -363,7 +363,7 @@ app.post('/update_report/:category', (req, res) => {
 
 app.post('/update_enquiry/:category', (req, res) => {
   const { category } = req.params;
-  const { reportId, halalStatus, comment } = req.body;
+  const { reportId, comment } = req.body;
   
   let tableName = '';
   if (category === 'Products') {
@@ -375,8 +375,8 @@ app.post('/update_enquiry/:category', (req, res) => {
     return;
   }
 
-  const sql = `UPDATE ${tableName} SET HalalStatus = ?, Comment = ?, Status = 'To Be Confirmed' WHERE ReportID = ?`;
-  db.query(sql, [halalStatus, comment, reportId], (err, result) => {
+  const sql = `UPDATE ${tableName} SET Comment = ?, Status = 'To Be Confirmed' WHERE ReportID = ?`;
+  db.query(sql, [comment, reportId], (err, result) => {
     if (err) {
       console.error(`Error updating ${category} report:`, err);
       res.status(500).send('Internal Server Error');

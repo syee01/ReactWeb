@@ -65,7 +65,6 @@ const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
       const endpoint = `http://localhost:8085/update_report/${category}`;
       await axios.post(endpoint, {
         reportId,
-        halalStatus: isHalal,
         comment
       });
       // Close the modal
@@ -110,6 +109,9 @@ const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
                   </p>
                 )}
                 <p>
+                  <strong>Reason:</strong> {reportData.Reason}
+                </p>
+                <p>
                   <strong>Description:</strong> {reportData.Description}
                 </p>
               </>
@@ -125,6 +127,9 @@ const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
                     <strong>Location:</strong> {filterNull(reportData.Location)}
                   </p>
                 )}
+                <p>
+                  <strong>Reason:</strong> {reportData.Reason}
+                </p>
                 <p>
                   <strong>Description:</strong> {reportData.Description}
                 </p>
@@ -153,36 +158,18 @@ const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
                 </div>
               ))}
             </div>
-            <div className="form-group">
-              <p className="bold-text"> {/* Added class for bold text */}
-                <strong>Halal Status:</strong>
-              </p>
-              <div className="halal-buttons">
-                <button
-                  className={`halalStatus ${isHalal === true ? 'active' : ''}`}
-                  onClick={handleHalalStatus}
-                >
-                  Halal
-                </button>
-                <button
-                  className={`halalStatus ${isHalal === false ? 'active' : ''}`}
-                  onClick={handleHalalStatus}
-                >
-                  Not Halal
-                </button>
-              </div>
-            </div>
-            <div className="form-group">
+            {/* <div className="form-group"> */}
               <label htmlFor="comment" className="bold-text"> {/* Added class for bold text */}
                 <strong>Comment:</strong>
               </label>
-              <input
-                type="text"
-                id="comment"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-              />
-            </div>
+              <textarea
+              id="comment"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              rows="4" // Set the number of rows to control the initial visible height
+              className="comment-textarea" // Add a class for custom styling
+            />
+            {/* </div> */}
           </div>
         )}
         <div className="modal-footer">

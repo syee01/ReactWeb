@@ -54,10 +54,7 @@ const CompletedEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
     }
   }, [isOpen, reportId, category]);
 
-  const handleHalalStatus = () => {
-    setIsHalal(prevState => !prevState);
-  };
-
+ 
   if (!isOpen) return null;
 
   return (
@@ -89,6 +86,9 @@ const CompletedEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
                     <strong>Location:</strong> {filterNull(reportData.Location)}
                   </p>
                 )}
+                <p>
+                  <strong>Reason:</strong> {reportData.Reason}
+                </p>
                 <p>
                   <strong>Description:</strong> {reportData.Description}
                 </p>
@@ -133,10 +133,6 @@ const CompletedEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
                 </div>
               ))}
             </div>
-            
-            <p>
-              <strong>Halal Status: </strong>{ reportData.HalalStatus === '0' ? 'Not Halal' : 'Halal'}
-            </p>
             <p>
                   <strong>Comment: </strong> {reportData.Comment}
             </p>

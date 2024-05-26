@@ -164,9 +164,11 @@ const Dashboard = () => {
         <div className="card"><h4>Total Enquiries</h4><p>{enquiriesCount}</p></div>
         {role === 'data admin' && (
         <>
+        <div className='row'>
           <h2 className='dashboardSub'>Total Dataset</h2>
           <div className="graph-container">
             <Bar data={graphData} options={{ responsive: true, scales: { y: { beginAtZero: true } } }} />
+          </div>
           </div>
         </>
       )}

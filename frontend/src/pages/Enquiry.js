@@ -103,7 +103,7 @@ const EnquiryPage = () => {
         <h2 className="reportTitle">Enquiry Submitted</h2>
       </div>
       <div className="tabs">
-        {['PENDING', 'REVIEWED', 'TO BE CONFIRMED', 'COMPLETED'].map((tab) => (
+        {['PENDING', 'IN PROGRESS', 'TO BE CONFIRMED', 'COMPLETED'].map((tab) => (
           <button
             key={tab}
             className={`tab ${activeTab.toLowerCase() === tab.toLowerCase() ? 'selected' : ''}`}

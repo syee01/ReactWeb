@@ -43,7 +43,7 @@ const EnquiryPage = () => {
   const handleReview = async (reportId) => {
     try {
         const report = reports.find(report => report.ReportID === reportId);
-        if (report.ViewedBy) {
+        if (report.ViewedBy && report.ViewedBy !== currentUser) {
             console.log('This report has already been reviewed.');
             return;
         }
@@ -55,7 +55,7 @@ const EnquiryPage = () => {
             status: 'Reviewed'
         });
 
-        setIsModalOpen(true);
+        // Do not close the modal here
         setSelectedReportId(report.ReportID);
         fetchReports();
 
@@ -74,7 +74,6 @@ const EnquiryPage = () => {
         console.error('Error updating viewedBy or sending email:', error);
     }
 };
-
   const formatDate = (dateString) => {
     return moment(dateString).format('YYYY-MM-DD HH:mm:ss');
   };

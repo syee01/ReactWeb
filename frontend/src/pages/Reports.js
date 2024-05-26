@@ -52,7 +52,7 @@ const ReportPage = () => {
         await axios.put(`http://localhost:8085/viewByReportUpdate/${reportId}`, {
             viewedBy: currentUser,
             category: activeCategory,
-            status: 'Reviewed'
+            status: 'In Progress'
         });
 
         // Set modal state to show the report is under review
@@ -105,7 +105,7 @@ const ReportPage = () => {
         <h2 className="reportTitle">Report Submitted</h2>
       </div>
       <div className="tabs">
-        {['PENDING', 'REVIEWED', 'TO BE CONFIRMED', 'COMPLETED'].map((tab) => (
+        {['PENDING', 'IN PROGRESS', 'TO BE CONFIRMED', 'COMPLETED'].map((tab) => (
           <button
             key={tab}
             className={`tab ${activeTab.toLowerCase() === tab.toLowerCase() ? 'selected' : ''}`}

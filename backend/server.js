@@ -95,7 +95,6 @@ app.get('/api/data', async (req, res) => {
     }));
 
     res.json({ data });
-    console.log(data)
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
@@ -221,7 +220,6 @@ app.get('/enquiries-count', async (req, res) => {
 app.get('/status-details', async (req, res) => {
   try {
     const role = req.query.role; // Assume role is passed as a query parameter
-    console.log(req.query)
     const categories = ['restaurant_reports', 'product_reports', 'restaurant_enquiry', 'product_enquiry'];
     let results = {};
 
@@ -238,7 +236,6 @@ app.get('/status-details', async (req, res) => {
     for (const category of categories) {
       results[category] = {};
       for (const status of statusFilter) {
-        console.log(status)
         const queryResult = await query(`SELECT COUNT(*) AS count FROM ${category} WHERE status = ?`, [status]);
         results[category][status] = queryResult[0] ? queryResult[0].count : 0;
       }
@@ -1421,11 +1418,11 @@ app.get('/:datacountry/restaurant/:id', (req, res) => {
 app.put('/malaysiarestaurant/:id', (req, res) => {
   const restaurantId = req.params.id;
 
-  const { name, address, region, date, status } = req.body;
+  const { name, address, region, date, status, description, category} = req.body;
 
-  const sql = `UPDATE malaysiarestaurant SET name = ?, address = ?, region = ?, date = ?, status = ? WHERE restaurantID = ?`;
+  const sql = `UPDATE malaysiarestaurant SET name = ?, address = ?, region = ?, date = ?, status = ?, description= ?, category = ? WHERE restaurantID = ?`;
 
-  db.query(sql, [ name, address, region, date, status, restaurantId], (err, result) => {
+  db.query(sql, [ name, address, region, date, status, description, category, restaurantId], (err, result) => {
     if (err) {
       console.error('Error updating restaurant:', err);
       res.status(500).json({ message: 'Error updating restaurant' });
@@ -1440,11 +1437,11 @@ app.put('/malaysiarestaurant/:id', (req, res) => {
 });
 
 app.post('/malaysiarestaurant/add', (req, res) => {
-  const { name, address, region, date, status } = req.body;
+  const { name, address, region, date, status, description, category } = req.body;
 
-  const sql = `INSERT INTO malaysiarestaurant (name, address, region, date, status) VALUES (?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO malaysiarestaurant (name, address, region, date, status, description, category) VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
-  db.query(sql, [name, address, region, date, status], (err, result) => {
+  db.query(sql, [name, address, region, date, status, description, category], (err, result) => {
     if (err) {
       console.error('Error adding new restaurant:', err);
       res.status(500).json({ message: 'Error adding new restaurant' });
@@ -1477,11 +1474,11 @@ app.put('/thailandrestaurant/:id', (req, res) => {
 });
 
 app.post('/thailandrestaurant/add', (req, res) => {
-  const { name, address, region, status } = req.body;
+  const { name, address, region, status, description, category } = req.body;
 
-  const sql = `INSERT INTO thailandrestaurant (name, address, region, status) VALUES (?, ?, ?, ?)`;
+  const sql = `INSERT INTO thailandrestaurant (name, address, region, status, description= ?, category = ?) VALUES (?, ?, ?, ?, ?, ?)`;
 
-  db.query(sql, [name, address, region, status], (err, result) => {
+  db.query(sql, [name, address, region, status, description, category], (err, result) => {
     if (err) {
       console.error('Error adding new restaurant:', err);
       res.status(500).json({ message: 'Error adding new restaurant' });
@@ -1513,11 +1510,11 @@ app.put('/korearestaurant/:id', (req, res) => {
 });
 
 app.post('/korearestaurant/add', (req, res) => {
-  const { name, address, region, status } = req.body;
+  const { name, address, region, status, description, category } = req.body;
 
-  const sql = `INSERT INTO korearestaurant (name, address, region, status) VALUES (?, ?, ?, ?)`;
+  const sql = `INSERT INTO korearestaurant (name, address, region, status, description= ?, category = ?) VALUES (?, ?, ?, ?, ?, ?)`;
 
-  db.query(sql, [name, address, region, status], (err, result) => {
+  db.query(sql, [name, address, region, status, description, category], (err, result) => {
     if (err) {
       console.error('Error adding new restaurant:', err);
       res.status(500).json({ message: 'Error adding new restaurant' });

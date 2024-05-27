@@ -90,7 +90,6 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
     }
 };
 
-  
   if (!isOpen) return null;
 
   return (

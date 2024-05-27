@@ -81,6 +81,8 @@ const EditRestaurantPage = ({ restaurantData, onClose, onSave, country, isAdding
       region: editedRestaurant.region,
       date: editedRestaurant.date,
       status: 'reviewed',
+      description: editedRestaurant.description,
+      category: editedRestaurant.category,
     };
   
     const apiEndpoint = isAdding ? 
@@ -129,6 +131,14 @@ const EditRestaurantPage = ({ restaurantData, onClose, onSave, country, isAdding
             <input type="date" name="date" value={editedRestaurant.date ? editedRestaurant.date.split('T')[0] : ''} onChange={handleInputChange} />
           </div>
         )}
+        <div>
+        <label>Description:</label>
+          <input type="text" name="description" value={editedRestaurant.description || ''} onChange={handleInputChange} className="form-input" />
+        </div>
+        <div>
+        <label>Category:</label>
+          <input type="text" name="description" value={editedRestaurant.category || ''} onChange={handleInputChange} className="form-input" />
+        </div>
         <div className="buttoncontainer">
           <button type="submit" className="form-button save-button">Save</button>
           <button type="button" onClick={onClose} className="form-button cancel-button">Cancel</button>

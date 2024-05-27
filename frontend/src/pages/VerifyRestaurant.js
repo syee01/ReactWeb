@@ -3,7 +3,6 @@ import axios from 'axios';
 import '../cssFolder/verifyProduct.css'; // Ensure you have the appropriate CSS
 
 const RestaurantDetailsModal = ({ restaurantData, country, onClose }) => {
-  console.log(restaurantData)
   if (!restaurantData) return <div>Restaurant not found.</div>;
 
   const handleStatusChange = async (newStatus) => {
@@ -11,7 +10,7 @@ const RestaurantDetailsModal = ({ restaurantData, country, onClose }) => {
       const response = await axios.put(`http://localhost:8085/${country.toLowerCase()}/restaurants/${restaurantData.restaurantID}/status`, {
         status: newStatus
       });
-      alert(`Status updated to ${newStatus}`);
+      alert(`Data is verified successfully`);
       onClose(); // Close modal after status update
     } catch (error) {
       console.error('Failed to update status:', error);

@@ -11,7 +11,7 @@ const MosqueDetailsModal = ({ mosqueData, country, onClose }) => {
       const response = await axios.put(`http://localhost:8085/${country.toLowerCase()}/mosques/${mosqueData.mosqueprID}/status`, {
         status: newStatus
       });
-      alert(`Status updated to ${newStatus}`);
+      alert(`Data is verified successfully`);
       onClose(); // Close modal after status update
     } catch (error) {
       console.error('Failed to update status:', error);

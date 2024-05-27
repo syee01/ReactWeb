@@ -71,6 +71,7 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
       });
       // Close the modal
       onClose();
+      alert('Enquiry status is updated successfully')
       // Refresh the page
       window.location.reload();
     } catch (error) {

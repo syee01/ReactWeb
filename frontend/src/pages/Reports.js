@@ -25,20 +25,6 @@ const ReportPage = () => {
     const formattedStatus = tab.charAt(0) + tab.slice(1).toLowerCase();
     setActiveTab(formattedStatus);
   };
-
-  const fetchReports = async () => {
-    try {
-      const response = await axios.get(`http://localhost:8085/reports`, {
-        params: { 
-          category: activeCategory,
-          status: activeTab
-        }
-      });
-      setReports(response.data);
-    } catch (error) {
-      console.error('Error fetching reports:', error);
-    }
-  };
   
   const handleReview = async (reportId) => {
     try {
@@ -90,6 +76,8 @@ const ReportPage = () => {
                 text: emailBody,
             });
         }
+
+        alert('Report status is updated successfully')
 
     } catch (error) {
         console.error('Error handling review process:', error);

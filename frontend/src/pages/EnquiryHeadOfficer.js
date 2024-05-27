@@ -84,6 +84,7 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
         });
 
         onClose(); // Close the modal
+        alert('Enquiry status is updated successfully')
         window.location.reload(); // Refresh the page
     } catch (error) {
         console.error('Failed to update report:', error);

@@ -92,6 +92,7 @@ const EnquiryPage = () => {
                 text: emailBody,
             });
         }
+        alert('Enquiry status is updated successfully')
 
     } catch (error) {
         console.error('Error handling review process:', error);

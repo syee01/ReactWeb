@@ -102,6 +102,9 @@ const EditProductPage = ({ productData, country, onClose, onSave, isAdding }) =>
       });
       
       if (onSave) onSave(response.data);  // Optionally pass saved data back
+      isAdding ? 
+      alert("Data is submitted successfullt "): 
+      alert("Data is edited successfully");
       onClose();  // Close modal after save
     } catch (error) {
       console.error('Error saving product:', error);

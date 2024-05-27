@@ -94,6 +94,9 @@ const EditPrayerRoomPage = ({ prayerRoomData, onClose, onSave, country, isAdding
       });
       
       if (onSave) onSave(response.data);
+      const apiEndpoint = isAdding ? 
+      alert("Data is submitted successfullt "): 
+      alert("Data is edited successfully");
       onClose(); 
     } catch (error) {
       console.error('Error saving prayer room:', error);

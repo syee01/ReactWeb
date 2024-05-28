@@ -22,13 +22,17 @@ const RestaurantDetailsModal = ({ restaurantData, country, onClose }) => {
     <div className="modalBackdrop1">
       <div className="modalContent1">
         <button onClick={onClose} className="closeButton">&times;</button>
-        <h2 className="titlePosition">Product Details</h2>
+        <h2 className="titlePosition">Restaurant Details</h2>
         <p><strong>Name:</strong></p>
         <p> {restaurantData.name}</p>
         <p><strong>Address:</strong></p>
         <p>{restaurantData.address}</p>
         <p><strong>Region:</strong></p>
         <p>{restaurantData.region}</p>
+        <p><strong>Description:</strong></p>
+        <p>{restaurantData.description}</p>
+        <p><strong>Category:</strong></p>
+        <p>{restaurantData.category}</p>
         <div className="action-buttons">
           <button className="approve-button" onClick={() => handleStatusChange('approved')}>Approve</button>
           <button className="reject-button" onClick={() => handleStatusChange('rejected')}>Reject</button>

@@ -97,7 +97,7 @@ const EditMosquePage = ({ mosqueData, country, onClose, onSave, isAdding }) => {
       
       if (onSave) onSave(response.data); 
       const apiEndpoint = isAdding ? 
-      alert("Data is submitted successfullt "): 
+      alert("Data is submitted successfully"): 
       alert("Data is edited successfully");
       onClose(); 
     } catch (error) {

@@ -513,7 +513,7 @@ app.put('/viewByEnquiryUpdate/:reportId', (req, res) => {
 
   db.query(sql, [viewedBy, status, reportId], (error, results) => {
     if (error) {
-      console.log('Error updating report:', error);
+      ('Error updating report:', error);
       return res.status(500).send('Error updating report');
     }
     if (results.affectedRows === 0) {

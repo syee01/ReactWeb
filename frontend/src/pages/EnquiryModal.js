@@ -66,7 +66,6 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
       const endpoint = `http://localhost:8085/update_enquiry/${category}`;
       await axios.post(endpoint, {
         reportId,
-        halalStatus: isHalal,
         comment
       });
       // Close the modal

@@ -101,7 +101,7 @@ const EditRestaurantPage = ({ restaurantData, onClose, onSave, country, isAdding
       
       if (onSave) onSave(response.data);
       isAdding ? 
-      alert("Data is submitted successfullt "): 
+      alert("Data is submitted successfully "): 
       alert("Data is edited successfully");
       onClose(); 
     } catch (error) {

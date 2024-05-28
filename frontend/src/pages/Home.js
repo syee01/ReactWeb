@@ -9,6 +9,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const Dashboard = () => {
   const role = localStorage.getItem('role'); // Retrieve role from local storage
+  const [roleHeader, setRoleHeader] = useState('');
   const [userCount, setUserCount] = useState(0);
   const [officerCount, setOfficerCount] = useState(0);
   const [reportsCount, setReportsCount] = useState(0);
@@ -53,6 +54,14 @@ const Dashboard = () => {
         const totalReviews = Object.values(reviewDataRes.data).reduce((acc, curr) => acc + Object.values(curr).reduce((sum, num) => sum + num, 0), 0);
         setTotalReviewsNeeded(totalReviews);
 
+        if(role === 'data admin') {
+          setRoleHeader('Data Admin');
+        } else if(role === 'officer') {
+          setRoleHeader('Officer');
+        } else {
+          setRoleHeader('Head Officer');
+        }
+
         // Filter data based on role
         const allowedStatuses = role === 'data admin' ? ['Pending', 'In Progress', 'To Be Confirmed', 'Completed']
           : role === 'head officer' ? ['To Be Confirmed', 'Completed']
@@ -65,7 +74,6 @@ const Dashboard = () => {
             return acc;
           }, {});
 
-          console.log(allowedStatuses.map(status => filterDataByRole(statusDetailsRes.data.restaurant_reports)[status]))
         setStatusDetails({
           reportData: {
             labels: allowedStatuses,
@@ -114,7 +122,6 @@ const Dashboard = () => {
         ]);
         setOfficerCount(officerRes.data.officerCount);
     
-        console.log(graphDataRes.data.data)
         // Assuming graphDataRes.data.data is the object with country keys and data arrays
         const graphDataFromApi = graphDataRes.data.data;
     
@@ -156,10 +163,10 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <h2 className="dashboardTitle">Dashboard - {role}</h2>
+      <h2 className="dashboardTitle">Dashboard - {roleHeader}</h2>
       <div className="card-container">
-        <div className="card"><h4>User Count</h4><p>{userCount}</p></div>
-        {role === 'data admin' && <div className="card"><h4>Officer Count</h4><p>{officerCount}</p></div>}
+        <div className="card"><h4>Officer Count</h4><p>{officerCount}</p></div>
+        {role === 'data admin' && <div className="card"><h4>User Count</h4><p>{userCount}</p></div>}
         <div className="card"><h4>Total Reports</h4><p>{reportsCount}</p></div>
         <div className="card"><h4>Total Enquiries</h4><p>{enquiriesCount}</p></div>
         {role === 'data admin' && (
@@ -194,19 +201,46 @@ const Dashboard = () => {
         </>
       )}
       <div className="row">
-        {statusDetails.reportData && (
-          <div className="half-width">
-            <h2 className='dashboardSub'>Report Data</h2>
-            <Bar data={statusDetails.reportData} options={{ responsive: true, scales: { y: { beginAtZero: true } } }} />
-          </div>
-        )}
-        {statusDetails.enquiryData && (
-          <div className="half-width">
-            <h2 className='dashboardSub'>Enquiry Data</h2>
-            <Bar data={statusDetails.enquiryData} options={{ responsive: true, scales: { y: { beginAtZero: true } } }} />
-          </div>
-        )}
-      </div>
+  {statusDetails.reportData && (
+    <div className="half-width">
+      <h2 className='dashboardSub'>Report Data</h2>
+      <Bar
+        data={statusDetails.reportData}
+        options={{
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1  // Ensures Y-axis values increment in steps of 1
+              }
+            }
+          }
+        }}
+      />
+    </div>
+  )}
+  {statusDetails.enquiryData && (
+    <div className="half-width">
+      <h2 className='dashboardSub'>Enquiry Data</h2>
+      <Bar
+        data={statusDetails.enquiryData}
+        options={{
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1  // Ensures Y-axis values increment in steps of 1
+              }
+            }
+          }
+        }}
+      />
+    </div>
+  )}
+</div>
+
     </div>
   );
 };

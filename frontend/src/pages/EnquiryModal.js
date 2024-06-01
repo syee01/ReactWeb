@@ -40,9 +40,11 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
       fetchData();
       const fetchReportImages = async () => {
         try {
+          console.log(`${reportId}`)
           const endpoint = `http://localhost:8085/enquiryImages/${reportId}`;
           const response = await axios.get(endpoint);
           setReportImages(response.data);
+          console.log(response.data)
         } catch (err) {
           console.error('Failed to fetch report images', err);
         }
@@ -70,7 +72,6 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
       });
       // Close the modal
       onClose();
-      alert('Enquiry status is updated successfully')
       // Refresh the page
       window.location.reload();
     } catch (error) {

@@ -72,22 +72,41 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
         const endpoint = `http://localhost:8085/finalise_enquiry/${category}`;
         await axios.post(endpoint, { reportId, updateData });
 
-        // Prepare the data for email notification
+        // Prepare detailed data for the email notification
         const emailSubject = `Update on Your Enquiry #${reportData.ReportID}`;
-        const emailBody = `Hello, your enquiry with ID: ${reportData.ReportID} is now marked.`;
+        const emailBody = `
+            Hello,
+
+            Your enquiry with ID: ${reportData.ReportID} has been replied. Here are the details:
+            
+            Type: ${category}
+            Name: ${reportData.Name}
+            Location: ${filterNull(reportData.Location)}
+            Reason: ${reportData.Reason}
+            Description: ${reportData.Description}
+            Status: Completed
+            Officer Comment: ${comment}
+            Decision Made By: ${localStorage.getItem('userName')}
+            Approved Date: ${updateData.ApprovedDate}
+
+            Thank you for your patience. If you have any further queries, please contact myhalalchecker@gmail.com.
+
+            Best Regards,
+            myHalal Checker Team
+        `;
 
         const emailEndpoint = 'http://localhost:8085/send-email';
         await axios.post(emailEndpoint, {
-            userId: reportData.UserID,  // Assuming userID is correctly fetched and available
+            userId: reportData.UserID,
             subject: emailSubject,
             text: emailBody,
         });
 
         onClose(); // Close the modal
-        alert('Enquiry status is updated successfully')
-        window.location.reload(); // Refresh the page
+        window.location.reload(); // Refresh the page to update the UI
     } catch (error) {
-        console.error('Failed to update report:', error);
+        console.error('Failed to update the report and send notification:', error);
+        alert('Failed to update the report status.');
     }
 };
 

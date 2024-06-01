@@ -65,6 +65,7 @@ const getUserEmail = async (userId) => {
 app.post('/send-email', async (req, res) => {
   const { userId, subject, text } = req.body;
   try {
+    console.log(userId)
     const userEmail = await getUserEmail(userId); // Ensure getUserEmail is secure and efficient
     console.log('Sending email to:', userEmail); // Debugging
     await sendEmail(userEmail, subject, text);
@@ -281,9 +282,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Route to handle finalizing report
-app.post('/finalise_report/:category', (req, res) => {
-  const { reportId, updateData } = req.body;
-  const { category } = req.params;
+app.post('/finalise_report/:category/:reportId', (req, res) => {
+  const { updateData } = req.body;
+  const { category, reportId } = req.params;
+  console.log(category)
 
   let tableName = '';
   if (category === 'Restaurants') {
@@ -293,8 +295,9 @@ app.post('/finalise_report/:category', (req, res) => {
   } else {
     return res.status(400).json({ error: 'Invalid category' });
   }
+  console.log(tableName)
 
-  const query = `UPDATE ${tableName} SET ? WHERE ReportID = ?`;
+  const query = `UPDATE ${tableName} SET status = ? WHERE ReportID = ?`;
 
   db.query(query, [updateData, reportId], (err, result) => {
     if (err) {

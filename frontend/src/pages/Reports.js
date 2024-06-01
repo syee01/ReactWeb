@@ -40,14 +40,20 @@ const ReportPage = () => {
         let approvedBy = null; // Initialize approvedBy
         if (activeTab === 'PENDING') {
             newStatus = 'In Progress';
+            setSelectedReportId(reportId); // Select report for modal operations
+            // setIsModalOpen(true); // Open modal for In Progress operations
         } else if (activeTab === 'IN PROGRESS') {
-            newStatus = 'To Be Confirmed';  // Transition to the next logical status
+            newStatus = 'To Be Confirmed'; 
+            alert('The report is reviewed successfully');
         } else if (activeTab === 'TO BE CONFIRMED') {
             newStatus = 'Completed';  // Mark the process as complete
+            alert('The report is reviewed successfully');
+            setIsModalOpen(false); // Close modal on completion
             approvedBy = currentUser; // Set the current user as the one who approved the enquiry
         }
 
         if (newStatus) {
+          console.log(newStatus)
             // Call API to update the database status
             await axios.put(`http://localhost:8085/viewByReportUpdate/${reportId}`, {
                 viewedBy: currentUser,
@@ -76,9 +82,6 @@ const ReportPage = () => {
                 text: emailBody,
             });
         }
-
-        alert('Report status is updated successfully')
-
     } catch (error) {
         console.error('Error handling review process:', error);
     }

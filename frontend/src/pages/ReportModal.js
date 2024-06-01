@@ -70,7 +70,6 @@ const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
       // Close the modal
       onClose();
       // Refresh the page
-      alert('Report status is updated successfully')
       window.location.reload();
     } catch (error) {
       console.error('Failed to submit data:', error);

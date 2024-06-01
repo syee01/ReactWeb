@@ -9,92 +9,87 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
   const [error, setError] = useState('');
   const [reportImages, setReportImages] = useState([]);
   const [comment, setComment] = useState('');
- 
+
   const handleCommentChange = (e) => {
     setComment(e.target.value);
   };
 
   const filterNull = (location) => {
-    // Split the location into parts
-    const parts = location.split(', ');
-    // Filter out the "null" values
-    const filteredParts = parts.filter(part => part !== 'null');
-    // Join the non-null parts back into a string
-    return filteredParts.join(', ');
+    if (!location) return '';
+    return location.split(', ').filter(part => part && part !== 'null').join(', ');
   };
 
   useEffect(() => {
-    if (isOpen) {
-      const fetchData = async () => {
-        setIsLoading(true);
-        try {
-          const endpoint = `http://localhost:8085/specificReports/${category}/${reportId}`;
-          const response = await axios.get(endpoint);
-          setReportData(response.data);
-          setComment(response.data.Comment || ''); 
-        } catch (err) {
-          setError('Failed to fetch data. Please try again later.');
-          console.error(err);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      fetchData();
-      const fetchReportImages = async () => {
-        try {
-          const endpoint = `http://localhost:8085/reportImages/${reportId}`;
-          const response = await axios.get(endpoint);
-          setReportImages(response.data);
-        } catch (err) {
-          console.error('Failed to fetch report images', err);
-        }
-      };
-
-      if (isOpen) {
-        setIsLoading(true);
-        fetchData();
-        fetchReportImages().then(() => setIsLoading(false));
+    const fetchData = async () => {
+      if (!isOpen) return;
+      setIsLoading(true);
+      try {
+        const response = await axios.get(`http://localhost:8085/specificReports/${category}/${reportId}`);
+        setReportData(response.data);
+        setComment(response.data.Comment || '');
+      } catch (err) {
+        console.error(err);
+        setError('Failed to fetch data. Please try again later.');
       }
-    }
+
+      try {
+        const imageResponse = await axios.get(`http://localhost:8085/reportImages/${reportId}`);
+        setReportImages(imageResponse.data);
+      } catch (err) {
+        console.error('Failed to fetch report images:', err);
+      }
+
+      setIsLoading(false);
+    };
+
+    fetchData();
   }, [isOpen, reportId, category]);
 
-
-  const handleAction = async (action, reportType) => {
-    console.log(comment); // Debugging
+  const handleAction = async (action) => {
+    const status = "Completed"
     try {
-        const updateData = {
-            Status: 'Completed',
-            ApprovedBy: localStorage.getItem('userID'),
-            Comment: comment,
-            ApprovedDate: new Date().toLocaleString('en-US', { timeZone: 'Asia/Kuala_Lumpur' })
-        };
+      const updateData = {
+        Status: status,
+        ApprovedBy: localStorage.getItem('userID'),
+        Comment: comment,
+        ApprovedDate: moment().format('YYYY-MM-DD HH:mm:ss')
+      };
 
-        const updateEndpoint = `http://localhost:8085/finalise_report/${category}`;
-        await axios.post(updateEndpoint, { reportId, updateData });
+      await axios.post(`http://localhost:8085/finalise_report/${category}/${reportId}`, updateData);
 
-        // Prepare dynamic email content
-        const emailSubject = `Update on Your Report #${reportData.ReportID}`;
-        
-        const emailBody = `Hello, your report with ID: ${reportData.ReportID} is now marked as.`;
+      const emailSubject = `Update on Your Report #${reportId}`;
+      const emailBody = `
+        Hello,
 
-        // Send email
-        const emailEndpoint = 'http://localhost:8085/send-email';
-        await axios.post(emailEndpoint, {
-            userId: reportData.UserID,
-            subject: emailSubject,
-            text: emailBody,
-        });
+        Your report with ID: ${reportId} has been ${status.toLowerCase()}. Here are the details:
 
-        onClose(); // Close the modal
-        alert('Report status is updated successfully')
-        window.location.reload(); // Refresh the page
+        - Type: ${category}
+        - Name: ${reportData.Name}
+        - Location: ${filterNull(reportData.Location)}
+        - Reason: ${reportData.Reason}
+        - Description: ${reportData.Description}
+        - Status: ${status}
+        - Officer Comment: ${comment}
+        - Approved Date: ${updateData.ApprovedDate}
+
+        Thank you for your patience and understanding. If you have further query, please contact myhalalchecker@gmail.com
+
+        Best regards,
+        myHalal Checker Team
+      `;
+
+      await axios.post('http://localhost:8085/send-email', {
+        userId: reportData.UserID,
+        subject: emailSubject,
+        text: emailBody,
+      });
+
+      onClose();
+      window.location.reload(); // Consider using React state or context for UI updates instead
     } catch (error) {
-        console.error('Failed to update report:', error);
+      console.error('Failed to update report and send notification:', error);
     }
-};
-
-
+  };
 
   if (!isOpen) return null;
 
@@ -103,9 +98,7 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
       <div className="modalContainer">
         <div className="modalHeader">
           <h2 className="reportTitle">{reportData.ReportID}</h2>
-          <span className="modalclose-button" onClick={onClose}>
-            &times;
-          </span>
+          <span className="modalclose-button" onClick={onClose}>&times;</span>
         </div>
         {isLoading ? (
           <p>Loading...</p>
@@ -113,87 +106,28 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
           <p>{error}</p>
         ) : (
           <div className="modalContent">
-            {category === 'Products' && (
-              <>
-                <h3 className="reportReportID">Product Report Details</h3>
-                <p>
-                  <strong>Name:</strong> {reportData.Name}
-                </p>
-                <p>
-                  <strong>Brand:</strong> {reportData.Brand}
-                </p>
-                {reportData.Location && (
-                  <p>
-                    <strong>Location:</strong> {filterNull(reportData.Location)}
-                  </p>
-                )}
-                <p>
-                  <strong>Reason:</strong> {reportData.Reason}
-                </p>
-                <p>
-                  <strong>Description:</strong> {reportData.Description}
-                </p>
-              </>
-            )}
-            {category === 'Restaurants' && (
-              <>
-                <h3 className="reportReportID">Restaurant Report Details</h3>
-                <p>
-                  <strong>Name:</strong> {reportData.Name}
-                </p>
-                {reportData.Location && (
-                  <p>
-                    <strong>Location:</strong> {filterNull(reportData.Location)}
-                  </p>
-                )}
-                <p>
-                  <strong>Reason:</strong> {reportData.Reason}
-                </p>
-                <p>
-                  <strong>Description:</strong> {reportData.Description}
-                </p>
-              </>
-            )}
-            <p>
-              <strong>Reported Date:</strong>{' '}
-              {moment(reportData.Date).format('YYYY-MM-DD HH:mm:ss')}
-            </p>
-            <p className="bold-text"> {/* Added class for bold text */}
-              <strong>Images Uploaded:</strong>
-            </p>
+            <h3>{category === 'Products' ? 'Product' : 'Restaurant'} Report Details</h3>
+            <p><strong>Name:</strong> {reportData.Name}</p>
+            {reportData.Brand && <p><strong>Brand:</strong> {reportData.Brand}</p>}
+            <p><strong>Location:</strong> {filterNull(reportData.Location)}</p>
+            <p><strong>Reason:</strong> {reportData.Reason}</p>
+            <p><strong>Description:</strong> {reportData.Description}</p>
+            <p><strong>Reported Date:</strong> {moment(reportData.Date).format('YYYY-MM-DD HH:mm:ss')}</p>
+            <p className="bold-text"><strong>Images Uploaded:</strong></p>
             <div className="image-container">
-              {reportImages.map((imagePath, index) => (
+              {reportImages.map((image, index) => (
                 <div key={index} className="image-wrapper">
-                  <img
-                    src={`http://localhost:8082/assets/${imagePath}`}
-                    alt={`Report ${index + 1}`}
-                    onClick={() => {
-                      window.open(
-                        `http://localhost:8082/assets/${imagePath}`,
-                        '_blank'
-                      );
-                    }}
-                  />
+                  <img src={`http://localhost:8082/assets/${image}`} alt={`Report ${index + 1}`} onClick={() => window.open(`http://localhost:8082/assets/${image}`, '_blank')} />
                 </div>
               ))}
             </div>
-              <div className="comment-edit">
-              <label htmlFor="comment" className="bold-text"> {/* Added class for bold text */}
-                Officer Comment:
-              </label>
-              <textarea
-                id="comment"
-                value={comment}
-                onChange={handleCommentChange}
-                className="comment-textarea"
-                rows="4"  // Specifies the number of lines you want the textarea to have
-              ></textarea>
+            <label htmlFor="comment" className="bold-text">Officer Comment:</label>
+            <textarea id="comment" value={comment} onChange={handleCommentChange} className="comment-textarea" rows="4"></textarea>
+            <div className="modal-footer">
+              <button onClick={() => handleAction('approve')}>Approve</button>
             </div>
           </div>
         )}
-        <div className="modal-footer">
-          <button onClick={() => handleAction('approve')}>Approve</button>
-        </div>
       </div>
     </div>
   );

@@ -14,7 +14,7 @@ const ReportPage = () => {
   const currentUser = localStorage.getItem('userID');
   const [selectedReportId, setSelectedReportId] = useState(null);
   const userRole = localStorage.getItem('role');
-  const [selectedFilter, setSelectedFilter] = useState('ReportID'); // Default to 'ReportID'
+  const [selectedFilter, setSelectedFilter] = useState('ReportID');
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleFilterChange = (e) => {
@@ -25,100 +25,87 @@ const ReportPage = () => {
     const formattedStatus = tab.charAt(0) + tab.slice(1).toLowerCase();
     setActiveTab(formattedStatus);
   };
-  
+
   const handleReview = async (reportId) => {
     try {
-        const report = reports.find(report => report.ReportID === reportId);
+      const report = reports.find(report => report.ReportID === reportId);
 
-        // Prevent multiple reviews by the same or different users once reviewed
-        if (report.ViewedBy && report.ViewedBy !== currentUser) {
-            console.log('This report has already been reviewed by another user.');
-            return;
-        }
+      if (report.ViewedBy && report.ViewedBy !== currentUser) {
+        console.log('This report has already been reviewed by another user.');
+        return;
+      }
 
-        let newStatus = '';
-        let approvedBy = null; // Initialize approvedBy
-        if (activeTab === 'PENDING') {
-            newStatus = 'In Progress';
-            setSelectedReportId(reportId); // Select report for modal operations
-            // setIsModalOpen(true); // Open modal for In Progress operations
-        } else if (activeTab === 'IN PROGRESS') {
-            newStatus = 'To Be Confirmed'; 
-            alert('The report is reviewed successfully');
-        } else if (activeTab === 'TO BE CONFIRMED') {
-            newStatus = 'Completed';  // Mark the process as complete
-            alert('The report is reviewed successfully');
-            setIsModalOpen(false); // Close modal on completion
-            approvedBy = currentUser; // Set the current user as the one who approved the enquiry
-        }
+      let newStatus = '';
+      let approvedBy = null;
+      if (activeTab === 'PENDING') {
+        newStatus = 'In Progress';
+        setSelectedReportId(reportId);
+      } else if (activeTab === 'IN PROGRESS') {
+        newStatus = 'To Be Confirmed';
+        alert('The report is reviewed successfully');
+      } else if (activeTab === 'TO BE CONFIRMED') {
+        newStatus = 'Completed';
+        alert('The report is reviewed successfully');
+        setIsModalOpen(false);
+        approvedBy = currentUser;
+      }
 
-        if (newStatus) {
-          console.log(newStatus)
-            // Call API to update the database status
-            await axios.put(`http://localhost:8085/viewByReportUpdate/${reportId}`, {
-                viewedBy: currentUser,
-                approvedBy: approvedBy,
-                category: activeCategory,
-                status: newStatus
-            });
+      if (newStatus) {
+        await axios.put(`http://localhost:8085/viewByReportUpdate/${reportId}`, {
+          viewedBy: currentUser,
+          approvedBy: approvedBy,
+          category: activeCategory,
+          status: newStatus
+        });
 
-            // Update the local state to reflect this change
-            const updatedReports = reports.map(r => 
-                r.ReportID === reportId ? {...r, Status: newStatus, ViewedBy: currentUser, ApprovedBy: approvedBy} : r
-            );
-            setReports(updatedReports);
+        const updatedReports = reports.map(r => 
+          r.ReportID === reportId ? {...r, Status: newStatus, ViewedBy: currentUser, ApprovedBy: approvedBy} : r
+        );
+        setReports(updatedReports);
+        setSelectedReportId(reportId);
 
-            // Keep the modal open for further actions
-            setSelectedReportId(reportId);
+        const emailSubject = `Update on Your Report #${reportId}`;
+        const emailBody = `
+          <html>
+          <body>
+            <p style="color: #000000; font-family: Arial, sans-serif; font-size: 14px;">
+              Hello,<br><br>
+              Your report with ID: <strong>${report.ReportID}</strong> is currently in progress. Here are the details:<br><br>
+              <strong>Type:</strong> ${activeCategory}<br>
+              <strong>Name:</strong> ${report.Name}<br>
+              <strong>Location:</strong> ${filterNull(report.Location)}<br>
+              <strong>Reason:</strong> ${report.Reason}<br>
+              <strong>Description:</strong> ${report.Description}<br>
+              <strong>Viewed By:</strong> ${localStorage.getItem('username')}<br><br>
+              Thank you for your patience. If you have any further queries, please contact <a href="mailto:myhalalchecker@gmail.com">myhalalchecker@gmail.com</a>.<br><br>
+              Best Regards,<br>
+              myHalal Checker Team
+            </p>
+          </body>
+        </html>
+        `;
 
-            // Send notification email to the user about the status change
-            const emailSubject = `Update on Your Report #${reportId}`;
-            const emailBody = `
-                <html>
-                <body>
-                  <p style="color: #000000; font-family: Arial, sans-serif; font-size: 14px;">
-                    Hello,<br><br>
-                    Your report with ID: <strong>${report.ReportID}</strong> is currently in progress. Here are the details:<br><br>
-                    <strong>Type:</strong> ${activeCategory}<br>
-                    <strong>Name:</strong> ${report.Name}<br>
-                    <strong>Location:</strong> ${filterNull(report.Location)}<br>
-                    <strong>Reason:</strong> ${report.Reason}<br>
-                    <strong>Description:</strong> ${report.Description}<br>
-                    <strong>Viewed By:</strong> ${localStorage.getItem('username')}<br><br>
-                    Thank you for your patience. If you have any further queries, please contact <a href="mailto:myhalalchecker@gmail.com">myhalalchecker@gmail.com</a>.<br><br>
-                    Best Regards,<br>
-                    myHalal Checker Team
-                  </p>
-                </body>
-              </html>
-            `;
-
-            const emailEndpoint = 'http://localhost:8085/send-email';
-            await axios.post(emailEndpoint, {
-                userId: report.UserID,  // Assuming the UserID is available in the report object
-                subject: emailSubject,
-                html: emailBody,
-            });
-        }
+        const emailEndpoint = 'http://localhost:8085/send-email';
+        await axios.post(emailEndpoint, {
+          userId: report.UserID,
+          subject: emailSubject,
+          html: emailBody,
+        });
+      }
     } catch (error) {
-        console.error('Error handling review process:', error);
+      console.error('Error handling review process:', error);
     }
-};
-
+  };
 
   const formatDate = (dateString) => {
     return moment(dateString).format('YYYY-MM-DD HH:mm:ss');
   };
 
   const filterNull = (location) => {
-    // Split the location into parts
     const parts = location.split(', ');
-    // Filter out the "null" values
     const filteredParts = parts.filter(part => part !== 'null');
-    // Join the non-null parts back into a string
     return filteredParts.join(', ');
   };
-
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -134,7 +121,7 @@ const ReportPage = () => {
         console.error('Error fetching reports:', error);
       }
     };
-  
+
     fetchReports();
   }, [activeCategory, activeTab]);
 
@@ -174,7 +161,6 @@ const ReportPage = () => {
           >
             <option value="ReportID">Report ID</option>
             <option value="Name">Product Name</option>
-            {/* Add other options as needed */}
           </select>
           <input
             className="filter-input"
@@ -210,24 +196,16 @@ const ReportPage = () => {
               </tr>
             </thead>
             <tbody>
-            {reports.filter((report) => {
-                // No filter applied if there's no search term.
+              {reports.filter((report) => {
                 if (!searchTerm.trim()) return true;
-
-                // Adjusting the field to be searched based on the selectedFilter.
                 let fieldValue = '';
                 if (selectedFilter === 'ReportID') {
                   fieldValue = report.ReportID;
                 } else if (selectedFilter === 'Name' && activeCategory === 'Products') {
-                  fieldValue = report.Name; // Assuming 'Name' is the field for Product Name.
+                  fieldValue = report.Name;
                 }
-                // Add more conditions if there are more filters.
-
-                // Return true if the field value includes the searchTerm.
-                // Adjust toLowerCase for case-insensitive search.
                 return fieldValue.toLowerCase().includes(searchTerm.toLowerCase());
-              })
-              .map((report) => (
+              }).map((report) => (
                 <tr key={report.id}>
                   <td>{report.ReportID}</td>
                   <td>{report.Name}</td>
@@ -244,49 +222,49 @@ const ReportPage = () => {
                   <td>{report.ViewedByUsername}</td>
                   <td>{report.ApprovedByUsername}</td>
                   <td>
-                  {activeTab !== 'To be confirmed' ? (
-                    (report.ViewedBy !== null && report.ViewedBy !== currentUser && activeTab !== 'Completed') ? ( // Adjusted condition
-                      <button 
-                        className="edit-button" 
-                        onClick={() => handleReview(report.ReportID)}
-                        disabled={report.ViewedBy !== null && report.ViewedBy !== currentUser && activeTab !== 'Completed'} // Adjusted condition
-                      >
-                        Review
-                      </button>
+                    {activeTab !== 'To be confirmed' ? (
+                      (report.ViewedBy !== null && report.ViewedBy !== currentUser && activeTab !== 'Completed') ? (
+                        <button 
+                          className="edit-button" 
+                          onClick={() => handleReview(report.ReportID)}
+                          disabled={report.ViewedBy !== null && report.ViewedBy !== currentUser && activeTab !== 'Completed'}
+                        >
+                          Review
+                        </button>
+                      ) : (
+                        <button
+                          className="edit-button"
+                          onClick={() => {
+                            handleReview(report.ReportID);
+                            setSelectedReportId(report.ReportID);
+                            setIsModalOpen(true);
+                          }}
+                        >
+                          Review
+                        </button>
+                      )
                     ) : (
-                      <button
-                        className="edit-button"
-                        onClick={() => {
-                          handleReview(report.ReportID);
-                          setSelectedReportId(report.ReportID);
-                          setIsModalOpen(true);
-                        }}
-                      >
-                        Review
-                      </button>
-                    )
-                  ) : (
-                    userRole === 'head officer' ? (
-                      <button
-                        className="edit-button"
-                        onClick={() => {
-                          handleReview(report.ReportID);
-                          setSelectedReportId(report.ReportID);
-                          setIsModalOpen(true);
-                        }}
-                      >
-                        Review
-                      </button>
-                    ) : (
-                      <button
-                        className="edit-button"
-                        onClick={() => {}}
-                        disabled={true}
-                      >
-                        Review
-                      </button>
-                    )
-                  )}
+                      userRole === 'head officer' ? (
+                        <button
+                          className="edit-button"
+                          onClick={() => {
+                            handleReview(report.ReportID);
+                            setSelectedReportId(report.ReportID);
+                            setIsModalOpen(true);
+                          }}
+                        >
+                          Review
+                        </button>
+                      ) : (
+                        <button
+                          className="edit-button"
+                          onClick={() => {}}
+                          disabled={true}
+                        >
+                          Review
+                        </button>
+                      )
+                    )}
                   </td>
                 </tr>
               ))}
@@ -295,9 +273,8 @@ const ReportPage = () => {
         </div>
       </div>
       <>
-        {reports.map((report) => (
-        <React.Fragment key={report.id}>
-          {activeTab !== 'To be confirmed' ? (
+        {isModalOpen && (
+          activeTab !== 'To be confirmed' ? (
             activeTab === 'Completed' ? (
               <CompletedReportModal
                 isOpen={isModalOpen}
@@ -320,9 +297,8 @@ const ReportPage = () => {
               reportId={selectedReportId}
               category={activeCategory}
             />
-          )}
-        </React.Fragment>
-      ))}
+          )
+        )}
       </>
     </>
   );

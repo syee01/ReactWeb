@@ -99,7 +99,7 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
           <div className="modalContent">
             {category === 'Products' && (
               <>
-                <h3 className="reportReportID">Product Report Details</h3>
+                <h3 className="reportReportID">Product Enquiry Details</h3>
                 <p>
                   <strong>Name:</strong> {reportData.Name}
                 </p>
@@ -121,7 +121,7 @@ const ProductEnquiryModal = ({ isOpen, onClose, reportId, category }) => {
             )}
             {category === 'Restaurants' && (
               <>
-                <h3 className="reportReportID">Restaurant Report Details</h3>
+                <h3 className="reportReportID">Restaurant Enquiry Details</h3>
                 <p>
                   <strong>Name:</strong> {reportData.Name}
                 </p>

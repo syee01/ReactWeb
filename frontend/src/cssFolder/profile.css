@@ -152,3 +152,65 @@
 .passwordBtn:hover{
   background-color:#149b77;
 }
+.modal2 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content2 {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 50%;
+  text-align: center;
+}
+
+.close2, .remove-file {
+  float: right;
+  font-size: 20px;
+  cursor: pointer;
+  color: #999;
+}
+
+.drop-area {
+  height: 100px;
+  width: 90%;
+  border: 2px dashed #ccc;
+  border-radius: 5px;
+  margin: 10px auto;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.drop-area p {
+  margin: 10px 0;
+  font-size: 16px;
+  color: #666;
+}
+
+.file-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.file-details p {
+  font-size: 14px;
+  margin: 0;
+}
+
+.editIcon1{
+  margin-left: 40px;
+  margin-top: 60px;
+}

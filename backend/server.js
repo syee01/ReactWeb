@@ -630,13 +630,13 @@ app.post('/login', [check('email', "Email length error").isEmail().isLength({ mi
 
 app.get('/malaysiapr', (req, res) => {
   // Assuming you have a database connection setup with a query function
-  const sql = 'SELECT * FROM malaysiapr'; // Selects all products
+  const sql = `SELECT * FROM malaysiapr WHERE status = 'approved'`;
   db.query(sql, (err, results) => {
     if (err) {
       // Handle error
   
       console.error(err);
-      res.status(500).json({ message: 'Error retrieving products' });
+      res.status(500).json({ message: 'Error retrieving prayer room' });
     } else {
       res.json(results);
     }
@@ -645,12 +645,12 @@ app.get('/malaysiapr', (req, res) => {
 
 app.get('/thailandpr', (req, res) => {
   // Assuming you have a database connection setup with a query function
-  const sql = 'SELECT * FROM thailandpr'; // Selects all products
+  const sql = `SELECT * FROM thailandpr WHERE status = 'approved'`; // Selects all products
   db.query(sql, (err, results) => {
     if (err) {
       // Handle error
       console.error(err);
-      res.status(500).json({ message: 'Error retrieving products' });
+      res.status(500).json({ message: 'Error retrieving prayer room' });
     } else {
       res.json(results);
     }
@@ -659,13 +659,13 @@ app.get('/thailandpr', (req, res) => {
 
 app.get('/koreapr', (req, res) => {
   // Assuming you have a database connection setup with a query function
-  const sql = 'SELECT * FROM koreapr'; // Selects all products
+  const sql = `SELECT * FROM koreapr WHERE status = 'approved'`;
   db.query(sql, (err, results) => {
     if (err) {
       // Handle error
   
       console.error(err);
-      res.status(500).json({ message: 'Error retrieving products' });
+      res.status(500).json({ message: 'Error retrieving prayer room' });
     } else {
       res.json(results);
     }
@@ -674,7 +674,7 @@ app.get('/koreapr', (req, res) => {
 
 app.get('/malaysiamosque', (req, res) => {
   // Assuming you have a database connection setup with a query function
-  const sql = 'SELECT * FROM malaysiamosque'; // Selects all products
+  const sql = `SELECT * FROM malaysiamosque WHERE status = 'approved'`;
   db.query(sql, (err, results) => {
     if (err) {
       // Handle error
@@ -688,7 +688,7 @@ app.get('/malaysiamosque', (req, res) => {
 
 app.get('/thailandmosque', (req, res) => {
   // Assuming you have a database connection setup with a query function
-  const sql = 'SELECT * FROM thailandmosque'; // Selects all products
+  const sql = `SELECT * FROM thailandmosque WHERE status = 'approved'`;
   db.query(sql, (err, results) => {
     if (err) {
       // Handle error
@@ -703,7 +703,7 @@ app.get('/thailandmosque', (req, res) => {
 
 app.get('/koreamosque', (req, res) => {
   // Assuming you have a database connection setup with a query function
-  const sql = 'SELECT * FROM koreamosque'; // Selects all products
+  const sql = `SELECT * FROM koreamosque WHERE status = 'approved'`;
   db.query(sql, (err, results) => {
     if (err) {
       // Handle error
@@ -717,7 +717,7 @@ app.get('/koreamosque', (req, res) => {
 
 app.get('/masproduct', (req, res) => {
     // Assuming you have a database connection setup with a query function
-    const sql = 'SELECT * FROM malaysiaproduct'; // Selects all products
+    const sql = `SELECT * FROM malaysiaproduct WHERE status = 'approved'`;
     db.query(sql, (err, results) => {
       if (err) {
         // Handle error
@@ -731,7 +731,7 @@ app.get('/masproduct', (req, res) => {
 
   app.get('/thaiproduct', (req, res) => {
     // Assuming you have a database connection setup with a query function
-    const sql = 'SELECT * FROM thailandproduct'; // Selects all products
+    const sql = `SELECT * FROM thailandproduct WHERE status = 'approved'`;
     db.query(sql, (err, results) => {
       if (err) {
         // Handle error
@@ -746,7 +746,7 @@ app.get('/masproduct', (req, res) => {
 
   app.get('/krproduct', (req, res) => {
     // Assuming you have a database connection setup with a query function
-    const sql = 'SELECT * FROM koreaproduct'; // Selects all products
+    const sql = `SELECT * FROM koreaproduct WHERE status = 'approved'`;
     db.query(sql, (err, results) => {
       if (err) {
         // Handle error
@@ -761,7 +761,7 @@ app.get('/masproduct', (req, res) => {
 
   app.get('/malaysiarestaurant', (req, res) => {
     // Assuming you have a database connection setup with a query function
-    const sql = 'SELECT * FROM malaysiarestaurant'; // Selects all products
+    const sql = `SELECT * FROM malaysiarestaurant WHERE status = 'approved'`;
     db.query(sql, (err, results) => {
       if (err) {
         // Handle error
@@ -776,7 +776,7 @@ app.get('/masproduct', (req, res) => {
 
   app.get('/thailandrestaurant', (req, res) => {
     // Assuming you have a database connection setup with a query function
-    const sql = 'SELECT * FROM thailandrestaurant'; // Selects all products
+    const sql = `SELECT * FROM thailandrestaurant WHERE status = 'approved'`;
     db.query(sql, (err, results) => {
       if (err) {
         // Handle error
@@ -791,7 +791,7 @@ app.get('/masproduct', (req, res) => {
 
   app.get('/korearestaurant', (req, res) => {
     // Assuming you have a database connection setup with a query function
-    const sql = 'SELECT * FROM korearestaurant'; // Selects all products
+    const sql = `SELECT * FROM korearestaurant WHERE status = 'approved'`;
     db.query(sql, (err, results) => {
       if (err) {
         // Handle error
@@ -1541,9 +1541,11 @@ app.get('/:country/:category/reviewed', async (req, res) => {
   
   const tableName = `${country}${tableCategory}`;
   try {
+    console.log(tableName)
       const sql = `SELECT * FROM ${tableName} WHERE status = 'reviewed'`;
       const results = await query(sql);
       res.json(results);
+      console.log(results)
   } catch (error) {
       console.error('Error fetching reviewed items:', error);
       res.status(500).json({ message: 'Error fetching data', error });
@@ -1614,6 +1616,44 @@ app.get('/review-counts', async (req, res) => {
     res.status(500).json({ message: 'Error fetching data', error });
   }
 });
+
+// Configure multer for file storage
+const storageProfile = multer.diskStorage({
+  destination: function(req, file, cb) {
+      cb(null, 'uploads/');
+  },
+  filename: function(req, file, cb) {
+      // Save the file with the userID as the filename
+      const ext = path.extname(file.originalname);
+      cb(null, `${req.params.userID}${ext}`);
+  }
+});
+
+const uploadProfile = multer({ storage: storageProfile });
+
+// Endpoint to upload and update user profile image
+app.post('/uploadProfileImage/:userID', uploadProfile.single('image'), async (req, res) => {
+  const { userID } = req.params;
+  const imageFile = req.file;
+  const newImageURL = `${userID}${path.extname(imageFile.originalname)}`;
+
+  // SQL Query to update the imageURL in the user's profile
+  const sql = `UPDATE user SET imageURL = ? WHERE UserID = ?`;
+
+  db.query(sql, [newImageURL, userID], (err, result) => {
+      if (err) {
+          console.error("Error updating profile image:", err);
+          res.status(500).send("Error updating profile image");
+      } else {
+          console.log('Image URL updated successfully!');
+          res.send({ imageURL: newImageURL });
+      }
+  });
+});
+
+// Static directory to serve images
+app.use('/images/userProfile', express.static('uploads'));
+
 
 
 app.listen(8085, ()=> {console.log("listening");})

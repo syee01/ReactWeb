@@ -295,3 +295,9 @@
 .table-header {
   background-color: #efefef; 
 }
+
+.adddata-button:disabled {
+  background-color: #ccc; /* Grey background */
+  color: #666; /* Darker grey text for better contrast */
+  cursor: not-allowed; /* Show a 'not-allowed' cursor on hover */
+}

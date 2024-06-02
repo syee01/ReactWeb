@@ -31,6 +31,7 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
           const endpoint = `http://localhost:8085/specificEnquiry/${category}/${reportId}`;
           const response = await axios.get(endpoint);
           setReportData(response.data);
+          console.log(response.data)
           setComment(response.data.Comment || ''); 
         } catch (err) {
           setError('Failed to fetch data. Please try again later.');
@@ -62,6 +63,13 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
   const handleAction = async (action) => {
     console.log(comment); // For debugging purposes
     try {
+
+      let reviewedByUsername = '';
+        if (reportData.ViewedBy) {
+            const userResponse = await axios.get(`http://localhost:8085/getUsername/${reportData.ViewedBy}`);
+            reviewedByUsername = userResponse.data.username || 'N/A'; // Default to 'N/A' if no username found
+        }
+
         const updateData = {
             Status: 'Completed',
             ApprovedBy: localStorage.getItem('userID'),
@@ -75,31 +83,34 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
         // Prepare detailed data for the email notification
         const emailSubject = `Update on Your Enquiry #${reportData.ReportID}`;
         const emailBody = `
-            Hello,
-
-            Your enquiry with ID: ${reportData.ReportID} has been replied. Here are the details:
-            
-            Type: ${category}
-            Name: ${reportData.Name}
-            Location: ${filterNull(reportData.Location)}
-            Reason: ${reportData.Reason}
-            Description: ${reportData.Description}
-            Status: Completed
-            Officer Comment: ${comment}
-            Decision Made By: ${localStorage.getItem('userName')}
-            Approved Date: ${updateData.ApprovedDate}
-
-            Thank you for your patience. If you have any further queries, please contact myhalalchecker@gmail.com.
-
-            Best Regards,
-            myHalal Checker Team
+        <html>
+          <body>
+              <p style="color: #000000; font-family: Arial, sans-serif; font-size: 14px;">
+                  Hello,<br><br>
+                  Your enquiry with ID: <strong>${reportData.ReportID}</strong> has been replied. Here are the details:<br><br>
+                  <strong>Type:</strong> ${category}<br>
+                  <strong>Name:</strong> ${reportData.Name}<br>
+                  <strong>Location:</strong> ${filterNull(reportData.Location)}<br>
+                  <strong>Reason:</strong> ${reportData.Reason}<br>
+                  <strong>Description:</strong> ${reportData.Description}<br>
+                  <strong>Status:</strong> Completed<br>
+                  <strong>Officer Comment:</strong> ${comment}<br>
+                  <strong>Reviewed By:</strong> ${reviewedByUsername}<br>
+                  <strong>Final Reviewed By:</strong> ${localStorage.getItem('username')}<br>
+                  <strong>Replied Date:</strong> ${updateData.ApprovedDate}<br><br>
+                  Thank you for your patience. If you have any further queries, please contact myhalalchecker@gmail.com<br><br>
+                  Best Regards,<br>
+                  myHalal Checker Team
+              </p>
+          </body>
+          </html>
         `;
 
         const emailEndpoint = 'http://localhost:8085/send-email';
         await axios.post(emailEndpoint, {
             userId: reportData.UserID,
             subject: emailSubject,
-            text: emailBody,
+            html: emailBody,
         });
 
         onClose(); // Close the modal

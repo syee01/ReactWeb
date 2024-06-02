@@ -73,13 +73,31 @@ const ReportPage = () => {
 
             // Send notification email to the user about the status change
             const emailSubject = `Update on Your Report #${reportId}`;
-            const emailBody = `Your report has been updated to the next status: ${newStatus}.` + (newStatus === 'Completed' ? ` It was approved by ${approvedBy}.` : '');
+            const emailBody = `
+                <html>
+                <body>
+                  <p style="color: #000000; font-family: Arial, sans-serif; font-size: 14px;">
+                    Hello,<br><br>
+                    Your report with ID: <strong>${report.ReportID}</strong> is currently in progress. Here are the details:<br><br>
+                    <strong>Type:</strong> ${activeCategory}<br>
+                    <strong>Name:</strong> ${report.Name}<br>
+                    <strong>Location:</strong> ${filterNull(report.Location)}<br>
+                    <strong>Reason:</strong> ${report.Reason}<br>
+                    <strong>Description:</strong> ${report.Description}<br>
+                    <strong>Viewed By:</strong> ${localStorage.getItem('username')}<br><br>
+                    Thank you for your patience. If you have any further queries, please contact <a href="mailto:myhalalchecker@gmail.com">myhalalchecker@gmail.com</a>.<br><br>
+                    Best Regards,<br>
+                    myHalal Checker Team
+                  </p>
+                </body>
+              </html>
+            `;
 
             const emailEndpoint = 'http://localhost:8085/send-email';
             await axios.post(emailEndpoint, {
                 userId: report.UserID,  // Assuming the UserID is available in the report object
                 subject: emailSubject,
-                text: emailBody,
+                html: emailBody,
             });
         }
     } catch (error) {
@@ -91,6 +109,16 @@ const ReportPage = () => {
   const formatDate = (dateString) => {
     return moment(dateString).format('YYYY-MM-DD HH:mm:ss');
   };
+
+  const filterNull = (location) => {
+    // Split the location into parts
+    const parts = location.split(', ');
+    // Filter out the "null" values
+    const filteredParts = parts.filter(part => part !== 'null');
+    // Join the non-null parts back into a string
+    return filteredParts.join(', ');
+  };
+
 
   useEffect(() => {
     const fetchReports = async () => {

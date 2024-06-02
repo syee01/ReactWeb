@@ -26,6 +26,8 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
       try {
         const response = await axios.get(`http://localhost:8085/specificReports/${category}/${reportId}`);
         setReportData(response.data);
+        console.log(response.data)
+        console.log(reportData)
         setComment(response.data.Comment || '');
       } catch (err) {
         console.error(err);
@@ -46,50 +48,66 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
   }, [isOpen, reportId, category]);
 
   const handleAction = async (action) => {
-    const status = "Completed"
+    console.log(reportData); // For debugging purposes
     try {
-      const updateData = {
-        Status: status,
-        ApprovedBy: localStorage.getItem('userID'),
-        Comment: comment,
-        ApprovedDate: moment().format('YYYY-MM-DD HH:mm:ss')
-      };
+        // Fetch the username of the user who viewed the report
+        let reviewedByUsername = '';
+        if (reportData.ViewedBy) {
+            const userResponse = await axios.get(`http://localhost:8085/getUsername/${reportData.ViewedBy}`);
+            reviewedByUsername = userResponse.data.username || 'N/A'; // Default to 'N/A' if no username found
+        }
 
-      await axios.post(`http://localhost:8085/finalise_report/${category}/${reportId}`, updateData);
+        // Update the report status in the backend
+        const updateData = {
+            Status: 'Completed',
+            ApprovedBy: localStorage.getItem('userID'),
+            Comment: comment,
+            ApprovedDate: new Date().toLocaleString('en-US', { timeZone: 'Asia/Kuala_Lumpur' })
+        };
 
-      const emailSubject = `Update on Your Report #${reportId}`;
-      const emailBody = `
-        Hello,
+        const endpoint = `http://localhost:8085/finalise_report/${category}`;
+        await axios.post(endpoint, { reportId, updateData });
 
-        Your report with ID: ${reportId} has been ${status.toLowerCase()}. Here are the details:
+        // Email setup for notification
+        const emailSubject = `Update on Your Report #${reportData.ReportID}`;
+        const emailBody = `
+        <html>
+          <body>
+              <p style="color: #000000; font-family: Arial, sans-serif; font-size: 14px;">
+                  Hello,<br><br>
+                  Your report with ID: <strong>${reportData.ReportID}</strong> has been replied. Here are the details:<br><br>
+                  <strong>Type:</strong> ${category}<br>
+                  <strong>Name:</strong> ${reportData.Name}<br>
+                  <strong>Location:</strong> ${filterNull(reportData.Location)}<br>
+                  <strong>Reason:</strong> ${reportData.Reason}<br>
+                  <strong>Description:</strong> ${reportData.Description}<br>
+                  <strong>Status:</strong> Completed<br>
+                  <strong>Officer Comment:</strong> ${comment}<br>
+                  <strong>Reviewed By:</strong> ${reviewedByUsername}<br>
+                  <strong>Final Reviewed By:</strong> ${localStorage.getItem('username')}<br>
+                  <strong>Replied Date:</strong> ${updateData.ApprovedDate}<br><br>
+                  Thank you for your patience. If you have any further queries, please contact myhalalchecker@gmail.com<br><br>
+                  Best Regards,<br>
+                  myHalal Checker Team
+              </p>
+          </body>
+          </html>
+        `;
 
-        - Type: ${category}
-        - Name: ${reportData.Name}
-        - Location: ${filterNull(reportData.Location)}
-        - Reason: ${reportData.Reason}
-        - Description: ${reportData.Description}
-        - Status: ${status}
-        - Officer Comment: ${comment}
-        - Approved Date: ${updateData.ApprovedDate}
+        const emailEndpoint = 'http://localhost:8085/send-email';
+        await axios.post(emailEndpoint, {
+            userId: reportData.UserID,
+            subject: emailSubject,
+            html: emailBody,
+        });
 
-        Thank you for your patience and understanding. If you have further query, please contact myhalalchecker@gmail.com
-
-        Best regards,
-        myHalal Checker Team
-      `;
-
-      await axios.post('http://localhost:8085/send-email', {
-        userId: reportData.UserID,
-        subject: emailSubject,
-        text: emailBody,
-      });
-
-      onClose();
-      window.location.reload(); // Consider using React state or context for UI updates instead
+        onClose(); // Close the modal
+        window.location.reload(); // Refresh the page to update the UI
     } catch (error) {
-      console.error('Failed to update report and send notification:', error);
+        console.error('Failed to finalize the report and send notification:', error);
+        alert('Failed to update the report status.');
     }
-  };
+};
 
   if (!isOpen) return null;
 

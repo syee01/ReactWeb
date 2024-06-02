@@ -10,7 +10,7 @@ const { table } = require("console");
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 
-const sendEmail = async (email, subject, text) => {
+const sendEmail = async (email, subject, htmlContent) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -23,7 +23,7 @@ const sendEmail = async (email, subject, text) => {
     from: process.env.EMAIL_USERNAME, // Your email
     to: email, // Recipient email
     subject: subject,
-    text: text,
+    html: htmlContent,
   };
 
   try {
@@ -63,19 +63,17 @@ const getUserEmail = async (userId) => {
 };
 
 app.post('/send-email', async (req, res) => {
-  const { userId, subject, text } = req.body;
+  const { userId, subject, html } = req.body;
   try {
-    console.log(userId)
     const userEmail = await getUserEmail(userId); // Ensure getUserEmail is secure and efficient
     console.log('Sending email to:', userEmail); // Debugging
-    await sendEmail(userEmail, subject, text);
+    await sendEmail(userEmail, subject, html);
     res.send({ message: 'Email sent successfully' });
   } catch (error) {
     console.error('Failed to send email:', error);
     res.status(500).send({ message: 'Failed to send email' });
   }
 });
-
 
 const query = util.promisify(db.query).bind(db);
 app.get('/api/data', async (req, res) => {
@@ -282,10 +280,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Route to handle finalizing report
-app.post('/finalise_report/:category/:reportId', (req, res) => {
-  const { updateData } = req.body;
-  const { category, reportId } = req.params;
-  console.log(category)
+app.post('/finalise_report/:category', (req, res) => {
+  const { reportId, updateData } = req.body;
+  const { category } = req.params;
 
   let tableName = '';
   if (category === 'Restaurants') {
@@ -295,9 +292,8 @@ app.post('/finalise_report/:category/:reportId', (req, res) => {
   } else {
     return res.status(400).json({ error: 'Invalid category' });
   }
-  console.log(tableName)
 
-  const query = `UPDATE ${tableName} SET status = ? WHERE ReportID = ?`;
+  const query = `UPDATE ${tableName} SET ? WHERE ReportID = ?`;
 
   db.query(query, [updateData, reportId], (err, result) => {
     if (err) {

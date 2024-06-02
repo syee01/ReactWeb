@@ -9,7 +9,6 @@ const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
   const [error, setError] = useState('');
   const [reportImages, setReportImages] = useState([]);
   const [comment, setComment] = useState('');
-  const [isHalal, setIsHalal] = useState(null);
 
   const filterNull = (location) => {
     // Split the location into parts
@@ -54,11 +53,6 @@ const ProductReportModal = ({ isOpen, onClose, reportId, category }) => {
       }
     }
   }, [isOpen, reportId, category]);
-
-  const handleHalalStatus = () => {
-    setIsHalal(prevState => !prevState);
-  };
-
   
   const handleSubmit = async () => {
     try {

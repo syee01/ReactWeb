@@ -57,34 +57,34 @@ function Login() {
             <div className="login-box">
                 <h1 className="welcome">Welcome Back</h1>
                 <form onSubmit={handleSubmit} className="login-form">
-                    <div className="input-group">
-                        <FaEnvelope className="input-icon" />
-                        <input
-                            type="email"
-                            id="email-address"
-                            name="email"
-                            onChange={handleInput}
-                            value={values.email}
-                            className="input-field"
-                            placeholder="Email Address" />
-                        {errors.email && <p className="error">{errors.email}</p>}
-                    </div>
-                    <div className="input-group">
-                        <FaLock className="input-icon" />
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            onChange={handleInput}
-                            value={values.password}
-                            className="input-field"
-                            placeholder="Password" />
-                        {errors.password && <p className="error">{errors.password}</p>}
-                    </div>
+                <div className="input-group">
+                <FaEnvelope className="input-icon" />
+                <input
+                    type="email"
+                    id="email-address"
+                    name="email"
+                    onChange={handleInput}
+                    value={values.email}
+                    className="input-field"
+                    placeholder="Email Address" />
+                {errors.email && backendError.length === 0 && <p className="error">{errors.email}</p>}
+                </div>
+                <div className="input-group">
+                    <FaLock className="input-icon" />
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        onChange={handleInput}
+                        value={values.password}
+                        className="input-field"
+                        placeholder="Password" />
+                    {errors.password && backendError.length === 0 && <p className="error">{errors.password}</p>}
+                </div>
                     {backendError.length > 0 && <p className="error">{backendError[0]}</p>}
                     <button type="submit" className="login-btn">Login</button>
                 </form>
-                <a href="" className="forgot-password">Forgot Password?</a>
+                {/* <a href="" className="forgot-password">Forgot Password?</a> */}
             </div>
         </div>
     );

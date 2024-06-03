@@ -81,7 +81,7 @@ const EnquiryHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
         await axios.post(endpoint, { reportId, updateData });
 
         // Prepare detailed data for the email notification
-        const emailSubject = `Update on Your Enquiry #${reportData.ReportID}`;
+        const emailSubject = `Final Update on Your Enquiry #${reportData.ReportID}`;
         const emailBody = `
         <html>
           <body>

@@ -69,7 +69,7 @@ const ReportHeadOfficer = ({ isOpen, onClose, reportId, category }) => {
         await axios.post(endpoint, { reportId, updateData });
 
         // Email setup for notification
-        const emailSubject = `Update on Your Report #${reportData.ReportID}`;
+        const emailSubject = `Final Update on Your Report #${reportData.ReportID}`;
         const emailBody = `
         <html>
           <body>

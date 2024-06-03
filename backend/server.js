@@ -603,7 +603,7 @@ app.get('/enquiry', (req, res) => {
 
 // write login error 
 app.post('/login', [check('email', "Email length error").isEmail().isLength({ min: 10, max: 30 }), check('password', "password length 8-10").isLength({ min: 1, max: 10 })], (req, res) => {
-    const sql = "SELECT * FROM user WHERE email = ? AND password = ?";
+    const sql = "SELECT * FROM user WHERE email = ? AND password = ? AND role != 'user'";
     db.query(sql, [req.body.email, req.body.password], (err, data) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -1095,21 +1095,34 @@ app.get("/userProfile/:userID", (req, res) => {
 
 app.put('/updateUserProfile/:userID', (req, res) => {
   const userID = req.params.userID;
-  const fieldName = Object.keys(req.body)[0]; // assuming the object has a single key
-  const fieldValue = req.body[fieldName];
+  const updates = req.body; // this is an object containing all the updates
 
-  // Construct your SQL query to update only the specified field
-  const query = `UPDATE user SET ${fieldName} = ? WHERE UserID = ?`;
-  const values = [fieldValue, userID];
+  // Filter out keys to prevent SQL injection and ensure only valid columns are updated
+  const validFields = ['username', 'email', 'phone', 'age', 'password', 'gender', 'imageURL', 'role'];
+  const fieldsToUpdate = Object.keys(updates).filter(key => validFields.includes(key));
+
+  // Construct the SQL query dynamically
+  if (fieldsToUpdate.length === 0) {
+      res.status(400).send('No valid fields provided for update');
+      return;
+  }
+
+  const setClause = fieldsToUpdate.map(field => `${field} = ?`).join(', ');
+  const values = fieldsToUpdate.map(field => updates[field]);
+  values.push(userID); // Adding userID at the end for the WHERE clause
+
+  const query = `UPDATE user SET ${setClause} WHERE UserID = ?`;
 
   db.query(query, values, (error, results, fields) => {
       if (error) {
+          console.error("SQL Error:", error.message);
           res.status(500).send('Error updating user profile');
           return;
       }
       res.send('Profile updated successfully');
   });
 });
+
 
 app.put('/changePassword/:userID', (req, res) => {
   const userID = req.params.userID;

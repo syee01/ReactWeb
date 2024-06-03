@@ -211,6 +211,8 @@ const Dashboard = () => {
           scales: {
             y: {
               beginAtZero: true,
+              min: 0,      // Explicitly set minimum
+              max: 5,     // Explicitly set maximum
               ticks: {
                 stepSize: 1  // Ensures Y-axis values increment in steps of 1
               }
@@ -230,8 +232,11 @@ const Dashboard = () => {
           scales: {
             y: {
               beginAtZero: true,
+              min: 0,      // Explicitly set minimum
+              max: 5,     // Explicitly set maximum
+              
               ticks: {
-                stepSize: 1  // Ensures Y-axis values increment in steps of 1
+                stepSize: 1 , // Ensures Y-axis values increment in steps of 1
               }
             }
           }

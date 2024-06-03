@@ -130,8 +130,11 @@ const Profile = () => {
 
     const handleSaveChanges = async () => {
         try {
+            console.log(editedData)
             const response = await axios.put(`http://localhost:8085/updateUserProfile/${userID}`, editedData);
-            setProfileData(editedData);
+            console.log('response')
+            console.log(response)
+            setProfileData(response);
             alert('Profile updated successfully!');
         } catch (error) {
             console.error("Error updating user profile:", error);
@@ -205,8 +208,8 @@ const Profile = () => {
                 {renderField('gender', 'Gender', false)}
                 {renderField('age', 'Age', true)}
                 {renderField('phone', 'Phone Number', true)}
-            </div>            
-             <div className="save-changes">
+            </div>
+            <div className="save-changes">
                 <button className="save-changes-btn" onClick={handleSaveChanges}>Save Changes</button>
                 <button onClick={() => setIsPasswordModalOpen(true)} className="change-password-btn">Change Password</button>
             </div>
